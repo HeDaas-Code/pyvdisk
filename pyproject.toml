@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyvdisk"
+version = "0.3.0"
+description = "纯 Python 虚拟磁盘、文件系统、向量数据盘与时序日志盘"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "PyVDisk contributors" }]
+keywords = ["virtual-disk", "filesystem", "fuse", "vm", "disk-image", "vector-database", "structured-logging", "time-series"]
+dependencies = ["hnswlib>=0.8.0"]
+
+[project.optional-dependencies]
+fuse = ["fusepy"]
+dev = ["pytest"]
+
+[project.scripts]
+pyvdisk = "pyvdisk.cli:main"
+
+[tool.setuptools]
+packages = ["pyvdisk"]
