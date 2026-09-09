@@ -1,21 +1,15 @@
-# StoragePlane and ExecutionPlane contracts
+# PyVDisk 与 VScript 技术契约
 
-本文档描述当前可用于项目集成的边界。具体 Python 定义位于 `pyvdisk/contracts.py`。
+PyVDisk 与 VScript 是同一个单机/单实例项目。DataDisk 是统一容器，VScript 是工作流层。
 
-## Layer 1 — StoragePlane
+## Storage Plane
+DataDisk 包含 FS、Vector、Log、Checkpoint、Metadata 和 WAL。Vector 提供 generation/checksum/index recovery；Log 提供 sequence/cursor/ack/replay/event_id 去重；Volume 提供 mirror degraded fallback。
 
-`DataDisk` 是推荐容器，提供显式 FS、Vector、Log、Checkpoint、WAL namespace。Vector 提供 generation/checksum 基础；Log 提供 sequence、cursor、ack、replay 和 trace metadata；Volume 提供基础 mirror degraded health 与 fallback。
+## Execution Plane
+ExecutionService 支持 inline 与可选 worker。DurableQueue 支持 lease、heartbeat、retry、idempotency、dead-letter。RunStateStore 持久化状态，Audit 关联运行元数据。
 
-事务提供统一 txid、intent、prepare、commit、abort 和 WAL recovery 基础。FS、Vector、Log participant 当前是可扩展边界，不宣称完整跨 namespace ACID。
+## ACID 与 exactly-once
+单一 DataDisk 内使用统一 txid 和 begin/intent/prepare/apply/commit/abort/recovery 生命周期。内部操作通过 operation_id、结果持久化、队列去重和 event_id 去重避免重复有效效果。外部系统副作用不在范围内。
 
-## Layer 2 — ExecutionPlane
-
-`ExecutionContext` 携带 run ID、capabilities、metadata 和 deadline。`ExecutionService` 支持 inline 与可选后台 worker；`DurableQueue` 支持 claim、lease、heartbeat、retry、idempotency 和 dead-letter；`RunStateStore` 持久化运行生命周期；Audit 可关联 run/task/attempt/queue/checkpoint/capability。
-
-## 运行限制
-
-当前是单机/单实例基础设施，不提供分布式 broker、跨进程 callable/context 恢复、exactly-once、任意 Python 调用强制取消或完整跨资源 ACID。取消和 deadline 需要任务协作检查；VScript `parallel/task/await` 当前为确定性顺序执行。
-
-## 项目使用建议
-
-项目可以立即使用当前 P0 能力，边运行边补强。优先使用 `ScopedDataDisk`、可注册操作入口、幂等外部副作用、定期 checkpoint 和审计事件。
+## 永久边界
+不实现分布式调度平台、不做多租户、不做旧格式迁移。不自动恢复任意 Python 执行栈；VScript parallel/task/await 为确定性顺序语义。
