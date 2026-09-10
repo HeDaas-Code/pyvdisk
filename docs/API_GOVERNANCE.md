@@ -4,13 +4,7 @@
 
 ## 推荐入口
 
-```text
-disk.fs
-disk.vector
-disk.log
-disk.checkpoints
-disk.wal
-```
+<div align="center"><table><tr><th>DataDisk API</th><th>用途</th></tr><tr><td><code>disk.fs</code></td><td>workspace 文件</td></tr><tr><td><code>disk.vector</code></td><td>语义记忆</td></tr><tr><td><code>disk.log</code></td><td>事件轨迹</td></tr><tr><td><code>disk.checkpoints</code></td><td>进度与结果</td></tr><tr><td><code>disk.wal</code></td><td>事务恢复</td></tr></table></div>
 
 Agent 默认使用 ScopedDataDisk；普通 DataDisk 仅用于受信任管理代码。
 

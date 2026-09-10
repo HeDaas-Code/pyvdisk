@@ -76,6 +76,7 @@ pyvdisk info image.vdisk
 
 | 文档 | 内容 |
 |---|---|
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | 详细设计架构、数据流、恢复和解释器架构 |
 | [CONTRACTS.md](docs/CONTRACTS.md) | Storage/Execution/ACID/exactly-once 契约 |
 | [API_GOVERNANCE.md](docs/API_GOVERNANCE.md) | API、权限、边界与使用策略 |
 | [VSCRIPT_SPEC.md](docs/VSCRIPT_SPEC.md) | VScript 语言、标准库和安全规则 |
