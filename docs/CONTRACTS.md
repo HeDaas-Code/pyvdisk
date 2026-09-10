@@ -1,6 +1,6 @@
 # PyVDisk 与 VScript 技术契约
 
-PyVDisk 与 VScript 是同一个单机/单实例项目。DataDisk 是统一容器，VScript 是工作流层。
+PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行基础设施项目。DataDisk 是统一容器，VScript 是工作流层。
 
 ## Storage Plane
 DataDisk 包含 FS、Vector、Log、Checkpoint、Metadata 和 WAL。Vector 提供 generation/checksum/index recovery；Log 提供 sequence/cursor/ack/replay/event_id 去重；Volume 提供 mirror degraded fallback。
