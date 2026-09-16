@@ -50,7 +50,12 @@ class CheckpointStore:
             try: raw, label = self.path.read_bytes(), str(self.path)
             except FileNotFoundError: return {}
         try:
-            value = json.loads(raw.decode("utf-8"))
+            def _object_hook(value):
+                if isinstance(value, dict) and set(value.keys()) == {"__bytes__"}:
+                    import base64
+                    return base64.b64decode(value["__bytes__"])
+                return value
+            value = json.loads(raw.decode("utf-8"), object_hook=_object_hook)
             return value if isinstance(value, dict) else {}
         except (ValueError, UnicodeDecodeError, OSError) as exc:
             raise ValueError(f"invalid checkpoint: {label}") from exc
@@ -62,7 +67,17 @@ class CheckpointStore:
             self.data[key] = value
             self.save()
     def save(self):
-        raw = json.dumps(self.data, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        def _default(value):
+            if isinstance(value, (bytes, bytearray, memoryview)):
+                import base64
+                return {"__bytes__": base64.b64encode(bytes(value)).decode("ascii")}
+            raise TypeError(f"object of type {type(value).__name__} is not JSON serialisable")
+        def _object_hook(value):
+            if isinstance(value, dict) and set(value.keys()) == {"__bytes__"}:
+                import base64
+                return base64.b64decode(value["__bytes__"])
+            return value
+        raw = json.dumps(self.data, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=_default).encode("utf-8")
         if self.backend == "vfs":
             self.vfs.write_file(self.path, raw)
             return

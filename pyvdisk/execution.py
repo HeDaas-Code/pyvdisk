@@ -113,10 +113,21 @@ class ExecutionService:
         return candidate if isinstance(candidate, Policy) else self.policy
 
     @staticmethod
+    def _scoped_view(disk, context):
+        if disk is None:
+            return None
+        from .infrastructure.capabilities import scoped_data_disk
+        return scoped_data_disk(disk, context)
+
+    @staticmethod
     def _call(operation, context, disk):
         try: parameters = inspect.signature(operation).parameters
-        except (TypeError, ValueError): return operation(context, disk)
-        if any(p.kind is inspect.Parameter.VAR_POSITIONAL for p in parameters.values()) or len(parameters) >= 2: return operation(context, disk)
+        except (TypeError, ValueError):
+            view = ExecutionService._scoped_view(disk, context)
+            return operation(context, view if view is not None else disk)
+        if any(p.kind is inspect.Parameter.VAR_POSITIONAL for p in parameters.values()) or len(parameters) >= 2:
+            view = ExecutionService._scoped_view(disk, context)
+            return operation(context, view if view is not None else disk)
         if len(parameters) == 1: return operation(context)
         return operation()
 
@@ -253,7 +264,7 @@ class ExecutionService:
                 elif record.status == "failed": handle.fail(RuntimeError(record.error_ref or "execution failed"))
                 else: handle.cancel()
                 return handle
-            if record.status == "running": return RunHandle(record.run_id)
+            if record.status == "running": raise RuntimeError(f"run {record.run_id} is already running; concurrent submit is not allowed")
             state.transition(record.run_id, "running", expected_version=record.version)
         handle = RunHandle(context.run_id)
         self._execute(operation, context, handle)
