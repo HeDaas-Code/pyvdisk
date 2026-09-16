@@ -19,7 +19,8 @@ class ExecutionService:
     """Synchronous adapter joining DataDisk, VScript Runtime and contracts."""
     def __init__(self, data_disk: Optional[Any] = None, *, policy: Optional[Policy] = None,
                  runtime_factory: Callable[..., Runtime] = Runtime, queue=None,
-                 checkpoint_store=None, run_state=None, audit_sink=None):
+                 checkpoint_store=None, run_state=None, audit_sink=None,
+                 operations=None):
         """Create a synchronous execution service.
 
         Queue-driven work is explicitly opt-in and driven by run_next/poll_once
@@ -44,6 +45,12 @@ class ExecutionService:
         self._queued_handles = {}
         self._workers = []
         self._worker_stop = None
+        from .infrastructure.operations import OperationRegistry
+        self.operations = operations
+        if self.operations is None and self.queue is not None:
+            store = getattr(self.queue, "store", None)
+            if store is not None:
+                self.operations = OperationRegistry(store=store)
 
     @property
     def worker_count(self):
@@ -133,8 +140,12 @@ class ExecutionService:
         if context.expired():
             handle.fail(TimeoutError("execution deadline expired")); return
         try:
-            disk = self._disk()
-            result = self._script(operation, context, disk) if isinstance(operation, str) or hasattr(operation, "ast") else self._call(operation, context, disk) if callable(operation) else (_ for _ in ()).throw(TypeError("unsupported execution operation"))
+            from .infrastructure.operations import RegisteredCallable
+            if isinstance(operation, RegisteredCallable):
+                result = operation()
+            else:
+                disk = self._disk()
+                result = self._script(operation, context, disk) if isinstance(operation, str) or hasattr(operation, "ast") else self._call(operation, context, disk) if callable(operation) else (_ for _ in ()).throw(TypeError("unsupported execution operation"))
             handle.complete(result)
         except BaseException as exc: handle.fail(exc)
 
@@ -152,6 +163,16 @@ class ExecutionService:
         key = idempotency_key if idempotency_key is not None else context.metadata.get("idempotency_key")
         operation_id = str(context.metadata.get("operation_id") or uuid.uuid4().hex)
         context.metadata["operation_id"] = operation_id
+        if self.operations is not None:
+            from .infrastructure.operations import describe_operation, UnserializableOperation
+            try:
+                described = describe_operation(operation)
+                if described["kind"] == "callable":
+                    described["payload"]["args"] = list(context.metadata.get("args", ()) or ())
+                    described["payload"]["kwargs"] = dict(context.metadata.get("kwargs", {}) or {})
+                self.operations.save(operation_id, described["kind"], described["payload"])
+            except UnserializableOperation:
+                pass
         task = self.queue.enqueue({"operation_id": operation_id, "run_id": context.run_id}, idempotency_key=key, task_id=task_id, operation_id=operation_id)
         context.metadata.setdefault("task_id", task.id)
         context.metadata.setdefault("idempotency_key", key)
@@ -171,6 +192,19 @@ class ExecutionService:
             return None
         context = self._queued_contexts.get(task.id)
         operation = self._queued_operations.get(task.id)
+        if operation is None and self.operations is not None:
+            op_id = (task.payload or {}).get("operation_id") if isinstance(task.payload, dict) else None
+            if op_id and self.operations.has(op_id):
+                from .infrastructure.operations import OperationError
+                try:
+                    operation = self.operations.recover(op_id)
+                except OperationError:
+                    operation = None
+            if context is None and op_id:
+                from .contracts import ExecutionContext
+                context = ExecutionContext(run_id=(task.payload or {}).get("run_id") or task.id,
+                                           metadata={"operation_id": op_id, "task_id": task.id, "attempt": task.attempt})
+                context.metadata.setdefault("idempotency_key", task.idempotency_key)
         state = self._queue_state()
         run_id = context.run_id if context is not None else task.id
         if context is not None:
