@@ -272,6 +272,10 @@ class Runtime:
             try:return ops[n.op](a,b)
             except Exception as exc: raise RuntimeError(f"运算失败 {n.op}: {exc}",n.span)
         if isinstance(n,A.Member): return self.member(self.eval(n.obj,env),n.name,n.span)
+        if isinstance(n,A.OptionalMember):
+            obj=self.eval(n.obj,env)
+            if obj is None: return None
+            return self.member(obj,n.name,n.span)
         if isinstance(n,A.Index):
             try:return self.eval(n.obj,env)[self.eval(n.index,env)]
             except Exception as exc: raise RuntimeError(f"索引失败: {exc}",n.span)

@@ -24,6 +24,8 @@ class Binary(Node): left:Node=None;op:str="";right:Node=None
 @dataclass
 class Member(Node): obj:Node=None;name:str=""
 @dataclass
+class OptionalMember(Node): obj:Node=None;name:str=""
+@dataclass
 class Index(Node): obj:Node=None;index:Node=None
 @dataclass
 class Call(Node): callee:Node=None;args:list=field(default_factory=list);kwargs:dict=field(default_factory=dict)
