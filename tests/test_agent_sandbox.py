@@ -248,6 +248,48 @@ def test_stats_reports_the_tool_set_and_the_call_counts(box):
     json.dumps(stats)  # must stay JSON-serialisable for logs and dashboards
 
 
+def test_the_readme_demo_matches_the_real_api():
+    """The ten-line README loop must stay executable against the real surface.
+
+    It is the first thing an integrator copies, and it is easy to let drift: the
+    tool-call arguments live on ``call.function.arguments`` (not ``call.arguments``),
+    ``tool_calls`` is a list, and every result needs its own ``tool_call_id``.
+    """
+    import ast
+    from pathlib import Path as _Path
+
+    root = _Path(__file__).resolve().parents[1]
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    assert "### 对接 Agent 框架（10 行）" in readme, "the Demo section was renamed or removed"
+    demo = readme.split("### 对接 Agent 框架（10 行）", 1)[1].split("```python", 1)[1].split("```", 1)[0]
+    tree = ast.parse(demo)  # a syntax error here is a broken copy-paste
+
+    assigned = {target.id for node in ast.walk(tree) if isinstance(node, ast.Assign)
+                for target in node.targets if isinstance(target, ast.Name)}
+    for name in ("box", "messages", "client"):
+        assert name in assigned, f"the demo never defines {name!r}, so it cannot run as pasted"
+    assert "json" in {alias.name for node in ast.walk(tree) if isinstance(node, ast.Import)
+                      for alias in node.names}, "the demo calls json.loads without importing json"
+    assert "call.function.arguments" in demo and "call.function.name" in demo
+    assert "tool_calls" in demo and "tool_call_id" in demo
+
+
+def test_a_tool_call_shaped_like_the_readme_demo_dispatches(tmp_path):
+    """Run the demo's inner two lines against a real call object."""
+    import json as _json
+
+    with AgentSandbox.create(str(tmp_path / "demo.vdisk"), size_bytes=8 << 20) as box:
+        box.write("/a.txt", "hello")
+        function = type("Function", (), {"name": "read_file",
+                                         "arguments": _json.dumps({"path": "/a.txt"})})()
+        call = type("Call", (), {"id": "call_1", "function": function})()
+        result = box.dispatch(call.function.name, _json.loads(call.function.arguments))
+        assert result == "hello"
+        messages = [{"role": "tool", "tool_call_id": call.id, "content": result}]
+        assert messages[0]["tool_call_id"] == "call_1"
+        assert box.tools(), "box.tools() is what the demo passes as the tools= argument"
+
+
 def test_a_sandbox_closes_its_disk(box):
     box.close()
     assert box.disk.mounted is False

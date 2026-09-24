@@ -6,7 +6,7 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-PyVDisk-181717?logo=github)](https://github.com/HeDaas-Code/pyvdisk)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-444%20passed-2ea44f)](#验证)
+[![Tests](https://img.shields.io/badge/Tests-446%20passed-2ea44f)](#验证)
 
 PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行基础设施项目：DataDisk 负责统一数据与执行基础设施，VScript 负责安全工作流语言、CLI、REPL 与运行时。
 
@@ -112,19 +112,29 @@ with DataDisk.create("agent.vdisk", 32 * 1024 * 1024) as disk:
 `AgentSandbox` 把 DataDisk 包成一个"给模型用的工作区"：路径被限制在镜像内，工具调用全部落进哈希链审计流。
 
 ```python
+import json
 from pyvdisk import AgentSandbox
 
-box = AgentSandbox.create("agent.vdisk")          # 或 AgentSandbox.open(...) 续用已有镜像
+box = AgentSandbox.create("agent.vdisk")           # 或 AgentSandbox.open(...) 续用已有镜像
 client = OpenAI().chat.completions                 # 换成任意框架的客户端
+messages = [{"role": "user", "content": "把发现写进 /report.md"}]
 
-while True:                                        # 标准 agent loop
+while True:
     reply = client.create(model="gpt-4o", messages=messages, tools=box.tools())
-    call = reply.choices[0].message.tool_calls[0]  # 模型要调用的工具
-    result = box.dispatch(call.function.name, json.loads(call.function.arguments))
-    messages += [reply.choices[0].message, {"role": "tool", "tool_call_id": call.id, "content": result}]
+    message = reply.choices[0].message
+    messages.append(message)                       # 不追加则模型看不到自己请求过什么
+    if not message.tool_calls:
+        break                                      # 模型不再调用工具，结束
+    for call in message.tool_calls:                # 一次可能请求多个工具
+        result = box.dispatch(call.function.name, json.loads(call.function.arguments))
+        messages.append({"role": "tool", "tool_call_id": call.id, "content": result})
 ```
 
-`box.tools()` 支持 `openai` / `anthropic` / `mcp` 三种 schema；`box.dispatch()` 永远返回字符串（失败也是字符串），可以直接塞回消息列表。可运行版本见 [examples/agent_tools.py](examples/agent_tools.py)（内置脚本化"模型"，无需 API key）。
+`box.tools()` 支持 `openai` / `anthropic` / `mcp` 三种 schema；`box.dispatch()` 永远返回字符串（失败也是字符串），可以直接塞回消息列表，**被拒绝的调用也一样**——模型看到的是"越权被拒"这条结果，而不是整个 agent loop 崩掉。
+
+三个容易踩的点：`json.loads` 的是 `call.function.arguments`（不是 `call.arguments`）；`tool_calls` 是列表，要逐个 `dispatch` 并用各自的 `call.id` 一一对应地回填 `tool_call_id`；每轮都要把 assistant 消息本身也追加进 `messages`。
+
+可运行版本见 [examples/agent_tools.py](examples/agent_tools.py)（内置脚本化"模型"，无需 API key 与网络，因此也能进 CI）。
 
 ## VScript
 
@@ -177,6 +187,6 @@ pyvdisk info image.vdisk
 .venv/bin/python -m pytest -q
 ```
 
-当前回归：444 passed（本地 3.12；CI 覆盖 3.9 / 3.10 / 3.11 / 3.12 四个版本的同一套用例）
+当前回归：446 passed（本地 3.12；CI 覆盖 3.9 / 3.10 / 3.11 / 3.12 四个版本的同一套用例）
 
-不装 hnswlib 时同一套用例为 440 passed / 4 skipped —— 核心路径不再依赖任何第三方包，跳过的是"两种索引后端结果一致"这类对照用例。
+不装 hnswlib 时同一套用例为 442 passed / 4 skipped —— 核心路径不再依赖任何第三方包，跳过的是"两种索引后端结果一致"这类对照用例。

@@ -26,7 +26,8 @@ if importlib.util.find_spec("pyvdisk") is None:
 
 from pyvdisk import AgentSandbox  # noqa: E402 - the path fix has to run first
 
-#: What a model would have produced.  Each entry is one assistant turn.
+#: What a model would have produced. Each entry is one assistant turn; an entry
+#: with several calls reproduces a model asking for more than one tool at once.
 SCRIPTED_TURNS = [
     {"tool": "list_files", "arguments": {"path": "/"}},
     {"tool": "write_file", "arguments": {
@@ -41,14 +42,43 @@ SCRIPTED_TURNS = [
     )}},
     {"tool": "read_file", "arguments": {"path": "/report.md"}},
     {"tool": "read_file", "arguments": {"path": "/etc/passwd"}},   # refused
-    {"tool": "read_file", "arguments": {"path": "/from-script.txt"}},
+    # Two tools in one turn: the loop must answer each with its own call id.
+    {"calls": [
+        {"tool": "read_file", "arguments": {"path": "/from-script.txt"}},
+        {"tool": "list_files", "arguments": {"path": "/", "recursive": True}},
+    ]},
 ]
 
 
+class _Message:
+    """The assistant message shape the OpenAI client returns."""
+
+    def __init__(self, calls):
+        self.tool_calls = [_ToolCall(f"call_{index}", tool, arguments)
+                           for index, (tool, arguments) in enumerate(calls)]
+
+
+class _ToolCall:
+    def __init__(self, call_id, name, arguments):
+        self.id = call_id
+        self.function = type("Function", (), {"name": name,
+                                              "arguments": json.dumps(arguments, ensure_ascii=False)})()
+
+
 def scripted_model(messages):
-    """Stand-in for a chat completion call: returns the next tool call, or None."""
-    asked = sum(1 for message in messages if message["role"] == "tool")
-    return SCRIPTED_TURNS[asked] if asked < len(SCRIPTED_TURNS) else None
+    """Stand-in for one chat completion: returns the next assistant message.
+
+    Returns an empty-tool_calls message once the script runs out, which is how a
+    real model signals "I am done" -- the loop below treats it identically.
+    """
+    # Assistant turns are objects, tool results are plain dicts; count the latter.
+    asked = sum(1 for message in messages
+                if isinstance(message, dict) and message.get("role") == "tool")
+    turn = SCRIPTED_TURNS[asked] if asked < len(SCRIPTED_TURNS) else None
+    if turn is None:
+        return _Message([])
+    calls = [(tool["tool"], tool["arguments"]) for tool in turn.get("calls", [turn])]
+    return _Message(calls)
 
 
 def main(argv):
@@ -60,14 +90,21 @@ def main(argv):
         print("json schema of one tool:", json.dumps(box.tools()[0], ensure_ascii=False)[:120], "...\n")
 
         messages = [{"role": "user", "content": "Summarise the workspace and write /report.md"}]
-        for turn in range(1, 12):
-            call = scripted_model(messages)
-            if call is None:
+        step = 0
+        while step < 12:
+            # Identical to the README demo: ask, append the assistant message, run
+            # every call it asked for, feed each result back by its own call id.
+            message = scripted_model(messages)
+            messages.append(message)
+            if not message.tool_calls:
                 break
-            result = box.dispatch(call["tool"], call["arguments"])
-            messages.append({"role": "tool", "name": call["tool"], "content": result})
-            print(f"[{turn}] {call['tool']}({json.dumps(call['arguments'], ensure_ascii=False)[:60]})")
-            print("     ->", result.replace("\n", "\n        "))
+            for call in message.tool_calls:
+                step += 1
+                arguments = json.loads(call.function.arguments)
+                result = box.dispatch(call.function.name, arguments)
+                messages.append({"role": "tool", "tool_call_id": call.id, "content": result})
+                print(f"[{step}] {call.function.name}({call.function.arguments[:60]})")
+                print("     ->", result.replace("\n", "\n        "))
 
         print("\nfinal /report.md:", repr(box.read_text("/report.md")))
         report = box.verify_audit()
