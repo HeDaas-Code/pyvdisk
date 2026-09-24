@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.wal",
+  "updated_at": "2026-09-23T07:24:03.371Z",
+  "reading": {
+    "zh": "journal 是 VFS 背衬的元数据日志，entries 是其事务动词与恢复重放，undo 是记录旧文件内容的宿主文件系统变体。",
+    "en": "journal is the VFS-backed metadata log, entries are its transaction verbs and recovery replay, and undo is the host-filesystem variant that records previous file bodies."
+  },
+  "order": [
+    "pyvdisk.storage.wal.journal",
+    "pyvdisk.storage.wal.entries",
+    "pyvdisk.storage.wal.undo"
+  ]
+}

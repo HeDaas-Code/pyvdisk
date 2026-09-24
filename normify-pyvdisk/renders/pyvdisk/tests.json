@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.tests",
+  "updated_at": "2026-09-23T07:24:46.055Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "按所验证的子系统分组：夹具与文件系统持久性、事务与崩溃矩阵、执行平面、队列与精确一次保证、VScript 语言、治理与契约，最后是日志盘、CLI 与打包检查。",
+    "en": "Grouped by the subsystem each module validates: fixtures and filesystem durability, transactions and crash matrices, the execution plane, queue and exactly-once guarantees, the VScript language, governance and contracts, and finally log-disk, CLI and packaging checks."
+  },
+  "order": [
+    "pyvdisk.tests.fixtures",
+    "pyvdisk.tests.vdisk",
+    "pyvdisk.tests.atomic-save",
+    "pyvdisk.tests.submit-conflict",
+    "pyvdisk.tests.wal-recovery",
+    "pyvdisk.tests.tx-rollback",
+    "pyvdisk.tests.tx-idempotency",
+    "pyvdisk.tests.crash-matrix",
+    "pyvdisk.tests.checkpoint",
+    "pyvdisk.tests.execution",
+    "pyvdisk.tests.execution-queue",
+    "pyvdisk.tests.cancellation",
+    "pyvdisk.tests.e2e",
+    "pyvdisk.tests.queue",
+    "pyvdisk.tests.queue-backoff",
+    "pyvdisk.tests.queue-crossprocess",
+    "pyvdisk.tests.exactly-once-internal",
+    "pyvdisk.tests.exactly-once-operation",
+    "pyvdisk.tests.vscript",
+    "pyvdisk.tests.vscript-audit",
+    "pyvdisk.tests.vscript-host",
+    "pyvdisk.tests.vscript-optional",
+    "pyvdisk.tests.governance",
+    "pyvdisk.tests.api-governance",
+    "pyvdisk.tests.contracts",
+    "pyvdisk.tests.logdisk-compact",
+    "pyvdisk.tests.logdisk-retention",
+    "pyvdisk.tests.agentic-cli",
+    "pyvdisk.tests.packaging"
+  ],
+  "groups": [
+    {
+      "id": "fs",
+      "title": {
+        "zh": "文件系统与持久性",
+        "en": "Filesystem and Durability"
+      },
+      "children": [
+        "pyvdisk.tests.fixtures",
+        "pyvdisk.tests.vdisk",
+        "pyvdisk.tests.atomic-save",
+        "pyvdisk.tests.submit-conflict",
+        "pyvdisk.tests.wal-recovery"
+      ]
+    },
+    {
+      "id": "tx",
+      "title": {
+        "zh": "事务与崩溃",
+        "en": "Transaction and Crash"
+      },
+      "children": [
+        "pyvdisk.tests.tx-rollback",
+        "pyvdisk.tests.tx-idempotency",
+        "pyvdisk.tests.crash-matrix",
+        "pyvdisk.tests.checkpoint"
+      ]
+    },
+    {
+      "id": "exec",
+      "title": {
+        "zh": "执行平面",
+        "en": "Execution Plane"
+      },
+      "children": [
+        "pyvdisk.tests.execution",
+        "pyvdisk.tests.execution-queue",
+        "pyvdisk.tests.cancellation",
+        "pyvdisk.tests.e2e"
+      ]
+    },
+    {
+      "id": "queue",
+      "title": {
+        "zh": "队列与精确一次",
+        "en": "Queue and Exactly-Once"
+      },
+      "children": [
+        "pyvdisk.tests.queue",
+        "pyvdisk.tests.queue-backoff",
+        "pyvdisk.tests.queue-crossprocess",
+        "pyvdisk.tests.exactly-once-internal",
+        "pyvdisk.tests.exactly-once-operation"
+      ]
+    },
+    {
+      "id": "vscript",
+      "title": {
+        "zh": "VScript",
+        "en": "VScript"
+      },
+      "children": [
+        "pyvdisk.tests.vscript",
+        "pyvdisk.tests.vscript-audit",
+        "pyvdisk.tests.vscript-host",
+        "pyvdisk.tests.vscript-optional"
+      ]
+    },
+    {
+      "id": "gov",
+      "title": {
+        "zh": "治理与契约",
+        "en": "Governance and Contracts"
+      },
+      "children": [
+        "pyvdisk.tests.governance",
+        "pyvdisk.tests.api-governance",
+        "pyvdisk.tests.contracts"
+      ]
+    },
+    {
+      "id": "misc",
+      "title": {
+        "zh": "日志盘、CLI 与打包",
+        "en": "Log Disk, CLI and Packaging"
+      },
+      "children": [
+        "pyvdisk.tests.logdisk-compact",
+        "pyvdisk.tests.logdisk-retention",
+        "pyvdisk.tests.agentic-cli",
+        "pyvdisk.tests.packaging"
+      ]
+    }
+  ]
+}

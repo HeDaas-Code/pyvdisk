@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "ok": true,
+  "project": "normify-pyvdisk",
+  "compiled_at": "2026-09-23T07:27:10.642Z",
+  "stats": {
+    "tree_count": 1,
+    "module_count": 262,
+    "leaf_count": 224,
+    "api_count": 761,
+    "dep_count": 116,
+    "cross_tree_dep_count": 0,
+    "max_depth": 4,
+    "layout_count": 38,
+    "planned_count": 0,
+    "deprecated_count": 0,
+    "policy_rule_count": 2,
+    "change_count": 0,
+    "open_change_count": 0
+  },
+  "warnings": {
+    "structure/leaf-too-coarse": 1,
+    "evidence/root-no-source": 1
+  },
+  "artifacts": {
+    "tree.json": {
+      "sha256": "dab5de978132b99194b441fc7752b8fcf50438c3b947f661590321a9dd9e9b94",
+      "bytes": 728917
+    },
+    "outline.md": {
+      "sha256": "3e8de996780262f75deb60ec62b24ee4de337926106f9b4ad589b35403a8651b",
+      "bytes": 49276
+    },
+    "api-index.json": {
+      "sha256": "787a820eada9582e389397e2dfa15f4c3678d47d7cad65e00418ef8ae355c2aa",
+      "bytes": 57517
+    },
+    "receipt.json": {
+      "sha256": "004afbfd298f0bc95f501cde9a6a298b3fb7e9e3a4c5b8c4a3f831fa10b3df08",
+      "bytes": 963
+    }
+  }
+}

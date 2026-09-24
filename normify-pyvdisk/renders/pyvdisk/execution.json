@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.execution",
+  "updated_at": "2026-09-23T07:24:03.994Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "先是持久状态：任务队列、带版本的运行记录，以及含可调用对象描述的操作注册表；service 拥有 worker 并向这三者分发执行。",
+    "en": "Durable state first: the task queue, the versioned run records and the operation registry with its callable descriptions; the service then owns the workers and dispatches into all three."
+  },
+  "order": [
+    "pyvdisk.execution.queue",
+    "pyvdisk.execution.runstate",
+    "pyvdisk.execution.operations",
+    "pyvdisk.execution.service"
+  ],
+  "groups": [
+    {
+      "id": "durable",
+      "title": {
+        "zh": "持久状态",
+        "en": "Durable State"
+      },
+      "children": [
+        "pyvdisk.execution.queue",
+        "pyvdisk.execution.runstate",
+        "pyvdisk.execution.operations"
+      ]
+    },
+    {
+      "id": "svc",
+      "title": {
+        "zh": "执行服务",
+        "en": "Execution Service"
+      },
+      "children": [
+        "pyvdisk.execution.service"
+      ]
+    }
+  ]
+}

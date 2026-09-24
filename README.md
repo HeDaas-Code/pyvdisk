@@ -18,6 +18,66 @@ PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行
 
 <div align="center"><table><tr><th colspan="3">Agent / 应用</th></tr><tr><td colspan="3">VScript · Python API · CLI · REPL · HostProxy</td></tr><tr><th>Execution</th><th>Capability</th><th>Storage</th></tr><tr><td>ExecutionService<br>DurableQueue<br>worker · lease · retry · DLQ<br>RunState · Audit</td><td>ScopedDataDisk<br>FS / Vector / Log / Checkpoint<br>逐操作权限</td><td>DataDisk<br>单一 .vdisk<br>WAL · transaction · recovery</td></tr><tr><th>FS</th><th>Vector</th><th>Log</th></tr><tr><td>workspace</td><td>HNSW memory<br>generation · checksum</td><td>trace<br>sequence · replay · ack</td></tr><tr><th colspan="3">VirtualDisk · Volume · lock · fsync · mirror degraded fallback</th></tr></table></div>
 
+## 架构图谱
+
+**▶ [打开可交互架构图谱](https://htmlpreview.github.io/?https://github.com/HeDaas-Code/pyvdisk/blob/master/normify-pyvdisk/normify.html)** — 点击模块逐层下钻、悬停查看中英双语介绍、`?lang=en` 切换英文、`#module=<id>` 深链直达具体模块。
+
+> GitHub 会过滤 README 中的 `<script>` / `<iframe>`，自包含的交互页无法内联渲染，因此上传的是**一键运行**链接：由 htmlpreview 直接执行仓库内 `normify-pyvdisk/normify.html`（单文件、无外部依赖、无网络请求）。下面的 Mermaid 图则在 GitHub 上原生渲染。
+
+```mermaid
+graph TD
+  R["pyvdisk · 262 模块 / 761 API / 116 依赖箭头"]
+  R --> pyvdisk_storage["storage · 14"]
+  R --> pyvdisk_execution["execution · 4"]
+  R --> pyvdisk_governance["governance · 4"]
+  R --> pyvdisk_vscript["vscript · 10"]
+  R --> pyvdisk_cli["cli · 14"]
+  R --> pyvdisk_contracts["contracts · 7"]
+  R --> pyvdisk_api["api"]
+  R --> pyvdisk_compat["compat · 2"]
+  R --> pyvdisk_tests["tests · 29"]
+  R --> pyvdisk_docs["docs · 5"]
+  R --> pyvdisk_delivery["delivery · 3"]
+```
+
+存储与执行平面展开：
+
+```mermaid
+graph TD
+  S["pyvdisk.storage"] --> S_datadisk["datadisk · 7（事务容器）"]
+  S --> S_fs["fs · 23（inode/目录/块分配）"]
+  S --> S_vfs["vfs · 16（路径式门面）"]
+  S --> S_volume["volume · 8（卷与镜像冗余）"]
+  S --> S_log["log · 6"]
+  S --> S_driver["driver · 5"]
+  S --> S_logging["logging · 5"]
+  S --> S_vector["vector · 4"]
+  S --> S_identity["identity · 4"]
+  S --> S_fuse["fuse · 4"]
+  S --> S_block["block · 3"]
+  S --> S_checkpoint["checkpoint · 3"]
+  S --> S_wal["wal · 3"]
+  S --> S_rwlock["rwlock · 2"]
+  E["pyvdisk.execution"] --> E_operations["operations · 6"]
+  E --> E_queue["queue · 5"]
+  E --> E_service["service · 4"]
+  E --> E_runstate["runstate · 2"]
+  G["pyvdisk.governance"] --> G_namespace["namespace（能力门禁）"]
+  G --> G_files["files"]
+  G --> G_data["data"]
+  G --> G_scoped["scoped（ScopedDataDisk）"]
+```
+
+| 产物 | 说明 |
+|---|---|
+| [`normify-pyvdisk/normify.html`](normify-pyvdisk/normify.html) | 单文件可交互图谱（262 模块 / 761 API / 116 依赖箭头） |
+| [`normify-pyvdisk/outline.md`](normify-pyvdisk/outline.md) | 缩进式模块大纲，适合逐层通读 |
+| [`normify-pyvdisk/api-index.json`](normify-pyvdisk/api-index.json) | 全量 API 索引 |
+| [`normify-pyvdisk/tree.json`](normify-pyvdisk/tree.json) | 编译产物：模块、每层布局、依赖边、内容指纹 |
+| [`normify-pyvdisk/modules/`](normify-pyvdisk/modules) | 262 个模块 Markdown，frontmatter 为机器可读契约（含源码路径与行号证据） |
+
+图谱由 Normify 从仓库源码生成，每个叶子模块都带**仓库内真实文件路径 + 行号区间**的 `source` 证据与 SHA-256 指纹，冻结于 commit `6d203c0`；`normify_validate` 结果为 0 error。
+
 ## 项目定位
 
 单机、单实例 Agentic 数据与执行基础设施。一个 DataDisk 承载 workspace、semantic memory、event trace、Checkpoint、Metadata、WAL 和运行状态。可以直接用于项目，并按真实负载持续增强。

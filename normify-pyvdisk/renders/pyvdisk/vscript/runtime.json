@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.vscript.runtime",
+  "updated_at": "2026-09-23T07:25:10.297Z",
+  "reading": {
+    "zh": "先是作用域与控制流，再是可调用对象与任务，随后是解释器核心及其两张分发表（语句与表达式）、模块加载，最后是带撤销日志的脚本事务。",
+    "en": "Scopes and control flow, then callables and tasks, then the interpreter core and its two dispatch tables (statements and expressions), module loading, and finally script transactions with their undo journal."
+  },
+  "order": [
+    "pyvdisk.vscript.runtime.env",
+    "pyvdisk.vscript.runtime.callables",
+    "pyvdisk.vscript.runtime.core",
+    "pyvdisk.vscript.runtime.statements",
+    "pyvdisk.vscript.runtime.expressions",
+    "pyvdisk.vscript.runtime.modules",
+    "pyvdisk.vscript.runtime.tx"
+  ]
+}

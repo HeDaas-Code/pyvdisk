@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.vscript",
+  "updated_at": "2026-09-23T07:24:46.672Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "跟随一个脚本穿过系统：前端完成词法与语法分析，策略与挂载/宿主层决定它能触及什么，标准库与运行时执行它，审计记录结果，触发器与 cron 安排后续运行，CLI 是用户的启动方式。",
+    "en": "Follow a script through the system: the front end lexes and parses, the policy and mount/host layers decide what it may touch, the stdlib and runtime execute it, audit records the outcome, triggers and cron schedule further runs, and the CLI is how a user starts one."
+  },
+  "order": [
+    "pyvdisk.vscript.frontend",
+    "pyvdisk.vscript.policy",
+    "pyvdisk.vscript.mounts",
+    "pyvdisk.vscript.host",
+    "pyvdisk.vscript.stdlib",
+    "pyvdisk.vscript.runtime",
+    "pyvdisk.vscript.audit",
+    "pyvdisk.vscript.triggers",
+    "pyvdisk.vscript.cron",
+    "pyvdisk.vscript.cli"
+  ],
+  "groups": [
+    {
+      "id": "frontend",
+      "title": {
+        "zh": "语言前端",
+        "en": "Language Front End"
+      },
+      "children": [
+        "pyvdisk.vscript.frontend"
+      ]
+    },
+    {
+      "id": "security",
+      "title": {
+        "zh": "沙箱与能力",
+        "en": "Sandbox and Capabilities"
+      },
+      "children": [
+        "pyvdisk.vscript.policy",
+        "pyvdisk.vscript.mounts",
+        "pyvdisk.vscript.host"
+      ]
+    },
+    {
+      "id": "runtime",
+      "title": {
+        "zh": "运行时与审计",
+        "en": "Runtime and Audit"
+      },
+      "children": [
+        "pyvdisk.vscript.stdlib",
+        "pyvdisk.vscript.runtime",
+        "pyvdisk.vscript.audit"
+      ]
+    },
+    {
+      "id": "events",
+      "title": {
+        "zh": "触发器与调度",
+        "en": "Triggers and Scheduling"
+      },
+      "children": [
+        "pyvdisk.vscript.triggers",
+        "pyvdisk.vscript.cron"
+      ]
+    },
+    {
+      "id": "entry",
+      "title": {
+        "zh": "命令行",
+        "en": "CLI"
+      },
+      "children": [
+        "pyvdisk.vscript.cli"
+      ]
+    }
+  ]
+}

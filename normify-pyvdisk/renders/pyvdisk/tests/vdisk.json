@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.tests.vdisk",
+  "updated_at": "2026-09-23T07:24:46.362Z",
+  "max_columns": 4,
+  "reading": {
+    "zh": "这份 1650 行的存储测试模块按类顺序阅读：基础路径与大文件、命名与 IO、链接与属性、维护、裸设备访问、空间耗尽、四组卷模式、身份、磁盘管理器、并发、权限、向量盘、日志盘，最后是 CLI 契约。",
+    "en": "The single 1650-line storage test module, read in class order: basic paths and large files, naming and IO, links and attributes, maintenance, raw device access, space exhaustion, the four volume-mode groups, identity, the disk manager, concurrency, permissions, vector disk, log disk and finally the CLI contract."
+  },
+  "order": [
+    "pyvdisk.tests.vdisk.base",
+    "pyvdisk.tests.vdisk.large-files",
+    "pyvdisk.tests.vdisk.names",
+    "pyvdisk.tests.vdisk.io",
+    "pyvdisk.tests.vdisk.links",
+    "pyvdisk.tests.vdisk.maintenance",
+    "pyvdisk.tests.vdisk.raw-fs",
+    "pyvdisk.tests.vdisk.exhaustion",
+    "pyvdisk.tests.vdisk.volume",
+    "pyvdisk.tests.vdisk.volume-mirror",
+    "pyvdisk.tests.vdisk.volume-meta",
+    "pyvdisk.tests.vdisk.volume-detect",
+    "pyvdisk.tests.vdisk.identity",
+    "pyvdisk.tests.vdisk.disk-manager",
+    "pyvdisk.tests.vdisk.locking",
+    "pyvdisk.tests.vdisk.permissions",
+    "pyvdisk.tests.vdisk.vector",
+    "pyvdisk.tests.vdisk.log",
+    "pyvdisk.tests.vdisk.cli"
+  ]
+}

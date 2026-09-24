@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage",
+  "updated_at": "2026-09-23T07:23:36.967Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "自下而上：block 是最底的块设备抽象，identity 给它贴身份，fs 在其上实现 inode/目录/块分配，vfs 提供路径式门面，rwlock 负责并发；volume 把多块盘组合成带冗余的卷；vector/log/logging 是块设备上的数据服务；datadisk+wal+checkpoint 组成事务性容器；driver 与 fuse 是挂载与宿主接入。",
+    "en": "Bottom-up: block is the raw device abstraction, identity labels it, fs implements inodes/directories/block allocation on top, vfs exposes a path-based facade and rwlock handles concurrency; volume combines disks into redundant volumes; vector/log/logging are data services over block devices; datadisk+wal+checkpoint form the transactional container; driver and fuse attach it to hosts."
+  },
+  "order": [
+    "pyvdisk.storage.fs",
+    "pyvdisk.storage.vfs",
+    "pyvdisk.storage.block",
+    "pyvdisk.storage.rwlock",
+    "pyvdisk.storage.identity",
+    "pyvdisk.storage.volume",
+    "pyvdisk.storage.vector",
+    "pyvdisk.storage.log",
+    "pyvdisk.storage.logging",
+    "pyvdisk.storage.datadisk",
+    "pyvdisk.storage.wal",
+    "pyvdisk.storage.checkpoint",
+    "pyvdisk.storage.driver",
+    "pyvdisk.storage.fuse"
+  ],
+  "groups": [
+    {
+      "id": "corefs",
+      "title": {
+        "zh": "文件系统与块层",
+        "en": "Filesystem and Block Layer"
+      },
+      "children": [
+        "pyvdisk.storage.fs",
+        "pyvdisk.storage.vfs",
+        "pyvdisk.storage.block",
+        "pyvdisk.storage.rwlock",
+        "pyvdisk.storage.identity"
+      ]
+    },
+    {
+      "id": "volumes",
+      "title": {
+        "zh": "卷与冗余",
+        "en": "Volumes and Redundancy"
+      },
+      "children": [
+        "pyvdisk.storage.volume"
+      ]
+    },
+    {
+      "id": "services",
+      "title": {
+        "zh": "数据服务",
+        "en": "Data Services"
+      },
+      "children": [
+        "pyvdisk.storage.vector",
+        "pyvdisk.storage.log",
+        "pyvdisk.storage.logging"
+      ]
+    },
+    {
+      "id": "containers",
+      "title": {
+        "zh": "容器与持久化",
+        "en": "Container and Durability"
+      },
+      "children": [
+        "pyvdisk.storage.datadisk",
+        "pyvdisk.storage.wal",
+        "pyvdisk.storage.checkpoint"
+      ]
+    },
+    {
+      "id": "access",
+      "title": {
+        "zh": "访问入口",
+        "en": "Access Entry Points"
+      },
+      "children": [
+        "pyvdisk.storage.driver",
+        "pyvdisk.storage.fuse"
+      ]
+    }
+  ]
+}

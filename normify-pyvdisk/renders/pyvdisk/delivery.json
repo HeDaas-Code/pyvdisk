@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.delivery",
+  "updated_at": "2026-09-23T07:24:04.294Z",
+  "reading": {
+    "zh": "先是打包元数据（构建与安装什么），再是守门的 CI 工作流与强制风格的 lint 配置。",
+    "en": "Packaging metadata first (what gets built and installed), then the CI workflow that gates merges and the lint configuration enforcing style."
+  },
+  "order": [
+    "pyvdisk.delivery.packaging",
+    "pyvdisk.delivery.ci",
+    "pyvdisk.delivery.lint"
+  ]
+}

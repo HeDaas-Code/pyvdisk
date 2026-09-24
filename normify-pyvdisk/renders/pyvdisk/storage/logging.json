@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.logging",
+  "updated_at": "2026-09-23T07:24:02.119Z",
+  "reading": {
+    "zh": "先是事件记录，再是持久化它的 sink 与发出事件的 logger，之后是标准库 logging 桥接与上下文传递辅助。",
+    "en": "Event records first, then the sinks that persist them and the logger that emits, then the stdlib-logging bridge and the context propagation helpers."
+  },
+  "order": [
+    "pyvdisk.storage.logging.events",
+    "pyvdisk.storage.logging.sinks",
+    "pyvdisk.storage.logging.logger",
+    "pyvdisk.storage.logging.bridge",
+    "pyvdisk.storage.logging.context"
+  ]
+}

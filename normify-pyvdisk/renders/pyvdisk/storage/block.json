@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.block",
+  "updated_at": "2026-09-23T07:23:37.893Z",
+  "reading": {
+    "zh": "io 是块级读写原语，image 负责镜像文件的打开与几何，access 是上层看到的设备接口。",
+    "en": "io holds the raw block read/write primitives, image handles image files and geometry, and access is the device interface seen by upper layers."
+  },
+  "order": [
+    "pyvdisk.storage.block.io",
+    "pyvdisk.storage.block.image",
+    "pyvdisk.storage.block.access"
+  ]
+}

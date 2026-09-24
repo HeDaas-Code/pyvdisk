@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.vscript.audit",
+  "updated_at": "2026-09-23T07:25:08.516Z",
+  "reading": {
+    "zh": "先是脚本与策略的内容哈希，再是由它们构成的记录形态、持久化记录的 sink，以及填充记录的 run id 与计时辅助。",
+    "en": "Content hashes of script and policy, then the record shape built from them, the sinks that persist records, and the run-id and timing helpers that fill them in."
+  },
+  "order": [
+    "pyvdisk.vscript.audit.hashing",
+    "pyvdisk.vscript.audit.record",
+    "pyvdisk.vscript.audit.sinks",
+    "pyvdisk.vscript.audit.clock"
+  ]
+}

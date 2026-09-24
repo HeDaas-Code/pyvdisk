@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.volume",
+  "updated_at": "2026-09-23T07:24:03.065Z",
+  "reading": {
+    "zh": "先是卷元数据与其模型，再是打开与创建，随后是把逻辑块映射到成员盘的 layout、使用它的块/字节 IO，最后是镜像修复与重同步。",
+    "en": "Volume metadata and its model, then open and create, then the layout that maps logical blocks onto members, the block and byte IO that use it, and finally mirror repair and resync."
+  },
+  "order": [
+    "pyvdisk.storage.volume.meta",
+    "pyvdisk.storage.volume.model",
+    "pyvdisk.storage.volume.open",
+    "pyvdisk.storage.volume.create",
+    "pyvdisk.storage.volume.layout",
+    "pyvdisk.storage.volume.blocks",
+    "pyvdisk.storage.volume.bytes",
+    "pyvdisk.storage.volume.repair"
+  ]
+}

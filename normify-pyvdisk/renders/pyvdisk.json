@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk",
+  "updated_at": "2026-09-23T07:23:36.674Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "从底向上读：storage 是块设备、文件系统、容器与数据服务；execution 在其上提供执行平面；governance 是能力门禁；vscript 是可执行脚本语言；cli 是用户入口；contracts 是被各方实现的抽象契约；api/compat 是导出面；tests/docs/delivery 是保障与交付。",
+    "en": "Read bottom-up: storage holds block devices, filesystems, containers and data services; execution layers the execution plane on top; governance is the capability gate; vscript is the executable script language; cli is the user entry; contracts are the abstractions others implement; api/compat are the exported surface; tests/docs/delivery provide assurance."
+  },
+  "order": [
+    "pyvdisk.storage",
+    "pyvdisk.execution",
+    "pyvdisk.governance",
+    "pyvdisk.vscript",
+    "pyvdisk.cli",
+    "pyvdisk.contracts",
+    "pyvdisk.api",
+    "pyvdisk.compat",
+    "pyvdisk.tests",
+    "pyvdisk.docs",
+    "pyvdisk.delivery"
+  ],
+  "groups": [
+    {
+      "id": "engine",
+      "title": {
+        "zh": "存储与执行引擎",
+        "en": "Storage and Execution Engine"
+      },
+      "children": [
+        "pyvdisk.storage",
+        "pyvdisk.execution",
+        "pyvdisk.governance",
+        "pyvdisk.contracts"
+      ]
+    },
+    {
+      "id": "language",
+      "title": {
+        "zh": "脚本语言与命令行",
+        "en": "Script Language and CLI"
+      },
+      "children": [
+        "pyvdisk.vscript",
+        "pyvdisk.cli"
+      ]
+    },
+    {
+      "id": "surface",
+      "title": {
+        "zh": "对外接口",
+        "en": "Public Surface"
+      },
+      "children": [
+        "pyvdisk.api",
+        "pyvdisk.compat"
+      ]
+    },
+    {
+      "id": "meta",
+      "title": {
+        "zh": "文档、测试与交付",
+        "en": "Docs, Tests and Delivery"
+      },
+      "children": [
+        "pyvdisk.tests",
+        "pyvdisk.docs",
+        "pyvdisk.delivery"
+      ]
+    }
+  ]
+}

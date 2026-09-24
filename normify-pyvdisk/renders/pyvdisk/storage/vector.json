@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.vector",
+  "updated_at": "2026-09-23T07:24:02.752Z",
+  "reading": {
+    "zh": "先挂载向量盘、管理集合，再写入与读取记录，最后在索引上做相似度检索。",
+    "en": "Mount the vector disk, manage collections, write and read records, then run similarity search over the built index."
+  },
+  "order": [
+    "pyvdisk.storage.vector.open",
+    "pyvdisk.storage.vector.collections",
+    "pyvdisk.storage.vector.records",
+    "pyvdisk.storage.vector.search"
+  ]
+}
