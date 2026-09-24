@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "2026-09-24-readme-agent-demo-fix",
+  "title": {
+    "en": "Fix the README agent demo",
+    "zh": "修正 README 的 Agent 对接 Demo"
+  },
+  "status": "verified",
+  "intent": {
+    "en": "The ten-line README agent demo had three defects that break a copy-paste (undefined names, wrong tool-call attribute, only the first of several tool calls handled). Sync the structure DB after correcting it and adding guards.",
+    "zh": "README 的 10 行 Agent 对接 Demo 有三处会让直接复制的人卡住的缺陷（名字未定义、工具调用属性取错、一轮多调用只处理第一个）。修正并补上守卫后同步结构库。"
+  },
+  "modules": {
+    "create": [],
+    "modify": [
+      "pyvdisk.docs.readme",
+      "pyvdisk.docs",
+      "pyvdisk.examples.agent-tools",
+      "pyvdisk.examples",
+      "pyvdisk.tests.agent-sandbox"
+    ]
+  },
+  "acceptance": [
+    "README 的 Agent 对接 Demo 与 examples/agent_tools.py 的循环形状一致且可直接运行",
+    "新增守卫测试（ast 解析 README 代码块 + 按 Demo 形状真实 dispatch）已覆盖该承诺",
+    "受影响模块（docs.readme / examples / tests.agent-sandbox / tests / docs）指纹与介绍与代码一致",
+    "normify_validate 0 error"
+  ],
+  "note": "修正 README Agent Demo 并新增防漂移守卫；docs.readme / docs / examples.agent-tools / tests.agent-sandbox / tests 已同步指纹与介绍。",
+  "revision": {
+    "before": null,
+    "after": "f163400c098f68cbdfb0393a9bf488037d012aaf"
+  },
+  "created_at": "2026-09-24T11:48:12.396Z",
+  "updated_at": "2026-09-24T11:48:42.331Z",
+  "closed_at": "2026-09-24T11:48:42.331Z"
+}

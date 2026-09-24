@@ -164,7 +164,7 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
         "repository": "https://github.com/HeDaas-Code/pyvdisk"
       }
     ],
-    "compiled_at": "2026-09-24T11:41:32.016Z",
+    "compiled_at": "2026-09-24T11:48:42.253Z",
     "stats": {
       "tree_count": 1,
       "module_count": 290,
@@ -177,7 +177,7 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
       "planned_count": 0,
       "deprecated_count": 0,
       "policy_rule_count": 2,
-      "change_count": 3,
+      "change_count": 4,
       "open_change_count": 1
     }
   },
@@ -2712,9 +2712,9 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
           "path": "docs/VSCRIPT_SPEC.md"
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T13:45:00Z",
-      "fingerprint": "7967b9cf3de163a9defdd8db9f1f6647edc58752751bf6ca540bbeb8155ad7d7",
+      "revision": "f163400c098f68cbdfb0393a9bf488037d012aaf",
+      "updated_at": "2026-09-24T11:48:38.686Z",
+      "fingerprint": "eb6fa907e54689d8347e966774b0ad07fba9f382d04fba10dacc8c03953c1644",
       "aggregate": {
         "descendant_count": 6,
         "own_api_count": 0,
@@ -2912,9 +2912,9 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
           "path": "README.md"
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T13:45:00Z",
-      "fingerprint": "ee385479b03b021e1a6204295602c53737107b4071bdf81038483f4865f230ef",
+      "revision": "f163400c098f68cbdfb0393a9bf488037d012aaf",
+      "updated_at": "2026-09-24T11:48:38.684Z",
+      "fingerprint": "21502068301a8671d1fae8491b59e2a56e5e63d4a6f43a8250b4f127abba4f40",
       "apis": [
         {
           "protocol": "file",
@@ -3010,9 +3010,9 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
           "path": "examples/agent_tools.py"
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T13:40:00Z",
-      "fingerprint": "4ccb5dedebd50551824b10ba22dd7ff4632c7df7b194307e3779d79c0585e4f2",
+      "revision": "f163400c098f68cbdfb0393a9bf488037d012aaf",
+      "updated_at": "2026-09-24T11:48:38.687Z",
+      "fingerprint": "d256d8803ce7868b443ddd6cfc00d16a7e42f11938c3056dca32f34eef8b11c9",
       "aggregate": {
         "descendant_count": 2,
         "own_api_count": 0,
@@ -3036,24 +3036,24 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
         "en": "Agent Loop Demo"
       },
       "description": {
-        "zh": "带脚本化\"模型\"的完整 agent loop，因此不需要 API key 与网络，可以进 CI。循环本身与对接真实客户端时完全一致，只替掉 scripted_model。示例里包含一次越权读取被拒，说明拒绝会像普通工具结果一样回灌。\n",
-        "en": "A complete agent loop with a scripted model, so it needs no API key and no network and can run in CI. The loop is the one you would write against a real client; only scripted_model is replaced. It includes a refused out-of-root read, showing a denial flows back like any other tool result.\n"
+        "zh": "带脚本化\"模型\"的完整 agent loop，形状与 README 示例完全一致，因此不需要 API key 与网络，可以进 CI。示例里包含一次越权读取被拒，以及一轮同时请求两个工具，覆盖拒绝路径与多调用列表路径。\n",
+        "en": "A complete agent loop with a scripted model, shaped exactly like the README demo, so it needs no API key and no network and can run in CI. It includes a refused out-of-root read and a turn that requests two tools at once, covering both the refusal path and the multi-call list path.\n"
       },
       "source": [
         {
           "path": "examples/agent_tools.py"
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T13:40:00Z",
-      "fingerprint": "021820b569bcab563e878c2d7331874621e55ca5641bac090f379fbf54f5efc1",
+      "revision": "f163400c098f68cbdfb0393a9bf488037d012aaf",
+      "updated_at": "2026-09-24T11:48:38.686Z",
+      "fingerprint": "38e6efd2ed3bfcec7954b1a00d09cc90b41ca8906175dcbb023a72fefed9f9b7",
       "apis": [
         {
           "protocol": "file",
           "path": "examples/agent_tools.py:scripted_model",
           "description": {
-            "zh": "聊天补全调用的替身：返回下一条预置的工具调用，\"模型\"不再调用工具时返回 None。\n",
-            "en": "A stand-in for a chat completion call: returns the next scripted tool call, or None when the model would stop.\n"
+            "zh": "单次聊天补全调用的替身：返回供循环消费的 assistant 消息；脚本跑完后返回 tool_calls 为空的消息。\n",
+            "en": "A stand-in for one chat completion call: returns an assistant message whose tool_calls the loop consumes, and an empty tool_calls list when the script runs out.\n"
           },
           "key": "file:examples/agent_tools.py:scripted_model"
         }
@@ -13279,8 +13279,8 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
         "en": "Test Suite"
       },
       "description": {
-        "zh": "测试套件：444 项可执行校验，覆盖文件系统、卷、身份、锁、队列、事务、VScript、审计轨迹、FUSE 桥、平台适配层、沙箱与打包。缺 hnswlib 时有 4 项对照用例跳过。\n",
-        "en": "Test suite: 444 executable checks covering the filesystem, volumes, identity, locking, the queue, transactions, VScript, the audit trail, the FUSE bridge, the platform layer, the sandbox and packaging. Four comparison cases skip when hnswlib is absent.\n"
+        "zh": "测试套件：446 项可执行校验，覆盖文件系统、卷、身份、锁、队列、事务、VScript、审计轨迹、FUSE 桥、平台适配层、沙箱与打包。缺 hnswlib 时有 4 项对照用例跳过。\n",
+        "en": "Test suite: 446 executable checks covering the filesystem, volumes, identity, locking, the queue, transactions, VScript, the audit trail, the FUSE bridge, the platform layer, the sandbox and packaging. Four comparison cases skip when hnswlib is absent.\n"
       },
       "source": [
         {
@@ -13294,7 +13294,7 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
         }
       ],
       "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T13:45:00Z",
+      "updated_at": "2026-09-24T14:10:00Z",
       "fingerprint": "b6440af3d48834c687f05de99c57cf0e3582d53a09d2ffb04b28579e901b64b1",
       "aggregate": {
         "descendant_count": 58,
@@ -13315,17 +13315,17 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
         "en": "Sandbox Tests"
       },
       "description": {
-        "zh": "把 AgentSandbox 当作一组承诺来测，而不是按实现来测：越权路径、Windows 样式路径、被隐藏的容器簿记、只读与禁删模式、含伪造行的审计链、脚本的宿主隔离与输出上限，以及\"脚本入口与 Python 入口共用一个根\"这条规则。\n",
-        "en": "Tests AgentSandbox as a set of promises rather than an implementation: escape attempts, Windows-looking paths, hidden bookkeeping, read-only and no-delete modes, the audit trail including forged rows, script host isolation and output caps, and the rule that the script door and the Python door share one root.\n"
+        "zh": "把 AgentSandbox 当作一组承诺来测，而不是按实现来测：越权路径、Windows 样式路径、被隐藏的容器簿记、只读与禁删模式、含伪造行的审计链、脚本的宿主隔离与输出上限、\"脚本入口与 Python 入口共用一个根\"这条规则，以及防止 README 示例漂移、确保它仍能按真实 API 执行的守卫。\n",
+        "en": "Tests AgentSandbox as a set of promises rather than an implementation: escape attempts, Windows-looking paths, hidden bookkeeping, read-only and no-delete modes, the audit trail including forged rows, script host isolation and output caps, the rule that the script door and the Python door share one root, and guards that keep the README demo executing against the real API.\n"
       },
       "source": [
         {
           "path": "tests/test_agent_sandbox.py"
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T13:40:00Z",
-      "fingerprint": "edf41d7c5682215a34e651deccb8a108c248aad110293e0dd67c0e56a01c7290",
+      "revision": "f163400c098f68cbdfb0393a9bf488037d012aaf",
+      "updated_at": "2026-09-24T11:48:38.687Z",
+      "fingerprint": "e44e25577e09fe09eef14d1d56de5975ad490fb995cfce45029bb93e2768012e",
       "apis": [
         {
           "protocol": "file",
@@ -23113,6 +23113,15 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
   },
   "changes": [
     {
+      "id": "2026-09-24-readme-agent-demo-fix",
+      "status": "in_progress",
+      "title": {
+        "en": "Fix the README agent demo",
+        "zh": "修正 README 的 Agent 对接 Demo"
+      },
+      "updated_at": "2026-09-24T11:48:12.396Z"
+    },
+    {
       "id": "2026-09-24-readme-counts",
       "status": "verified",
       "title": {
@@ -23132,12 +23141,12 @@ footer { color: var(--muted); font-size: 12px; text-align: center; padding: 18px
     },
     {
       "id": "2026-09-24-zero-dep-windows-agentsandbox",
-      "status": "proposed",
+      "status": "verified",
       "title": {
         "en": "Zero dependency, Windows compat layer and AgentSandbox",
         "zh": "零依赖 + Windows 兼容层 + AgentSandbox"
       },
-      "updated_at": "2026-09-24T11:30:26.105Z"
+      "updated_at": "2026-09-24T11:41:32.089Z"
     }
   ]
 }
