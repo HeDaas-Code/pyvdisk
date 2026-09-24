@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.compat",
+  "updated_at": "2026-09-23T07:26:31.537Z",
+  "reading": {
+    "zh": "两条保持可用的遗留导入路径：容器化之前的 Unified 名称，以及旧的 vscript.checkpoint 位置。",
+    "en": "Two legacy import paths kept working: the pre-container Unified names and the old vscript.checkpoint location."
+  },
+  "order": [
+    "pyvdisk.compat.unified",
+    "pyvdisk.compat.vscript"
+  ]
+}

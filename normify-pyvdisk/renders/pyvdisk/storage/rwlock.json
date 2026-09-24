@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.rwlock",
+  "updated_at": "2026-09-23T07:24:02.413Z",
+  "reading": {
+    "zh": "core 是读写锁本体（获取、释放、升级）；ctx 把它包装成 with 语句可用的读/写上下文。",
+    "en": "core is the reader/writer lock itself (acquire, release, upgrade); ctx wraps it into with-statement read and write contexts."
+  },
+  "order": [
+    "pyvdisk.storage.rwlock.core",
+    "pyvdisk.storage.rwlock.ctx"
+  ]
+}

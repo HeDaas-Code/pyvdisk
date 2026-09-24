@@ -48,7 +48,7 @@ class CapabilityNamespace:
 
 
 class ScopedFileNamespace(CapabilityNamespace):
-    _PROTECTED = ("/.vectors", "/.logs", "/.system/wal.jsonl", "/.system/checkpoint.json")
+    _PROTECTED = ("/.vectors", "/.logs", "/.system/wal.jsonl", "/.system/wal.ckpt.json", "/.system/checkpoint.json")
 
     def _check_file(self, permission, path):
         normalized = _path(path)
@@ -147,6 +147,10 @@ class ScopedDataDisk:
         self.checkpoints = ScopedCheckpointNamespace(disk.checkpoints, context, "checkpoint")
     def __enter__(self): self._disk.mount(); return self
     def __exit__(self, *exc): self._disk.close()
+    @property
+    def mounted(self): return bool(getattr(self._disk, "mounted", False))
+    @property
+    def path(self): return getattr(self._disk, "path", None)
 
 
 def scoped(disk, context):

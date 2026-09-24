@@ -132,7 +132,8 @@ class LogDisk:
             previous = self.vfs.read_file(segment_path) if self.vfs.exists(segment_path) else b""
             payload = previous + (_json(event.to_dict())+"\n").encode()
             # Directory entries are limited to 27 bytes; use a short temp name.
-            temp_path = base + "/segments/" + f"tmp{seg["id"]:016d}"
+            # No PEP 701 same-quote nesting, so the package still parses on 3.9-3.11.
+            temp_path = base + "/segments/" + f"tmp{seg['id']:016d}"
             self.vfs.write_file(temp_path, payload)
             self.vfs.rename(temp_path, segment_path)
             seg["count"]+=1;seg["min_ns"]=min(seg["min_ns"],event.timestamp_ns);seg["max_ns"]=max(seg["max_ns"],event.timestamp_ns);seg["checksum"]=hashlib.sha256(payload).hexdigest()
@@ -201,17 +202,35 @@ class LogDisk:
             keep=[s for s in man["segments"] if s not in remove]
             max_events=cfg.get("max_events")
             while max_events is not None and sum(s["count"] for s in keep)>max_events and len(keep)>1:remove.append(keep.pop(0))
+            cutoff_id=set()
             for s in remove:
                 p=base+"/"+s["file"]
-                if self.vfs.exists(p):self.vfs.remove(p)
+                if self.vfs.exists(p):
+                    raw=self.vfs.read_file(p).decode("utf-8","replace")
+                    for line in raw.splitlines():
+                        line=line.strip()
+                        if not line:continue
+                        try: obj=json.loads(line)
+                        except ValueError: continue
+                        eid=obj.get("event_id")
+                        if eid: cutoff_id.add(eid)
+                    self.vfs.remove(p)
+            if cutoff_id:
+                ids=man.setdefault("event_ids",{})
+                for eid in cutoff_id:
+                    ids.pop(eid,None)
             man["segments"]=keep;self._write(base+"/manifest.json",man);return sum(s["count"] for s in remove)
     def compact(self,stream):
         with self._lock:
-            cfg=self._config(stream);events=self.query(stream);base=self._dir(stream);man=self._read(base+"/manifest.json")
-            for s in man["segments"]:
+            self._config(stream);base=self._dir(stream);old_man=self._read(base+"/manifest.json")
+            events=self.query(stream)
+            preserved_consumers=dict(old_man.get("consumers",{}) or {})
+            for s in old_man.get("segments",[]):
                 p=base+"/"+s["file"]
                 if self.vfs.exists(p):self.vfs.remove(p)
-            self._write(base+"/manifest.json",{"next_segment":0,"next_sequence":man.get("next_sequence",0),"segments":[]})
+            self._write(base+"/manifest.json",{"next_segment":0,"next_sequence":0,"segments":[],
+                                                "schema_version":old_man.get("schema_version",1),
+                                                "consumers":preserved_consumers,"event_ids":{}})
             for event in events:self.append(stream,event)
             return len(events)
     def stats(self,stream):

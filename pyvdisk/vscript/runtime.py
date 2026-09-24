@@ -1,31 +1,114 @@
 """Safe tree-walking VScript interpreter."""
 from __future__ import annotations
-import io, operator, time
+import io, operator, time, uuid
+from .undo import (apply_undo, discard_body, discard_spill_area, normalize,
+                   snapshot_tree, spill_conflict, store_body)
 from .wal import WriteAheadLog
 from pathlib import Path
 from .parser import parse
 from .audit import AuditRecord, new_run_id, policy_hash, script_hash, monotonic_ms
 
 class TransactionContext:
-    """In-process undo log; not crash-safe and has no WAL."""
+    """In-process undo log, mirrored into a WAL when the runtime has one.
+
+    Every entry is recorded *before* the change it undoes (write-ahead, see
+    `docs/CONTRACTS.md`). The in-memory list is what a rollback uses -- entries plus
+    the store they belong to, since handles are live -- and the WAL carries the same
+    entries so a *later* process can settle a transaction whose owner died. Neither
+    is a substitute for the other: one needs live handles, the other survives the
+    process.
+    """
     def __init__(self, runtime):
-        self.runtime=runtime; self.undos=[]; self.operations=[]; self.rolling_back=False
+        self.runtime=runtime
+        #: (store, entry) pairs, undone in reverse order.
+        self.undos=[]
+        #: entries as recorded, for introspection.
+        self.operations=[]
+        self.rolling_back=False
         self.txid = runtime.wal.begin() if runtime.wal is not None else None
-    def add_operation(self, operation):
-        if not self.rolling_back:
-            self.operations.append(operation)
-            if self.runtime.wal is not None: self.runtime.wal.append(self.txid, operation)
-    def add(self, undo):
-        if not self.rolling_back: self.undos.append(undo)
-    def commit(self):
+        # Spill slots are named per transaction, and short: a directory entry is
+        # limited to 27 bytes, so a uuid4 hex txid does not fit in a file name.
+        self.spill_token = uuid.uuid4().hex[:12]
+        self._spill_index = 0
+    def _spill_slot(self):
+        self._spill_index += 1
+        return self._spill_index
+    def journal(self, capability, undo, path=None, body=None, tree=False, **fields):
+        """Record one reversible change before it is applied.
+
+        ``body`` is the file's previous content, or None when it did not exist; a
+        large body goes to the store rather than into memory (`undo.store_body`).
+        """
+        if self.rolling_back: return
+        entry={"undo":undo,"path":path,**fields}
+        if undo=="write":
+            entry.update(store_body(capability.target,self.spill_token,self._spill_slot(),body))
+        elif undo=="restore_tree":
+            if spill_conflict(path):
+                raise RuntimeError(f"无法在事务内递归删除 {path}：撤销快照必须与数据在同一文件系统内，且不能在删除范围内")
+            entry["spill"]=snapshot_tree(capability.target,path,self.spill_token,self._spill_slot())
+        self.operations.append(entry)
+        if self.runtime.wal is not None: self.runtime.wal.append(self.txid,dict(entry,mount=capability.name))
+        self.undos.append((capability.target,entry))
+    def _discard_spills(self):
+        for store,entry in self.undos: discard_body(store,entry)
+    def commit(self, parent=None):
+        """Publish the transaction, or hand its undo log to an enclosing one."""
         if self.runtime.wal is not None: self.runtime.wal.commit(self.txid)
+        if parent is not None:
+            parent.undos.extend(self.undos); parent.operations.extend(self.operations)
+        else:
+            self._discard_spills()
     def rollback(self):
         self.rolling_back=True
         errors=[]
-        for undo in reversed(self.undos):
-            try: undo()
+        for store,entry in reversed(self.undos):
+            try: apply_undo(store,entry)
             except Exception as exc: errors.append(exc)
+        self._discard_spills()
+        if self.runtime.wal is not None and self.txid is not None:
+            self.runtime.wal.abort(self.txid)
         if errors: raise RuntimeError(f"事务回滚失败: {errors[0]}")
+def recover_wal(wal, mounts=None):
+    """Consume a VScript transaction log: roll back work that never committed.
+
+    Committed operations are not replayed. A write is applied before its commit is
+    recorded, so a durable ``commit`` already implies the data reached the store --
+    and re-applying an ``append`` would duplicate it. The direction the log is
+    actually needed for is the other one: undoing a transaction whose process died.
+
+    Entries are interpreted by the same `undo.apply_undo` the in-process rollback
+    uses, so every operation that records an undo is compensable, not just writes.
+
+    ``mounts`` maps a mount name to the capability its operations were recorded
+    against. A transaction with an operation whose mount was not supplied is left in
+    flight and reported as ``deferred`` instead of being marked aborted, because
+    aborting it would silently keep a half-applied change; the log is kept so a later
+    recovery can finish the job.
+    """
+    mounts=dict(mounts or {})
+    committed,pending=wal.recover()
+    report={"committed":[txid for txid,_ in committed],"pending":[],"deferred":[],"rolled_back":0,"unresolved":[]}
+    def undo(entry):
+        target=mounts.get(entry.get("mount"))
+        if target is None: report["unresolved"].append(entry); return False
+        if not apply_undo(target,normalize(entry)): report["unresolved"].append(entry); return False
+        report["rolled_back"]+=1
+        return True
+    for txid,operations in pending:
+        blocked=False
+        for entry in reversed(operations):
+            if not undo(entry): blocked=True
+        if blocked: report["deferred"].append(txid)
+        else:
+            wal.abort(txid); report["pending"].append(txid)
+    if not report["unresolved"]:
+        wal.truncate()
+        # Any spill left now belongs to a transaction that is settled: committed ones
+        # never needed it, and unfinished ones were just undone.
+        for target in mounts.values(): discard_spill_area(target)
+    return report
+
 from dataclasses import dataclass
 from . import ast as A
 from .errors import RuntimeError, ScriptThrown, ResourceLimitError, CapabilityError
@@ -58,7 +141,7 @@ class Task:
     """Deterministic task value; execution is eager within a parallel block."""
     name: str
     result: object = None
-    error: object = None
+    error: "BaseException | None" = None
     done: bool = False
 
     def await_result(self):
@@ -66,7 +149,7 @@ class Task:
         return self.result
 @dataclass
 class Function:
-    params:list; body:object; closure:Env; runtime:object
+    params:list; body:object; closure:Env; runtime:"Runtime"
     def __call__(self,*args,**kwargs):
         if kwargs or len(args)!=len(self.params): raise RuntimeError("函数参数数量不匹配")
         if self.runtime.depth>=self.runtime.policy.max_call_depth: raise ResourceLimitError("函数调用深度超限")
@@ -128,10 +211,12 @@ class Runtime:
                 record = AuditRecord(record_id, script_hash(source if source is not None else program), policy_hash(self.policy), status, {"steps": self.budget.steps, "read_bytes": self.budget.read_bytes, "write_bytes": self.budget.write_bytes, "output_bytes": self.budget.output_bytes, "duration_ms": monotonic_ms(started)}, error=error, started_at=time.time() - (time.monotonic() - started), finished_at=time.time(), **self.audit_context)
                 sink = self.audit_sink.emit if hasattr(self.audit_sink, "emit") else self.audit_sink
                 sink(record)
-    def record_undo(self, undo):
-        if self._transactions: self._transactions[-1].add(undo)
-    def record_operation(self, operation):
-        if self._transactions: self._transactions[-1].add_operation(operation)
+    def transactions_open(self):
+        """True while a ``tx`` block is still running, so the log cannot be settled."""
+        return bool(self._transactions)
+    def journal(self, capability, undo, **fields):
+        """Record a reversible change before applying it; a no-op outside a ``tx``."""
+        if self._transactions: self._transactions[-1].journal(capability, undo, **fields)
     def exec_block(self,block,env):
         child=Env(env);value=None
         for s in block.statements:value=self.execute(s,child)
@@ -189,10 +274,7 @@ class Runtime:
                 raise
             else:
                 self._transactions.pop()
-                tx.commit()
-                if self._transactions:
-                    self._transactions[-1].undos.extend(tx.undos)
-                    self._transactions[-1].operations.extend(tx.operations)
+                tx.commit(self._transactions[-1] if self._transactions else None)
                 return result
         elif isinstance(n,A.Try):
             try:self.exec_block(n.body,env)
@@ -272,6 +354,10 @@ class Runtime:
             try:return ops[n.op](a,b)
             except Exception as exc: raise RuntimeError(f"运算失败 {n.op}: {exc}",n.span)
         if isinstance(n,A.Member): return self.member(self.eval(n.obj,env),n.name,n.span)
+        if isinstance(n,A.OptionalMember):
+            obj=self.eval(n.obj,env)
+            if obj is None: return None
+            return self.member(obj,n.name,n.span)
         if isinstance(n,A.Index):
             try:return self.eval(n.obj,env)[self.eval(n.index,env)]
             except Exception as exc: raise RuntimeError(f"索引失败: {exc}",n.span)

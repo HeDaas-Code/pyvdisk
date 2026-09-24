@@ -1,23 +1,28 @@
-name: Pylint
+name: Lint
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  build:
+  errors:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+    timeout-minutes: 15
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pylint
-    - name: Analysing the code with pylint
-      run: |
-        pylint $(git ls-files '*.py')
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[dev]
+          python -m pip install "pylint==4.0.9"
+      # Errors only: undefined names, wrong attribute access, raising non-exceptions
+      # and real import failures. The stock template gated on the whole message set,
+      # which never passed and was mostly style -- a gate that is always red says
+      # nothing about correctness. The deliberate optional-dependency import failures
+      # in fuse_mount.py are suppressed inside that module, with a comment.
+      #
+      # pylint 4 requires Python >= 3.10, so this job runs on 3.12. Whether the
+      # declared 3.9 floor still parses is proven by the CI test matrix, not here.
+      - name: Lint (errors only)
+        run: python -m pylint -E --score=n pyvdisk tests

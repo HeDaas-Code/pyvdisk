@@ -10,6 +10,10 @@ FUSE 运行在用户态，**不需要 root 权限**（需要系统已安装 fuse
 而 VFS / API 仍可正常使用。
 """
 
+# pylint: disable=import-error
+# fusepy 是可选依赖（pip install pyvdisk[fuse]），所有 import fuse 都刻意延迟到
+# 函数内部，因此未安装时本模块依然可导入 -- 这不是缺陷。
+
 from __future__ import annotations
 
 import os
@@ -134,7 +138,10 @@ class _VFuseOperations:
 
         fs = self.vfs._fs_or_raise()
         try:
-            ino = fs.resolve(path)
+            # lstat semantics: the link's own inode. Following it here resolved to the
+            # target -- a regular file -- and readlink then raised, so every symlink
+            # read through FUSE reported EINVAL.
+            ino = fs.resolve(path, follow=False)
             return fs.readlink(ino)
         except FSError:
             raise FuseOSError(EINVAL)

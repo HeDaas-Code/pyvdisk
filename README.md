@@ -5,8 +5,8 @@
 **单机 Agentic 数据与执行基础设施**
 
 [![GitHub](https://img.shields.io/badge/GitHub-PyVDisk-181717?logo=github)](https://github.com/HeDaas-Code/pyvdisk)
-[![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-193%20passed-2ea44f)](#验证)
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Tests](https://img.shields.io/badge/Tests-391%20passed-2ea44f)](#验证)
 
 PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行基础设施项目：DataDisk 负责统一数据与执行基础设施，VScript 负责安全工作流语言、CLI、REPL 与运行时。
 
@@ -17,6 +17,66 @@ PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行
 ## 架构总览
 
 <div align="center"><table><tr><th colspan="3">Agent / 应用</th></tr><tr><td colspan="3">VScript · Python API · CLI · REPL · HostProxy</td></tr><tr><th>Execution</th><th>Capability</th><th>Storage</th></tr><tr><td>ExecutionService<br>DurableQueue<br>worker · lease · retry · DLQ<br>RunState · Audit</td><td>ScopedDataDisk<br>FS / Vector / Log / Checkpoint<br>逐操作权限</td><td>DataDisk<br>单一 .vdisk<br>WAL · transaction · recovery</td></tr><tr><th>FS</th><th>Vector</th><th>Log</th></tr><tr><td>workspace</td><td>HNSW memory<br>generation · checksum</td><td>trace<br>sequence · replay · ack</td></tr><tr><th colspan="3">VirtualDisk · Volume · lock · fsync · mirror degraded fallback</th></tr></table></div>
+
+## 架构图谱
+
+**▶ [打开可交互架构图谱](https://htmlpreview.github.io/?https://github.com/HeDaas-Code/pyvdisk/blob/master/normify-pyvdisk/normify.html)** — 点击模块逐层下钻、悬停查看中英双语介绍、`?lang=en` 切换英文、`#module=<id>` 深链直达具体模块。
+
+> GitHub 会过滤 README 中的 `<script>` / `<iframe>`，自包含的交互页无法内联渲染，因此上传的是**一键运行**链接：由 htmlpreview 直接执行仓库内 `normify-pyvdisk/normify.html`（单文件、无外部依赖、无网络请求）。下面的 Mermaid 图则在 GitHub 上原生渲染。
+
+```mermaid
+graph TD
+  R["pyvdisk · 272 模块 / 794 API / 124 依赖箭头"]
+  R --> pyvdisk_storage["storage · 14"]
+  R --> pyvdisk_execution["execution · 4"]
+  R --> pyvdisk_governance["governance · 4"]
+  R --> pyvdisk_vscript["vscript · 10"]
+  R --> pyvdisk_cli["cli · 14"]
+  R --> pyvdisk_contracts["contracts · 7"]
+  R --> pyvdisk_api["api"]
+  R --> pyvdisk_compat["compat · 2"]
+  R --> pyvdisk_tests["tests · 29"]
+  R --> pyvdisk_docs["docs · 5"]
+  R --> pyvdisk_delivery["delivery · 3"]
+```
+
+存储与执行平面展开：
+
+```mermaid
+graph TD
+  S["pyvdisk.storage"] --> S_datadisk["datadisk · 7（事务容器）"]
+  S --> S_fs["fs · 23（inode/目录/块分配）"]
+  S --> S_vfs["vfs · 16（路径式门面）"]
+  S --> S_volume["volume · 8（卷与镜像冗余）"]
+  S --> S_log["log · 6"]
+  S --> S_driver["driver · 5"]
+  S --> S_logging["logging · 5"]
+  S --> S_vector["vector · 4"]
+  S --> S_identity["identity · 4"]
+  S --> S_fuse["fuse · 4"]
+  S --> S_block["block · 3"]
+  S --> S_checkpoint["checkpoint · 3"]
+  S --> S_wal["wal · 3"]
+  S --> S_rwlock["rwlock · 2"]
+  E["pyvdisk.execution"] --> E_operations["operations · 6"]
+  E --> E_queue["queue · 5"]
+  E --> E_service["service · 4"]
+  E --> E_runstate["runstate · 2"]
+  G["pyvdisk.governance"] --> G_namespace["namespace（能力门禁）"]
+  G --> G_files["files"]
+  G --> G_data["data"]
+  G --> G_scoped["scoped（ScopedDataDisk）"]
+```
+
+| 产物 | 说明 |
+|---|---|
+| [`normify-pyvdisk/normify.html`](normify-pyvdisk/normify.html) | 单文件可交互图谱（272 模块 / 794 API / 124 依赖箭头） |
+| [`normify-pyvdisk/outline.md`](normify-pyvdisk/outline.md) | 缩进式模块大纲，适合逐层通读 |
+| [`normify-pyvdisk/api-index.json`](normify-pyvdisk/api-index.json) | 全量 API 索引 |
+| [`normify-pyvdisk/tree.json`](normify-pyvdisk/tree.json) | 编译产物：模块、每层布局、依赖边、内容指纹 |
+| [`normify-pyvdisk/modules/`](normify-pyvdisk/modules) | 272 个模块 Markdown，frontmatter 为机器可读契约（含源码路径与行号证据） |
+
+图谱由 Normify 从仓库源码生成，每个叶子模块都带**仓库内真实文件路径 + 行号区间**的 `source` 证据与 SHA-256 指纹，冻结于 commit `6d203c0`；`normify_validate` 结果为 0 error。
 
 ## 项目定位
 
@@ -54,7 +114,9 @@ pyvdisk vscript run-disk tools.vdisk:/.vscript/scripts/job.vds
 
 - Storage Plane：FS、Vector、Log、Checkpoint、Metadata、WAL、VirtualDisk、Volume。
 - Execution Plane：ExecutionService、DurableQueue、worker、lease、heartbeat、retry、idempotency、dead-letter、RunState、Audit。
-- 单 DataDisk ACID：统一 txid、intent、prepare、apply、commit、abort 和 recovery。
+- WAL 检查点：日志结算后整段截断（`wal.ckpt.json` 记录明细），重挂载只重放检查点之后的尾巴；DataDisk 与 VScript 共用同一份 WAL 实现，`vscript run --wal` 是它的真实恢复入口。
+- 单 DataDisk ACID：统一 txid、intent、prepare、apply、commit、abort；FS/Vector/Log 副作用走**写前补偿日志**，未提交事务在 mount 时被幂等补偿，不再出现"元数据回滚、副作用残留"的部分提交。
+- VScript 事务撤销：每次可撤销的 `fs.*` 变更都在生效前记账（`write/remove/mkdir/rename/symlink/meta/truncate/restore_tree`），进程内回滚与崩溃恢复共用同一份 undo 解释器；旧内容 ≥64 KiB 落到挂载内 `/.system/tx`，不再整份留在内存。
 - 内部 exactly-once：operation_id、结果持久化、任务去重、Log event_id 去重。
 - 安全：ScopedDataDisk、路径/collection/stream scope、Host allowlist、atomic write。
 - 可靠性：generation、checksum、fsync、mirror degraded fallback、remount recovery。
@@ -87,4 +149,5 @@ pyvdisk info image.vdisk
 .venv/bin/python -m pytest -q
 ```
 
-当前回归：193 passed
+当前回归：391 passed（本地 3.12；CI 覆盖 3.9 / 3.10 / 3.11 / 3.12 四个版本的同一套用例）
+其中 3.11 本地缺 hnswlib 时有 5 例跳过（该版本无法编译 hnswlib），CI 环境正常。

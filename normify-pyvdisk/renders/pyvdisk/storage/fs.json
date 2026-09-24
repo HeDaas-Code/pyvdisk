@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.fs",
+  "updated_at": "2026-09-23T07:23:37.275Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "先看磁盘布局（超级块、inode 表、位图、多级块指针），再看目录与路径解析，然后是创建/写入/截断等文件操作，最后是加锁、挂载、格式化、fsck 与扩容。",
+    "en": "Start with the on-disk layout (superblock, inode table, bitmap, multi-level block pointers), then directories and path resolution, then create/write/truncate operations, and finally locking, mount, mkfs, fsck and growth."
+  },
+  "order": [
+    "pyvdisk.storage.fs.layout",
+    "pyvdisk.storage.fs.superblock",
+    "pyvdisk.storage.fs.inode",
+    "pyvdisk.storage.fs.inode-io",
+    "pyvdisk.storage.fs.bitmap",
+    "pyvdisk.storage.fs.block-alloc",
+    "pyvdisk.storage.fs.pointers",
+    "pyvdisk.storage.fs.dir",
+    "pyvdisk.storage.fs.dir-mutate",
+    "pyvdisk.storage.fs.names",
+    "pyvdisk.storage.fs.paths",
+    "pyvdisk.storage.fs.attrs",
+    "pyvdisk.storage.fs.stat",
+    "pyvdisk.storage.fs.query",
+    "pyvdisk.storage.fs.locking",
+    "pyvdisk.storage.fs.mount",
+    "pyvdisk.storage.fs.mkfs",
+    "pyvdisk.storage.fs.fsck",
+    "pyvdisk.storage.fs.grow",
+    "pyvdisk.storage.fs.create",
+    "pyvdisk.storage.fs.mutate",
+    "pyvdisk.storage.fs.readwrite",
+    "pyvdisk.storage.fs.truncate"
+  ],
+  "groups": [
+    {
+      "id": "ondisk",
+      "title": {
+        "zh": "磁盘布局",
+        "en": "On-Disk Layout"
+      },
+      "children": [
+        "pyvdisk.storage.fs.layout",
+        "pyvdisk.storage.fs.superblock",
+        "pyvdisk.storage.fs.inode",
+        "pyvdisk.storage.fs.inode-io",
+        "pyvdisk.storage.fs.bitmap",
+        "pyvdisk.storage.fs.block-alloc",
+        "pyvdisk.storage.fs.pointers"
+      ]
+    },
+    {
+      "id": "namespace",
+      "title": {
+        "zh": "目录与命名",
+        "en": "Directories and Naming"
+      },
+      "children": [
+        "pyvdisk.storage.fs.dir",
+        "pyvdisk.storage.fs.dir-mutate",
+        "pyvdisk.storage.fs.names",
+        "pyvdisk.storage.fs.paths",
+        "pyvdisk.storage.fs.attrs",
+        "pyvdisk.storage.fs.stat",
+        "pyvdisk.storage.fs.query"
+      ]
+    },
+    {
+      "id": "ops",
+      "title": {
+        "zh": "文件操作",
+        "en": "File Operations"
+      },
+      "children": [
+        "pyvdisk.storage.fs.create",
+        "pyvdisk.storage.fs.mutate",
+        "pyvdisk.storage.fs.readwrite",
+        "pyvdisk.storage.fs.truncate"
+      ]
+    },
+    {
+      "id": "lifecycle",
+      "title": {
+        "zh": "生命周期与维护",
+        "en": "Lifecycle and Maintenance"
+      },
+      "children": [
+        "pyvdisk.storage.fs.locking",
+        "pyvdisk.storage.fs.mount",
+        "pyvdisk.storage.fs.mkfs",
+        "pyvdisk.storage.fs.fsck",
+        "pyvdisk.storage.fs.grow"
+      ]
+    }
+  ]
+}

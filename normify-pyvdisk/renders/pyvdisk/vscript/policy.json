@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.vscript.policy",
+  "updated_at": "2026-09-23T07:25:09.885Z",
+  "reading": {
+    "zh": "budget 是声明式限额与强制限额的运行时计数器；capability 是脚本必须满足的逐句柄权限集。",
+    "en": "budget is the declarative limits plus the runtime counter that enforces them; capability is the per-handle permission set a script must satisfy."
+  },
+  "order": [
+    "pyvdisk.vscript.policy.budget",
+    "pyvdisk.vscript.policy.capability"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.vscript.host",
+  "updated_at": "2026-09-23T07:25:09.568Z",
+  "reading": {
+    "zh": "guard 是读写根白名单的强制执行；module 是面向脚本的读取、写入与传输入口，全部经它限权。",
+    "en": "guard is the allowlisted read/write root enforcement; module is the script-facing read/write/transfer entry points that all funnel through it."
+  },
+  "order": [
+    "pyvdisk.vscript.host.guard",
+    "pyvdisk.vscript.host.module"
+  ]
+}

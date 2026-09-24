@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.vscript.frontend",
+  "updated_at": "2026-09-23T07:25:09.231Z",
+  "reading": {
+    "zh": "按编译流水线顺序阅读：词法单元词表、词法器、AST 节点、语法解析器，以及前四者用于报告的的位置/诊断与错误类型。",
+    "en": "The compilation pipeline in order: token vocabulary, lexer, AST nodes, parser, and the span/diagnostic and error types the first four report through."
+  },
+  "order": [
+    "pyvdisk.vscript.frontend.tokens",
+    "pyvdisk.vscript.frontend.lexer",
+    "pyvdisk.vscript.frontend.ast",
+    "pyvdisk.vscript.frontend.parser",
+    "pyvdisk.vscript.frontend.span",
+    "pyvdisk.vscript.frontend.errors"
+  ]
+}

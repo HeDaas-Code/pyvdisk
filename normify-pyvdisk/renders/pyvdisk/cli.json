@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.cli",
+  "updated_at": "2026-09-23T07:26:44.335Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "先是共享的格式化与打开 VFS 辅助，再是文件系统子命令（镜像生命周期、目录、整文件操作、检查、管理），随后是卷/驱动器/向量/日志数据子命令，最后是注册全部命令的解析器、分发入口与 python -m 钩子。",
+    "en": "Shared formatting and VFS-opening helpers, then the filesystem subcommands (image lifecycle, directories, whole-file operations, inspection, administration), then the volume/drive/vector/log data subcommands, and finally the parser that registers them all, the dispatch entry point and the python -m hook."
+  },
+  "order": [
+    "pyvdisk.cli.format",
+    "pyvdisk.cli.open",
+    "pyvdisk.cli.image",
+    "pyvdisk.cli.dirs",
+    "pyvdisk.cli.file-ops",
+    "pyvdisk.cli.inspect",
+    "pyvdisk.cli.admin",
+    "pyvdisk.cli.volume",
+    "pyvdisk.cli.drive",
+    "pyvdisk.cli.vector",
+    "pyvdisk.cli.log",
+    "pyvdisk.cli.parser",
+    "pyvdisk.cli.main",
+    "pyvdisk.cli.entry"
+  ],
+  "groups": [
+    {
+      "id": "helpers",
+      "title": {
+        "zh": "共享辅助",
+        "en": "Shared Helpers"
+      },
+      "children": [
+        "pyvdisk.cli.format",
+        "pyvdisk.cli.open"
+      ]
+    },
+    {
+      "id": "fs",
+      "title": {
+        "zh": "文件系统子命令",
+        "en": "Filesystem Subcommands"
+      },
+      "children": [
+        "pyvdisk.cli.image",
+        "pyvdisk.cli.dirs",
+        "pyvdisk.cli.file-ops",
+        "pyvdisk.cli.inspect",
+        "pyvdisk.cli.admin"
+      ]
+    },
+    {
+      "id": "data",
+      "title": {
+        "zh": "卷与数据子命令",
+        "en": "Volume and Data Subcommands"
+      },
+      "children": [
+        "pyvdisk.cli.volume",
+        "pyvdisk.cli.drive",
+        "pyvdisk.cli.vector",
+        "pyvdisk.cli.log"
+      ]
+    },
+    {
+      "id": "entry",
+      "title": {
+        "zh": "解析器与入口",
+        "en": "Parser and Entry Point"
+      },
+      "children": [
+        "pyvdisk.cli.parser",
+        "pyvdisk.cli.main",
+        "pyvdisk.cli.entry"
+      ]
+    }
+  ]
+}

@@ -47,6 +47,10 @@ class VFS:
         # 想启用权限隔离时：vfs.uid = 1000; vfs.gid = 1000
         self.uid: int = 0
         self.gid: int = 0
+        # Stack of active MetadataTransactions (outermost last) for FS undo.
+        # FileNamespace mutators record before-state here so abort() can replay
+        # in reverse. Push/pop is driven by MetadataTransaction.__enter__/__exit__.
+        self._tx_stack: list = []
         self.enforce_perms: bool = True
 
     @staticmethod

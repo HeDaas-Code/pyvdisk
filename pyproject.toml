@@ -7,7 +7,7 @@ name = "pyvdisk"
 version = "0.3.0"
 description = "纯 Python 虚拟磁盘、文件系统、向量数据盘与时序日志盘"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "PyVDisk contributors" }]
 keywords = ["virtual-disk", "filesystem", "fuse", "vm", "disk-image", "vector-database", "structured-logging", "time-series"]
@@ -15,10 +15,20 @@ dependencies = ["hnswlib>=0.8.0"]
 
 [project.optional-dependencies]
 fuse = ["fusepy"]
-dev = ["pytest"]
+dev = ["pytest", "setuptools>=61.0"]
 
 [project.scripts]
 pyvdisk = "pyvdisk.cli:main"
 
 [tool.setuptools]
-packages = ["pyvdisk"]
+packages = ["pyvdisk", "pyvdisk.infrastructure", "pyvdisk.vscript"]
+
+[tool.setuptools.package-data]
+pyvdisk = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    "error::DeprecationWarning:pyvdisk.unified",
+    "error::DeprecationWarning:pyvdisk.vscript.checkpoint",
+]

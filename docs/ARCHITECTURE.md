@@ -18,6 +18,10 @@ ExecutionService 支持 inline 和可选 worker。任务经过 queue claim、lea
 
 事务以 txid 标识，生命周期为 `begin → intent → prepare → apply → commit`，失败则 `abort → recovery`。participant 通过 prepare/commit/abort 参与；WAL 在 remount 时判定 committed、pending 或 aborted。当前保证限定在一个 DataDisk 内。
 
+事务日志只有一份实现，DataDisk 与 VScript 共用（容器内 VFS 后端 / VScript 宿主文件后端），记录编解码、kind 词表与 `recover()` 完全相同。日志可被检查点截断：`checkpoint_wal()` 在没有打开事务时结算全部记录（已提交事务的效果早已发布，未完成事务先被补偿）后整段丢弃，`close()` 与超过阈值时自动触发，截断明细写在 `/.system/wal.ckpt.json`。因此恢复只重放检查点之后的尾巴，而不是全部历史。
+
+元数据之外，FS / Vector / Log 命名空间的副作用同样受事务保护：变更生效**之前**先把撤销所需的**前像**写入 WAL；mount 时对没有 `commit` 记录的事务，把这些记录按**逆序**重放（幂等，重复 mount 结果一致），因此不会再出现"元数据回滚了、参与者副作用还在"的部分提交。已提交事务只做 redo，其副作用被保留。第三方 participant 通过 `register_recovery_participant` 注册后，会在恢复期收到 `abort(txid, intents)`；`recovery_report()` 暴露本次恢复的补偿明细。跨出容器的副作用仍由 participant 自行负责。
+
 ## 5. 内部 exactly-once
 
 内部操作使用稳定 operation_id 和 idempotency_key；成功结果持久化，重复 queue task 返回既有结果，Log 通过 event_id 去重，Vector 通过 generation/index_generation 检测索引状态。外部 API、支付、邮件和外部数据库不在该保证内。
@@ -41,12 +45,14 @@ ExecutionService 支持 inline 和可选 worker。任务经过 queue claim、lea
 
 1. 打开并校验 DataDisk；
 2. 校验 WAL checksum 和 transaction manifest；
-3. 已提交事务保持结果；
-4. 未完成事务执行既定回滚/补偿；
-5. 已 abort 事务跳过；
-6. Vector 校验 records/index generation 并按需重建；
-7. Log 校验 segment 并恢复 sequence/cursor；
-8. RunState 和 Queue 恢复可观察状态，不伪造 Python 执行栈。
+3. 已提交事务（有 `commit` 记录）只做元数据 redo，命名空间副作用保留；
+4. 未提交事务：元数据回滚，并按**逆序**重放写前补偿日志撤销参与者副作用，最后写入 `compensated` 标记；
+5. 已 abort 事务同样由日志重放补齐——`abort` 记录与补偿完成之间也可能崩溃；
+6. 已注册的 participant 通过 `abort(txid, intents)` 收到其持久化 intent；
+7. 若没有打开事务则写入检查点并截断日志（`close()` 与超阈值时自动执行）；
+8. Vector 校验 records/index generation 并按需重建；
+9. Log 校验 segment 并恢复 sequence/cursor；
+10. RunState 和 Queue 恢复可观察状态，不伪造 Python 执行栈。
 
 ## 9. 可观测与运维
 

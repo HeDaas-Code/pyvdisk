@@ -46,12 +46,13 @@ class QueueTask:
     result: Any = None
     error: Any = None
     dead_letter: bool = False
+    next_attempt_at: Optional[float] = None
 
     @classmethod
     def from_dict(cls, value: Dict[str, Any]) -> "QueueTask":
         return cls(**{key: value.get(key) for key in (
             "id", "payload", "status", "attempt", "idempotency_key", "operation_id",
-            "lease_id", "leased_until", "result", "error", "dead_letter")})
+            "lease_id", "leased_until", "result", "error", "dead_letter", "next_attempt_at")})
 
 
 class DurableQueue:
@@ -65,7 +66,7 @@ class DurableQueue:
 
     def __init__(self, checkpoint_store=None, *, backend=None, path=None,
                  namespace="durable_queue", max_attempts=3, lease_seconds=60.0,
-                 clock=None):
+                 clock=None, backoff_base=None, backoff_max=60.0):
         if isinstance(checkpoint_store, (str, bytes)) and backend is None and path is None:
             path, checkpoint_store = checkpoint_store, None
         if checkpoint_store is None:
@@ -80,6 +81,8 @@ class DurableQueue:
         self.namespace = namespace
         self.max_attempts = max_attempts
         self.lease_seconds = float(lease_seconds)
+        self.backoff_base = None if backoff_base is None else float(backoff_base)
+        self.backoff_max = float(backoff_max)
         self._clock = clock or time.time
         self._lock = checkpoint_store._lock  # one-process atomicity, not a distributed lock
         with self._lock:
@@ -91,7 +94,23 @@ class DurableQueue:
         return value if isinstance(value, dict) else {"tasks": {}, "idempotency": {}}
 
     def _save(self, state):
-        self.store.set(self.namespace, state)
+        # B9: serialise writes across processes on the shared host checkpoint file
+        with self.store.locked():
+            self.store.set(self.namespace, state)
+
+    def _backoff_seconds(self, attempt):
+        """Exponential backoff with jitter; returns 0 when disabled."""
+        if self.backoff_base is None:
+            return 0.0
+        import random
+        cap = min(self.backoff_max, self.backoff_base * (2 ** (int(attempt) - 1)))
+        return cap * random.uniform(1.0, 1.2)
+
+    def _stamp_next_attempt(self, task, now):
+        if self.backoff_base is not None:
+            task["next_attempt_at"] = now + self._backoff_seconds(task.get("attempt", 0))
+        else:
+            task.pop("next_attempt_at", None)
 
     @staticmethod
     def _copy(value):
@@ -135,11 +154,12 @@ class DurableQueue:
         with self._lock:
             self.recover_stale(now=now)
             state = self._state()
-            candidates = [t for t in state["tasks"].values() if t["status"] == "queued"]
+            current = self._clock() if now is None else float(now)
+            candidates = [t for t in state["tasks"].values()
+                          if t["status"] == "queued" and not (t.get("next_attempt_at") or 0) > current]
             if not candidates:
                 return None
             task = min(candidates, key=lambda t: (t.get("sequence", 0), t["id"]))
-            current = self._clock() if now is None else float(now)
             task["status"] = "running"
             task["attempt"] += 1
             task["lease_id"] = str(uuid.uuid4())
@@ -170,7 +190,7 @@ class DurableQueue:
     def complete(self, task_id, result=None, *, lease_id=None):
         with self._lock:
             state = self._state(); task = self._running(state, self._id(task_id), lease_id)
-            task.update(status="succeeded", result=self._copy(result), lease_id=None, leased_until=None)
+            task.update(status="succeeded", result=self._copy(result), lease_id=None, leased_until=None, next_attempt_at=None)
             self._save(state); return self._result(task)
 
     def fail(self, task_id, error=None, *, retry=False, lease_id=None):
@@ -180,13 +200,17 @@ class DurableQueue:
             should_retry = retry and (self.max_attempts is None or task["attempt"] < self.max_attempts)
             task.update(status="queued" if should_retry else "failed", lease_id=None, leased_until=None,
                         dead_letter=not should_retry and retry)
+            if should_retry and self.backoff_base is not None:
+                self._stamp_next_attempt(task, self._clock())
+            elif not should_retry:
+                task.pop("next_attempt_at", None)
             self._save(state); return self._result(task)
 
     def retry(self, task_id):
         with self._lock:
             state = self._state(); task = self._task(state, self._id(task_id))
             if task["status"] != "failed": raise InvalidTaskState("task is not failed")
-            task.update(status="queued", dead_letter=False, lease_id=None, leased_until=None)
+            task.update(status="queued", dead_letter=False, lease_id=None, leased_until=None, next_attempt_at=None)
             self._save(state); return self._result(task)
 
     def dead_letter(self, task_id, error=None):
@@ -211,9 +235,10 @@ class DurableQueue:
             for task in state["tasks"].values():
                 if task["status"] == "running" and task["leased_until"] is not None and task["leased_until"] <= current:
                     if self.max_attempts is not None and task["attempt"] >= self.max_attempts:
-                        task.update(status="failed", dead_letter=True)
+                        task.update(status="failed", dead_letter=True, next_attempt_at=None)
                     else:
                         task.update(status="queued")
+                        self._stamp_next_attempt(task, current)
                     task.update(lease_id=None, leased_until=None); changed.append(self._result(task))
             if changed: self._save(state)
             return changed

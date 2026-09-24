@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.datadisk",
+  "updated_at": "2026-09-23T07:23:38.616Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "从元数据编解码与事务暂存机制开始，到事务的提交/回滚结局，再看文件系统与向量/日志的事务性命名空间，最后是 DataDisk 容器自身的核心与对外接口。",
+    "en": "From metadata codec and transaction staging, to commit/rollback outcomes, then the transactional filesystem and vector/log namespaces, and finally the DataDisk container core and its interface."
+  },
+  "order": [
+    "pyvdisk.storage.datadisk.codec",
+    "pyvdisk.storage.datadisk.tx",
+    "pyvdisk.storage.datadisk.tx-lifecycle",
+    "pyvdisk.storage.datadisk.namespace",
+    "pyvdisk.storage.datadisk.services",
+    "pyvdisk.storage.datadisk.core",
+    "pyvdisk.storage.datadisk.api"
+  ],
+  "groups": [
+    {
+      "id": "txm",
+      "title": {
+        "zh": "事务机制",
+        "en": "Transaction Machinery"
+      },
+      "children": [
+        "pyvdisk.storage.datadisk.codec",
+        "pyvdisk.storage.datadisk.tx",
+        "pyvdisk.storage.datadisk.tx-lifecycle"
+      ]
+    },
+    {
+      "id": "ns",
+      "title": {
+        "zh": "事务性命名空间",
+        "en": "Transactional Namespaces"
+      },
+      "children": [
+        "pyvdisk.storage.datadisk.namespace",
+        "pyvdisk.storage.datadisk.services"
+      ]
+    },
+    {
+      "id": "container",
+      "title": {
+        "zh": "容器本体",
+        "en": "The Container"
+      },
+      "children": [
+        "pyvdisk.storage.datadisk.core",
+        "pyvdisk.storage.datadisk.api"
+      ]
+    }
+  ]
+}

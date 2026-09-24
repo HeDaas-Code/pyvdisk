@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.driver",
+  "updated_at": "2026-09-23T07:23:39.653Z",
+  "reading": {
+    "zh": "assembled 是挂载结果对象，mounts 是挂载记录，manager 是扫描与台账，mounting 按类型分发挂载，lifecycle 负责卸载与恢复。",
+    "en": "assembled is the mount result object, mounts holds mount records, manager scans and keeps the ledger, mounting dispatches per disk type, lifecycle unmounts and recovers."
+  },
+  "order": [
+    "pyvdisk.storage.driver.assembled",
+    "pyvdisk.storage.driver.mounts",
+    "pyvdisk.storage.driver.manager",
+    "pyvdisk.storage.driver.mounting",
+    "pyvdisk.storage.driver.lifecycle"
+  ]
+}

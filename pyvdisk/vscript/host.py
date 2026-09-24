@@ -24,6 +24,12 @@ class HostProxy:
         raw = os.path.abspath(os.fspath(path))
         if not raw or "\x00" in raw: raise CapabilityError("宿主路径无效")
         roots = self.capability.write_roots if write else self.capability.read_roots
+        if not roots:
+            # An empty root list is a policy that granted nothing, not a bad path:
+            # say which switch grants it instead of blaming the caller's argument.
+            raise CapabilityError(
+                "宿主%s未授权：启动时用 --host-%s-root 指定允许的根目录"
+                % ("写入" if write else "读取", "write" if write else "read"))
         resolved = os.path.realpath(raw)
         if not any(os.path.commonpath((resolved, r)) == r for r in roots):
             raise CapabilityError("宿主路径不在允许的根目录")

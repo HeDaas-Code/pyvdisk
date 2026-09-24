@@ -48,18 +48,87 @@ def create_stdlib(runtime):
     def fs_read(h,p):
         c=_cap(h,"fs","read");data=c.target.read_file(_vpath(c,p));b.charge_read(len(data));return data
     def fs_read_text(h,p,encoding="utf-8"):return fs_read(h,p).decode(encoding)
+    def _old_body(store,path):
+        """The content to restore, or None when the path did not exist."""
+        if not store.exists(path):return None
+        return store.read_file(path) if store.isfile(path) else None
+    def _missing_dirs(store,path):
+        """Directories ``makedirs`` will create, shallowest first (undos run in reverse)."""
+        out=[];seen=""
+        for name in path.strip("/").split("/"):
+            seen=seen+"/"+name
+            if not store.exists(seen):out.append(seen)
+        return out
     def fs_write(h,p,data,overwrite=True):
-        c=_cap(h,"fs","write");target=_vpath(c,p);raw=data.encode() if isinstance(data,str) else bytes(data);existed=c.target.exists(target);old=c.target.read_file(target) if existed and c.target.isfile(target) else None;b.charge_write(len(raw));c.target.write_file(target,raw)
-        runtime.record_operation({"kind":"write","path":target,"old":old.decode("latin1") if old is not None else None,"new":raw.decode("latin1")})
-        runtime.record_undo(lambda: c.target.write_file(target,old) if existed and old is not None else (c.target.remove(target) if c.target.exists(target) else None));return len(raw)
+        c=_cap(h,"fs","write");target=_vpath(c,p);raw=data.encode() if isinstance(data,str) else bytes(data)
+        old=_old_body(c.target,target);b.charge_write(len(raw))
+        runtime.journal(c,"write",path=target,body=old)
+        c.target.write_file(target,raw);return len(raw)
     def fs_append(h,p,data):
-        c=_cap(h,"fs","write");target=_vpath(c,p);raw=data.encode() if isinstance(data,str) else bytes(data);existed=c.target.exists(target);old=c.target.read_file(target) if existed else None;b.charge_write(len(raw));c.target.append_file(target,raw)
-        runtime.record_operation({"kind":"append","path":target,"old":old.decode("latin1") if old is not None else None,"new":raw.decode("latin1")})
-        runtime.record_undo(lambda: c.target.write_file(target,old) if existed else c.target.remove(target));return len(raw)
+        c=_cap(h,"fs","write");target=_vpath(c,p);raw=data.encode() if isinstance(data,str) else bytes(data)
+        old=_old_body(c.target,target);b.charge_write(len(raw))
+        runtime.journal(c,"write",path=target,body=old)
+        c.target.append_file(target,raw);return len(raw)
     def fs_copy(sh,sp,dh,dp,overwrite=False):
         data=fs_read(sh,sp);c=_cap(dh,"fs","write");target=_vpath(c,dp)
         if not overwrite and c.target.exists(target):raise RuntimeError(f"目标已存在: {dp}")
-        b.charge_write(len(data));c.target.write_file(target,data);return len(data)
+        old=_old_body(c.target,target);b.charge_write(len(data))
+        runtime.journal(c,"write",path=target,body=old)
+        c.target.write_file(target,data);return len(data)
+    def fs_mkdir(h,p,parents=False,mode=0o755):
+        c=_cap(h,"fs","write");target=_vpath(c,p)
+        if parents:
+            for created in _missing_dirs(c.target,target):runtime.journal(c,"mkdir",path=created)
+            c.target.makedirs(target,mode)
+        else:
+            runtime.journal(c,"mkdir",path=target);c.target.mkdir(target,mode)
+    def fs_remove(h,p,recursive=False):
+        c=_cap(h,"fs","delete");target=_vpath(c,p)
+        try:info=c.target.lstat(target)
+        except Exception:raise RuntimeError(f"路径不存在: {p}")
+        if info.is_dir:
+            # A tree cannot be reconstructed from its path, so it is copied aside
+            # first; a file only needs its content.
+            runtime.journal(c,"restore_tree" if recursive else "remove",path=target)
+            c.target.rmtree(target) if recursive else c.target.rmdir(target)
+        elif info.is_symlink:
+            runtime.journal(c,"symlink",path=target,link_target=c.target.readlink(target))
+            c.target.remove(target)
+        else:
+            runtime.journal(c,"write",path=target,body=c.target.read_file(target))
+            c.target.remove(target)
+    def fs_move(h,a,z):
+        c=_cap(h,"fs","write");src=_vpath(c,a);dst=_vpath(c,z)
+        if c.target.exists(dst):runtime.journal(c,"write",path=dst,body=_old_body(c.target,dst))
+        runtime.journal(c,"rename",path=dst,to=src)
+        c.target.rename(src,dst)
+    def fs_link(h,a,z):
+        c=_cap(h,"fs","write");src=_vpath(c,a);dst=_vpath(c,z)
+        runtime.journal(c,"remove",path=dst)
+        c.target.link(src,dst)
+    def fs_symlink(h,target,p):
+        c=_cap(h,"fs","write");dst=_vpath(c,p)
+        runtime.journal(c,"remove",path=dst)
+        c.target.symlink(str(target),dst)
+    def fs_truncate(h,p,size):
+        c=_cap(h,"fs","write");target=_vpath(c,p);size=int(size)
+        runtime.journal(c,"write",path=target,body=_old_body(c.target,target))
+        c.target.truncate(target,size)
+    def fs_chmod(h,p,mode,follow=True):
+        c=_cap(h,"fs","write");target=_vpath(c,p);mode=int(mode)
+        info=c.target.stat(target,follow=follow)
+        runtime.journal(c,"meta",path=target,mode=info.mode&0o7777,follow=follow)
+        c.target.chmod(target,mode,follow)
+    def fs_chown(h,p,uid=-1,gid=-1,follow=True):
+        c=_cap(h,"fs","admin");target=_vpath(c,p)
+        info=c.target.stat(target,follow=follow)
+        runtime.journal(c,"meta",path=target,uid=info.uid,gid=info.gid,follow=follow)
+        c.target.chown(target,int(uid),int(gid),follow)
+    def fs_utime(h,p,atime=-1,mtime=-1,follow=True):
+        c=_cap(h,"fs","write");target=_vpath(c,p)
+        info=c.target.stat(target,follow=follow)
+        runtime.journal(c,"meta",path=target,atime=info.atime,mtime=info.mtime,follow=follow)
+        c.target.utime(target,int(atime),int(mtime),follow)
     def _stat_dict(s):
         return {"ino":s.ino,"type":s.type,"mode":s.mode,"nlink":s.nlink,"size":s.size,"uid":s.uid,"gid":s.gid,"atime":s.atime,"mtime":s.mtime,"ctime":s.ctime,"is_file":s.is_file,"is_dir":s.is_dir,"is_symlink":s.is_symlink}
     def fs_walk(h,p="/"):
@@ -77,9 +146,10 @@ def create_stdlib(runtime):
       "exists":lambda h,p:_cap(h,"fs","read").target.exists(_vpath(h.cap,p)),"is_file":lambda h,p:_cap(h,"fs","read").target.isfile(_vpath(h.cap,p)),"is_dir":lambda h,p:_cap(h,"fs","read").target.isdir(_vpath(h.cap,p)),
       "list":lambda h,p="/":sorted(_cap(h,"fs","read").target.listdir(_vpath(h.cap,p))),"listdir":lambda h,p="/":sorted(_cap(h,"fs","read").target.listdir(_vpath(h.cap,p))),"listdir_with_stat":fs_listdir_with_stat,"walk":fs_walk,"glob":fs_glob,
       "read":fs_read,"read_text":fs_read_text,"write":fs_write,"append":fs_append,"copy":fs_copy,
-      "mkdir":lambda h,p,parents=False,mode=0o755:(_cap(h,"fs","write").target.makedirs(_vpath(h.cap,p),mode) if parents else _cap(h,"fs","write").target.mkdir(_vpath(h.cap,p),mode)),"remove":lambda h,p,recursive=False:(_cap(h,"fs","delete").target.rmtree(_vpath(h.cap,p)) if recursive else _cap(h,"fs","delete").target.remove(_vpath(h.cap,p))),"move":lambda h,a,z:_cap(h,"fs","write").target.rename(_vpath(h.cap,a),_vpath(h.cap,z)),
+      "mkdir":fs_mkdir,"remove":fs_remove,"move":fs_move,"link":fs_link,"symlink":fs_symlink,"truncate":fs_truncate,
+      "chmod":fs_chmod,"chown":fs_chown,"utime":fs_utime,
       "stat":lambda h,p:_stat_dict(_cap(h,"fs","read").target.stat(_vpath(h.cap,p))),"df":lambda h:_cap(h,"fs","read").target.df(),"du":lambda h,p="/":_cap(h,"fs","read").target.du(_vpath(h.cap,p)),"fsck":lambda h,repair=False:_cap(h,"fs","admin" if repair else "read").target.fsck(repair),
-      "chmod":lambda h,p,mode,follow=True:_cap(h,"fs","write").target.chmod(_vpath(h.cap,p),int(mode),follow),"chown":lambda h,p,uid=-1,gid=-1,follow=True:_cap(h,"fs","admin").target.chown(_vpath(h.cap,p),int(uid),int(gid),follow),"utime":lambda h,p,atime=-1,mtime=-1,follow=True:_cap(h,"fs","write").target.utime(_vpath(h.cap,p),int(atime),int(mtime),follow),"truncate":lambda h,p,size:_cap(h,"fs","write").target.truncate(_vpath(h.cap,p),int(size)),"link":lambda h,a,z:_cap(h,"fs","write").target.link(_vpath(h.cap,a),_vpath(h.cap,z)),"symlink":lambda h,target,p:_cap(h,"fs","write").target.symlink(str(target),_vpath(h.cap,p)),"readlink":lambda h,p:_cap(h,"fs","read").target.readlink(_vpath(h.cap,p)),
+      "readlink":lambda h,p:_cap(h,"fs","read").target.readlink(_vpath(h.cap,p)),
     }
     vec={
       "collections":lambda h:_cap(h,"vector","read").target.list_collections(),

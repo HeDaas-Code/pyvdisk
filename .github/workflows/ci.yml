@@ -1,0 +1,26 @@
+name: CI
+on:
+  push: {}
+  pull_request: {}
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    # hnswlib builds from source here; without a cap a stuck build burns the runner.
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # Every version requires-python promises. The 3.9 job is the floor: it is what
+        # fails if a change starts using newer syntax (it caught PEP 701 nesting).
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[dev]
+      - name: Tests
+        run: python -m pytest -q --no-header -p no:cacheprovider

@@ -185,7 +185,8 @@ class Parser:
       else:args.append(self.expr())
       if not self.match(T.COMMA):break
     self.need(T.RPAREN);left=A.Call(left.span,left,args,kwargs);continue
-   if self.match(T.DOT,T.OPTIONAL_DOT):left=A.Member(left.span,left,self.need(T.IDENT).value);continue
+   if self.match(T.DOT):left=A.Member(left.span,left,self.need(T.IDENT).value);continue
+   if self.match(T.OPTIONAL_DOT):left=A.OptionalMember(left.span,left,self.need(T.IDENT).value);continue
    if self.match(T.LBRACKET):idx=self.expr();self.need(T.RBRACKET);left=A.Index(left.span,left,idx);continue
    typ=self.cur().type;p=PREC.get(typ,-1)
    if p<minp:break

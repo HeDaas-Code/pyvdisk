@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.vscript.cli",
+  "updated_at": "2026-09-23T07:25:08.831Z",
+  "reading": {
+    "zh": "先是把本接口挂到主 CLI 的解析器钩子，再是含挂载授权的 check/run 命令，最后是交互式 REPL。",
+    "en": "The parser hook that grafts this surface onto the main CLI, the check/run commands with mount authorization, and the interactive REPL."
+  },
+  "order": [
+    "pyvdisk.vscript.cli.parser",
+    "pyvdisk.vscript.cli.commands",
+    "pyvdisk.vscript.cli.repl"
+  ]
+}

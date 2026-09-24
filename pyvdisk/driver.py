@@ -58,7 +58,7 @@ class MountedLog:
     label: str
     kind: str
     uuid: str
-    store: object
+    store: "LogDisk"
     paths: List[str]
 
     @property
@@ -75,7 +75,7 @@ class MountedVector:
     label: str
     kind: str
     uuid: str
-    store: object
+    store: "VectorDisk"
     paths: List[str]
 
     def close(self):

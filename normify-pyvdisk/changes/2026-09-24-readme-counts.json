@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "2026-09-24-readme-counts",
+  "title": {
+    "en": "Align the README counts with the rebuilt tree",
+    "zh": "README 计数与重建后的结构库对齐"
+  },
+  "status": "verified",
+  "intent": {
+    "en": "After the resync build the README still advertised the previous counts (193 tests, 262 modules, 761 APIs, 116 arrows). Bringing them in line with the compiled tree (391 tests, 272 modules, 794 APIs, 124 arrows) changes the file, so its module fingerprint and revision are refreshed in their own small change.",
+    "zh": "重同步编译后 README 仍写着旧计数（193 测试、262 模块、761 API、116 箭头）。把其对齐到刚编译的 tree.json（391 测试、272 模块、794 API、124 箭头）会改动该文件，因此用一个小变更刷新它的指纹与修订号。"
+  },
+  "modules": {
+    "modify": [
+      "pyvdisk.docs.readme",
+      "pyvdisk.docs"
+    ]
+  },
+  "acceptance": [
+    "README 中的用例数、模块/API/依赖箭头计数与刚编译的 tree.json 一致"
+  ],
+  "note": "README 计数对齐到 c3881ee 的编译结果；刷新 pyvdisk.docs.readme 与其父容器 pyvdisk.docs 的指纹。",
+  "revision": {
+    "before": null,
+    "after": "c3881eee5dced2b180cd3b383e5d848026224154"
+  },
+  "created_at": "2026-09-24T10:00:06.695Z",
+  "updated_at": "2026-09-24T10:00:54.385Z",
+  "closed_at": "2026-09-24T10:00:54.385Z"
+}

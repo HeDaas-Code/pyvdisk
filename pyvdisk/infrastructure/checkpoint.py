@@ -4,6 +4,8 @@ The infrastructure implementation is canonical; pyvdisk.vscript.checkpoint
 re-exports this class for compatibility with older VScript users.
 """
 from __future__ import annotations
+import contextlib
+import fcntl
 import json
 import os
 import tempfile
@@ -38,6 +40,58 @@ class CheckpointStore:
     @classmethod
     def from_vfs(cls, vfs, path="/.system/checkpoints.json"):
         return cls(vfs, path)
+
+    @contextlib.contextmanager
+    def locked(self):
+        """Cross-process mutual exclusion around a host backend.
+
+        Host backends place an exclusive ``flock`` on a sidecar ``<path>.lock``
+        so concurrent processes share one JSON file without clobbering each
+        other. The lock is reentrant per thread (nested acquisitions are
+        allowed and only the outermost releases it). VFS backends have no
+        cross-process file handle to lock and return a no-op context.
+        """
+        if self.backend != "host":
+            yield
+            return
+        local = getattr(self, "_flock_local", None)
+        if local is None:
+            local = self._flock_local = threading.local()
+        if getattr(local, "held", False):
+            local.depth += 1
+            try:
+                yield
+            finally:
+                local.depth -= 1
+            return
+        lockfile = Path(str(self.path) + ".lock")
+        lockfile.parent.mkdir(parents=True, exist_ok=True)
+        fd = os.open(str(lockfile), os.O_CREAT | os.O_RDWR, 0o644)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX)
+            local.held = True
+            local.fd = fd
+            local.depth = 1
+            try:
+                yield
+            finally:
+                local.depth -= 1
+                if local.depth <= 0:
+                    try:
+                        fcntl.flock(fd, fcntl.LOCK_UN)
+                    finally:
+                        os.close(fd)
+                    local.held = False
+                    local.fd = None
+                    local.depth = 0
+        except BaseException:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+            local.held = False
+            local.fd = None
+            raise
     @classmethod
     def from_host(cls, path):
         return cls(path)
@@ -50,7 +104,12 @@ class CheckpointStore:
             try: raw, label = self.path.read_bytes(), str(self.path)
             except FileNotFoundError: return {}
         try:
-            value = json.loads(raw.decode("utf-8"))
+            def _object_hook(value):
+                if isinstance(value, dict) and set(value.keys()) == {"__bytes__"}:
+                    import base64
+                    return base64.b64decode(value["__bytes__"])
+                return value
+            value = json.loads(raw.decode("utf-8"), object_hook=_object_hook)
             return value if isinstance(value, dict) else {}
         except (ValueError, UnicodeDecodeError, OSError) as exc:
             raise ValueError(f"invalid checkpoint: {label}") from exc
@@ -62,7 +121,17 @@ class CheckpointStore:
             self.data[key] = value
             self.save()
     def save(self):
-        raw = json.dumps(self.data, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+        def _default(value):
+            if isinstance(value, (bytes, bytearray, memoryview)):
+                import base64
+                return {"__bytes__": base64.b64encode(bytes(value)).decode("ascii")}
+            raise TypeError(f"object of type {type(value).__name__} is not JSON serialisable")
+        def _object_hook(value):
+            if isinstance(value, dict) and set(value.keys()) == {"__bytes__"}:
+                import base64
+                return base64.b64decode(value["__bytes__"])
+            return value
+        raw = json.dumps(self.data, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=_default).encode("utf-8")
         if self.backend == "vfs":
             self.vfs.write_file(self.path, raw)
             return

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.vfs",
+  "updated_at": "2026-09-23T07:23:37.579Z",
+  "mode": "groups",
+  "max_columns": 4,
+  "reading": {
+    "zh": "先看 VFS 如何打开镜像/卷并挂载（含 create），再沿着路径式接口读下去：权限检查、查询、目录、文件、删除、属性、宿主导入导出、遍历与空间；最后是 VFile 文件对象及其读写与上下文。",
+    "en": "First how the VFS opens an image or volume and mounts it (including create), then the path-based API: permission checks, query, directories, files, removal, attributes, host transfer, walking and space; finally the VFile object with its IO and context."
+  },
+  "order": [
+    "pyvdisk.storage.vfs.open",
+    "pyvdisk.storage.vfs.create",
+    "pyvdisk.storage.vfs.lifetime",
+    "pyvdisk.storage.vfs.permissions",
+    "pyvdisk.storage.vfs.query",
+    "pyvdisk.storage.vfs.dirs",
+    "pyvdisk.storage.vfs.files",
+    "pyvdisk.storage.vfs.remove",
+    "pyvdisk.storage.vfs.stat",
+    "pyvdisk.storage.vfs.attrs",
+    "pyvdisk.storage.vfs.hostio",
+    "pyvdisk.storage.vfs.walk",
+    "pyvdisk.storage.vfs.space",
+    "pyvdisk.storage.vfs.vfile",
+    "pyvdisk.storage.vfs.vfile-io",
+    "pyvdisk.storage.vfs.vfile-ctx"
+  ],
+  "groups": [
+    {
+      "id": "lifecycle",
+      "title": {
+        "zh": "挂载与生命周期",
+        "en": "Mount and Lifetime"
+      },
+      "children": [
+        "pyvdisk.storage.vfs.open",
+        "pyvdisk.storage.vfs.create",
+        "pyvdisk.storage.vfs.lifetime"
+      ]
+    },
+    {
+      "id": "namespace",
+      "title": {
+        "zh": "路径式文件系统接口",
+        "en": "Path-Based Filesystem API"
+      },
+      "children": [
+        "pyvdisk.storage.vfs.permissions",
+        "pyvdisk.storage.vfs.query",
+        "pyvdisk.storage.vfs.dirs",
+        "pyvdisk.storage.vfs.files",
+        "pyvdisk.storage.vfs.remove",
+        "pyvdisk.storage.vfs.stat",
+        "pyvdisk.storage.vfs.attrs",
+        "pyvdisk.storage.vfs.hostio",
+        "pyvdisk.storage.vfs.walk",
+        "pyvdisk.storage.vfs.space"
+      ]
+    },
+    {
+      "id": "fileobj",
+      "title": {
+        "zh": "文件对象",
+        "en": "File Objects"
+      },
+      "children": [
+        "pyvdisk.storage.vfs.vfile",
+        "pyvdisk.storage.vfs.vfile-io",
+        "pyvdisk.storage.vfs.vfile-ctx"
+      ]
+    }
+  ]
+}
