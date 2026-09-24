@@ -1,7 +1,13 @@
-"""向量数据盘：在 PyVDisk 文件系统中持久化多个 HNSW 向量集合。"""
+"""向量数据盘：在 PyVDisk 文件系统中持久化多个向量集合。
+
+索引后端是可选的：装了 hnswlib 就用 HNSW 图索引（近似、对数级查询），
+没装就用内置的扁平索引（精确、线性查询）。两种后端写出的集合都带格式标记，
+因此换一台机器、换一个环境打开同一块盘都不会读错。
+"""
 from __future__ import annotations
 import hashlib, json, math, os, tempfile, threading
 from typing import Any, Dict, Iterable, List, Optional
+from . import vector_index
 from .disk import VirtualDisk
 from .identity import probe_disk, write_identity_to_block0
 from .vfs import VFS
@@ -13,12 +19,20 @@ SUPPORTED_METRICS = ("cosine", "l2", "ip")
 class VectorDiskError(Exception):
     """向量数据盘操作失败。"""
 
-def _hnswlib():
+def _index_backend():
+    """返回可用的索引后端：装了 hnswlib 用它，否则用内置扁平索引。
+
+    以前缺 hnswlib 会直接抛 ImportError；现在它只是可选的加速器，
+    没有它集合依然可用（查询精确，代价是线性扫描）。
+    """
     try:
         import hnswlib
-    except ImportError as exc:
-        raise ImportError("向量数据盘需要可选依赖 hnswlib；请运行 pip install \"pyvdisk[vector]\"（Windows 上它需要现场编译 C++）") from exc
+    except ImportError:
+        return vector_index.backend
     return hnswlib
+
+def _is_hnswlib(backend) -> bool:
+    return getattr(backend, "__name__", "") == "hnswlib"
 
 def _json_bytes(value: Any) -> bytes:
     return json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -221,25 +235,41 @@ class VectorDisk:
             self._config(collection); return len(self._records(collection)["items"])
 
     def _rebuild_index(self, name: str, config: Dict[str, Any], records: Dict[str, Any]) -> None:
-        hnswlib = _hnswlib(); index = hnswlib.Index(space=config["metric"], dim=config["dimension"])
+        backend = _index_backend()
+        index = backend.Index(space=config["metric"], dim=config["dimension"])
         index.init_index(max_elements=max(config["max_elements"], 1), ef_construction=config["ef_construction"], M=config["m"])
         index.set_ef(config["ef_search"]); values = list(records["items"].values())
         if values: index.add_items([v["vector"] for v in values], [v["label"] for v in values])
-        fd, host_path = tempfile.mkstemp(suffix=".hnsw"); os.close(fd)
-        try:
-            index.save_index(host_path)
-            with open(host_path, "rb") as stream:
-                # Publish the rebuilt index as one VFS rename.
-                target = self._dir(name) + "/index.hnsw"
-                temporary = target + ".tmp"
-                self.vfs.write_file(temporary, stream.read())
-                self.vfs.rename(temporary, target)
-        finally:
-            try: os.unlink(host_path)
-            except OSError: pass
+        # The backend tags its own output (the flat index carries a magic header),
+        # so a later reader knows what wrote the file.
+        payload = vector_index.serialize_from_backend(index, backend)
+        # Publish the rebuilt index as one VFS rename.
+        target = self._dir(name) + "/index.hnsw"
+        temporary = target + ".tmp"
+        self.vfs.write_file(temporary, payload)
+        self.vfs.rename(temporary, target)
 
-    def _load_index(self, name: str, config: Dict[str, Any]):
-        hnswlib = _hnswlib(); data = self.vfs.read_file(self._dir(name) + "/index.hnsw")
+    def _flat_from_records(self, config: Dict[str, Any], records: Dict[str, Any]):
+        """精确索引，由记录直接构建（hnswlib 写的盘在无 hnswlib 环境下也能查）。"""
+        index = vector_index.FlatIndex(space=config["metric"], dim=config["dimension"])
+        index.init_index(max_elements=max(config["max_elements"], 1))
+        index.set_ef(config["ef_search"])
+        for record in records["items"].values():
+            index.add_item(int(record["label"]), record["vector"])
+        return index
+
+    def _load_index(self, name: str, config: Dict[str, Any], records: Dict[str, Any] = None):
+        data = self.vfs.read_file(self._dir(name) + "/index.hnsw")
+        if vector_index.read_kind(data) == vector_index.KIND_FLAT:
+            return vector_index.deserialize(data)
+        try:
+            hnswlib = _index_backend()
+            if not _is_hnswlib(hnswlib):
+                raise ImportError("hnswlib unavailable")
+        except ImportError:
+            # Written by hnswlib elsewhere and hnswlib is not installed here:
+            # answer exactly, from the records, instead of failing the query.
+            return self._flat_from_records(config, records or self._records(name))
         fd, host_path = tempfile.mkstemp(suffix=".hnsw")
         try:
             with os.fdopen(fd, "wb") as stream: stream.write(data)
@@ -258,7 +288,7 @@ class VectorDisk:
             by_label = {v["label"]: (item_id, v) for item_id, v in records["items"].items()}
             allowed = {label for label, (_id, rec) in by_label.items() if _match_filter(rec["metadata"], where)}
             if not allowed: return []
-            index = self._load_index(collection, config); wanted = min(k, len(allowed))
+            index = self._load_index(collection, config, records); wanted = min(k, len(allowed))
             labels, distances = index.knn_query([query], k=wanted, filter=lambda label: int(label) in allowed)
             result = []
             for label, distance in zip(labels[0], distances[0]):

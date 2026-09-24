@@ -21,6 +21,29 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e .[dev]
+          # [vector] keeps the hnswlib path covered now that it is optional: without
+          # this the accelerator backend would silently stop being tested.
+          python -m pip install -e .[dev,vector]
       - name: Tests
+        run: python -m pytest -q --no-header -p no:cacheprovider
+
+  no-dependencies:
+    # The zero-dependency claim is a promise to users, so it gets its own job: install
+    # the package alone and prove the core still imports and passes.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install without extras
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[dev]
+      - name: No third-party runtime dependency may be installed
+        run: |
+          python -c "import importlib.util,sys; bad=[n for n in ('hnswlib','fuse','numpy') if importlib.util.find_spec(n)]; sys.exit('installed: '+','.join(bad)) if bad else None"
+          python -c "import pyvdisk; print('pyvdisk', pyvdisk.__version__, 'imported with the standard library only')"
+      - name: Tests (accelerator-dependent cases skip)
         run: python -m pytest -q --no-header -p no:cacheprovider

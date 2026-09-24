@@ -524,9 +524,7 @@ wheels = [
 name = "pyvdisk"
 version = "0.3.0"
 source = { editable = "." }
-dependencies = [
-    { name = "hnswlib" },
-]
+dependencies = []
 
 [package.optional-dependencies]
 dev = [
@@ -537,14 +535,17 @@ dev = [
 fuse = [
     { name = "fusepy" },
 ]
+vector = [
+    { name = "hnswlib" },
+]
 
 [package.metadata]
 requires-dist = [
     { name = "fusepy", marker = "extra == 'fuse'" },
-    { name = "hnswlib", specifier = ">=0.8.0" },
+    { name = "hnswlib", marker = "extra == 'vector'", specifier = ">=0.8.0" },
     { name = "pytest", marker = "extra == 'dev'" },
 ]
-provides-extras = ["fuse", "dev"]
+provides-extras = ["fuse", "dev", "vector"]
 
 [[package]]
 name = "tomli"
