@@ -5,14 +5,12 @@ parent: pyvdisk.storage.vector
 name: {zh: "向量检索", en: "Vector Search"}
 description:
   zh: >
-      HNSW 图上的索引管理与相似度检索，支持元数据过滤。
-      
+      索引构建、加载与查询。后端在加载时由文件魔数决定：装了 hnswlib 就用它，否则用内置 flat 索引。以一次改名发布，并发读方看到的要么是旧索引要么是新索引。
   en: >
-      Index management and similarity search over the HNSW graph with metadata filtering.
-      
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:48.423Z"
-fingerprint: f3bc6b45a520369279ba039c4bf06fb0bfce7e84df609d7d20d81ad24a85dc35
+      Index construction, loading and query. The backend is chosen at load time from the file's magic tag: hnswlib when installed, the built-in flat index otherwise. Published with a single rename, so a concurrent reader sees either the old index or the new one.
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: ee801e56c4d436543de323aa02bb0c3a4e78339ef28b5c1ec180ad68cee817b0
 source:
   - path: "pyvdisk/vector_disk.py"
     line: 223
@@ -22,33 +20,26 @@ apis:
     path: "pyvdisk.vector_disk.VectorDisk#_rebuild_index"
     description:
       zh: >
-          从持久记录重建 HNSW 索引。
-          
+          由记录重建索引，并以一次改名原子发布，读方不会看到写了一半的索引。
       en: >
-          Rebuild the HNSW index from the persisted records.
-          
+          Rebuild the index from the records and publish it with one rename, so a reader never sees a half-written index.
   - protocol: rpc
     path: "pyvdisk.vector_disk.VectorDisk#_load_index"
     description:
       zh: >
-          加载盘上索引，缺失时重建。
-          
+          加载集合索引。由文件魔数决定路径：flat 直接解析，hnswlib 索引经 hnswlib 加载，缺 hnswlib 时回退为按记录重建的精确索引。
       en: >
-          Load the on-disk index or rebuild it when absent.
-          
+          Load the collection index. The file's magic decides how: flat parses directly, hnswlib loads through hnswlib, and a missing hnswlib falls back to an exact index over the records.
   - protocol: rpc
     path: "pyvdisk.vector_disk.VectorDisk#search"
     description:
       zh: >
-          相似度检索：k 结果、可选元数据过滤，以及是否返回向量。
-          
+          最近邻检索，可带元数据过滤。
       en: >
-          Similarity search with k results, an optional metadata filter and include/exclude of vectors.
-          
+          Nearest-neighbour search with an optional metadata filter.
 deps:
-  - kind: dataflow
-    to: pyvdisk.storage.vector.records
-    from_api: "rpc:pyvdisk.vector_disk.VectorDisk#_rebuild_index"
-    to_api: "rpc:pyvdisk.vector_disk.VectorDisk#get"
-    label: {zh: "读取记录", en: "reads records"}
+  - kind: call
+    to: pyvdisk.storage.vector.flat-index
+    from_api: "rpc:pyvdisk.vector_disk.VectorDisk#_load_index"
+    label: {zh: "后端回退", en: "backend fallback"}
 ---

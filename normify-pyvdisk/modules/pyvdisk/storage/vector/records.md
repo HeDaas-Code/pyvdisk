@@ -10,9 +10,9 @@ description:
   en: >
       Record CRUD: dimension validation, upsert (single and batch), fetch, delete and count.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:13.025Z"
-fingerprint: f3bc6b45a520369279ba039c4bf06fb0bfce7e84df609d7d20d81ad24a85dc35
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: ee801e56c4d436543de323aa02bb0c3a4e78339ef28b5c1ec180ad68cee817b0
 source:
   - path: "pyvdisk/vector_disk.py"
     line: 165

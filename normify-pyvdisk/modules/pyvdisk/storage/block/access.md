@@ -10,9 +10,9 @@ description:
   en: >
       Block and byte access on an open image: block read/write, raw byte ranges and image resize.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:48.423Z"
-fingerprint: f3dafc0720e696593d7bf2d99ff7d99856081e9e0c20a734b75f83098f1cfb80
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: 88da0b2f3ce22b186edf88eab3d800c8e50671236a9ed1b9dbed478ff6837d16
 source:
   - path: "pyvdisk/disk.py"
     line: 143
@@ -68,4 +68,8 @@ deps:
     to: pyvdisk.storage.block.io
     from_api: "rpc:pyvdisk.disk.VirtualDisk#read_block"
     label: {zh: "定位读取", en: "positional read"}
+  - kind: call
+    to: pyvdisk.storage.block.io
+    from_api: "rpc:pyvdisk.disk.VirtualDisk#write_block"
+    label: {zh: "定位写入", en: "positioned write"}
 ---

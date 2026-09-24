@@ -5,14 +5,12 @@ parent: pyvdisk.vscript.host
 name: {zh: "宿主隔离", en: "Host Confinement"}
 description:
   zh: >
-      宿主隔离：声明脚本可读写的宿主目录，其余路径一律拒绝。该策略现在有真实入口——CLI 注入声明的根目录——host.* 不再因根目录为空而不可用。
-      
+      宿主隔离：声明脚本可读写的宿主目录，其余路径一律拒绝。写入末尾会刷盘目录，让改名本身落地；该刷盘经由平台适配层，因为 Windows 无法把目录当文件打开。
   en: >
-      Host confinement: declares which host directories a script may read and write and refuses everything else. The policy now has a real entry point -- the CLI injects the declared roots -- so host.* is reachable instead of failing with an empty root set.
-      
-revision: c3881eee5dced2b180cd3b383e5d848026224154
-updated_at: "2026-09-24T09:58:38.260Z"
-fingerprint: baf58ee2c4dbda56cd6c7afb131bba217cd12b97019cd89fbebb5a1a7edad7c2
+      Host confinement: declares which host directories a script may read and write and refuses everything else. Writes end with a directory flush so the rename itself is durable; that flush goes through the platform layer, since Windows cannot open a directory as a file.
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: b041b5a92b2d5d9ff7cfc03f3d5bd925f17d1a1137ec559745e0608f984f0d8a
 source:
   - path: "pyvdisk/vscript/host.py"
     line: 8
@@ -72,4 +70,9 @@ apis:
       en: >
           Write host data with an optional no-overwrite guard.
           
+deps:
+  - kind: call
+    to: pyvdisk.platform.durability
+    from_api: "rpc:pyvdisk.vscript.host.HostProxy#write"
+    label: {zh: "刷盘目录", en: "flush the directory"}
 ---

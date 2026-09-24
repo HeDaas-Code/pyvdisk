@@ -11,9 +11,9 @@ description:
   en: >
       Repository documentation layer: architecture, contracts, API governance and the VScript spec; the primary evidence source for this module tree.
       
-revision: c3881eee5dced2b180cd3b383e5d848026224154
-updated_at: "2026-09-24T10:00:52.069Z"
-fingerprint: 08fd9522bb3a8bd1bc169f548c3c3e441fb6cd89f089c8e4206604371248a807
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: 7967b9cf3de163a9defdd8db9f1f6647edc58752751bf6ca540bbeb8155ad7d7
 source:
   - path: "README.md"
   - path: "docs/ARCHITECTURE.md"

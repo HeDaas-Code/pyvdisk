@@ -5,14 +5,14 @@ parent: pyvdisk.storage.fuse
 name: {zh: "FUSE 属性", en: "FUSE Attributes"}
 description:
   zh: >
-      FUSE 可用性检测，以及操作表中属性与目录列举部分。
+      stat 到 fuse 的映射与目录项对象：类型、mode、大小、时间戳与属主。身份来自平台适配层，同时修掉一个真实缺陷：此前 uid 0（root）与"平台没有 uid"无法区分。
       
   en: >
-      FUSE availability check and the attribute/listing half of the operation table.
+      Stat-to-fuse mapping and the entry object: type, mode, size, timestamps and ownership. Identity comes from the platform layer, which also fixes a real bug: uid 0 (root) was previously indistinguishable from "no uid available".
       
-revision: c3881eee5dced2b180cd3b383e5d848026224154
-updated_at: "2026-09-24T09:58:38.232Z"
-fingerprint: b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T11:37:33.368Z"
+fingerprint: c711d0ed315e831e5d1d2873c7557dc5e72c8dcb01ee91556eb39cb3065c5d76
 source:
   - path: "pyvdisk/fuse_mount.py"
     line: 24
@@ -56,8 +56,7 @@ apis:
           
 deps:
   - kind: call
-    to: pyvdisk.storage.vfs.stat
+    to: pyvdisk.platform.durability
     from_api: "rpc:pyvdisk.fuse_mount._VFuseOperations#_getattr"
-    to_api: "rpc:pyvdisk.vfs.VFS#stat"
-    label: {zh: "取 stat", en: "stats path"}
+    label: {zh: "进程身份", en: "process identity"}
 ---

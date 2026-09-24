@@ -6,12 +6,12 @@ tags: [api]
 name: {zh: "公开门面", en: "Public Facade"}
 description:
   zh: >
-      公开门面：调用方直接从 pyvdisk 包根导入的存储、执行与契约名称。
+      公开门面：调用方直接从 pyvdisk 包根导入的存储、执行、Agent 与契约名称。
   en: >
-      Public facade: the storage, execution and contract names that callers import directly from the pyvdisk package root.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:14:45.848Z"
-fingerprint: 1e6d5c306ceb1123c99b098fd82cda1a805d9c5f23aa12f22d64f3bd129a5da7
+      Public facade: the storage, execution, agent and contract names that callers import directly from the pyvdisk package root.
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: 829b9ac86974d0b749ac032ca0809ff290509d8be9218da09a8823562bd84a3b
 source:
   - path: "pyvdisk/__init__.py"
 apis:
@@ -71,4 +71,38 @@ apis:
           执行平面返回的运行句柄。
       en: >
           Run handle returned by the execution plane.
+  - protocol: rpc
+    path: "pyvdisk.AgentSandbox"
+    description:
+      zh: >
+          Agent 工作区门面：Agent 框架只需要这一个导入。
+      en: >
+          The agent workspace facade: the one import an agent framework needs.
+  - protocol: rpc
+    path: "pyvdisk.compat"
+    description:
+      zh: >
+          平台适配层；导出后调用方可以查询当前用的是哪套实现。
+      en: >
+          The platform layer, exported so callers can ask which implementation is live.
+  - protocol: rpc
+    path: "pyvdisk.FlatIndex"
+    description:
+      zh: >
+          无外部依赖的精确向量索引。
+      en: >
+          The dependency-free exact vector index.
+deps:
+  - kind: reference
+    to: pyvdisk.agent.sandbox
+    from_api: "rpc:pyvdisk.AgentSandbox"
+    label: {zh: "转出沙箱门面", en: "re-exports the sandbox"}
+  - kind: reference
+    to: pyvdisk.platform
+    from_api: "rpc:pyvdisk.compat"
+    label: {zh: "转出平台适配层", en: "re-exports the platform layer"}
+  - kind: reference
+    to: pyvdisk.storage.vector.flat-index
+    from_api: "rpc:pyvdisk.FlatIndex"
+    label: {zh: "转出扁平索引", en: "re-exports the flat index"}
 ---

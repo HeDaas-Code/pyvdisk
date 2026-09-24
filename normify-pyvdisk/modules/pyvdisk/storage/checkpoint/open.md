@@ -5,14 +5,14 @@ parent: pyvdisk.storage.checkpoint
 name: {zh: "检查点存储", en: "Checkpoint Store"}
 description:
   zh: >
-      检查点存储的构造与加锁：后端选择、VFS 或宿主背衬，以及独占写周期。
+      检查点存储的构造与加锁：后端选择、VFS 或宿主背衬，以及独占写周期。本模块过去在顶层 import fcntl，导致整个包在 Windows 上无法导入；现在锁来自平台适配层。
       
   en: >
-      Checkpoint store construction and locking: backend selection, VFS or host backing, and the exclusive write cycle.
+      Checkpoint store construction and locking: backend selection, VFS or host backing, and the exclusive write cycle. This module used to import fcntl at the top level, which made the whole package unimportable on Windows; the lock now comes from the platform layer.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:20:48.308Z"
-fingerprint: d96b0e630513ab3bea2172e2d6d091b3f50f62680b86ce05380946d8ce3e3424
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T11:40:40.830Z"
+fingerprint: 9ca9673053b671140cc605c35d9a339dee71a77fee8e2598d5b2483bcfd26539
 source:
   - path: "pyvdisk/infrastructure/checkpoint.py"
     line: 15
@@ -65,8 +65,7 @@ apis:
           
 deps:
   - kind: call
-    to: pyvdisk.storage.vfs.files
-    from_api: "rpc:pyvdisk.infrastructure.checkpoint.CheckpointStore#from_vfs"
-    to_api: "rpc:pyvdisk.vfs.VFS#read_file"
-    label: {zh: "经 VFS 读写", en: "reads via VFS"}
+    to: pyvdisk.platform.locking
+    from_api: "rpc:pyvdisk.infrastructure.checkpoint.CheckpointStore#locked"
+    label: {zh: "跨进程锁", en: "cross-process lock"}
 ---

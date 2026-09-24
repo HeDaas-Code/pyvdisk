@@ -6,11 +6,13 @@ name: {zh: "触发器检查点", en: "Trigger Checkpoints"}
 description:
   zh: >
       面向触发器的便利层，为调度器提供持久的事件去重保证。
+      
   en: >
       Trigger-facing convenience layer that gives the scheduler durable exactly-once event dedup.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: d96b0e630513ab3bea2172e2d6d091b3f50f62680b86ce05380946d8ce3e3424
+      
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: 9ca9673053b671140cc605c35d9a339dee71a77fee8e2598d5b2483bcfd26539
 source:
   - path: "pyvdisk/infrastructure/checkpoint.py"
     line: 146
@@ -21,15 +23,19 @@ apis:
     description:
       zh: >
           记录某触发器已消费某事件 id。
+          
       en: >
           Record that a trigger already consumed an event id.
+          
   - protocol: rpc
     path: "pyvdisk.infrastructure.checkpoint.CheckpointStore#last_event"
     description:
       zh: >
           读取某触发器最近成功处理的事件 id。
+          
       en: >
           Read the last successfully processed event id of a trigger.
+          
 deps:
   - kind: reference
     to: pyvdisk.vscript.triggers

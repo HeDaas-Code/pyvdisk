@@ -11,9 +11,9 @@ description:
   en: >
       Optional FUSE mount that exposes a VFS as a host directory; degrades to a clear ImportError when fusepy is absent.
       
-revision: c3881eee5dced2b180cd3b383e5d848026224154
-updated_at: "2026-09-24T09:58:38.231Z"
-fingerprint: b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: c711d0ed315e831e5d1d2873c7557dc5e72c8dcb01ee91556eb39cb3065c5d76
 source:
   - path: "pyvdisk/fuse_mount.py"
 ---

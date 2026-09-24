@@ -9,20 +9,20 @@
         "repository": "https://github.com/HeDaas-Code/pyvdisk"
       }
     ],
-    "compiled_at": "2026-09-24T10:00:54.895Z",
+    "compiled_at": "2026-09-24T11:41:32.599Z",
     "stats": {
       "tree_count": 1,
-      "module_count": 272,
-      "leaf_count": 234,
-      "api_count": 794,
-      "dep_count": 124,
+      "module_count": 290,
+      "leaf_count": 249,
+      "api_count": 844,
+      "dep_count": 132,
       "cross_tree_dep_count": 0,
       "max_depth": 4,
-      "layout_count": 38,
+      "layout_count": 41,
       "planned_count": 0,
       "deprecated_count": 0,
       "policy_rule_count": 2,
-      "change_count": 2,
+      "change_count": 3,
       "open_change_count": 0
     }
   },
@@ -44,18 +44,429 @@
         "en": "PyVDisk"
       },
       "description": {
-        "zh": "单机 Agentic 数据与执行基础设施：一个 .vdisk 容器承载文件系统、向量记忆、事件轨迹、检查点、WAL 与运行状态，并内置 VScript 安全工作流语言。\n",
-        "en": "Single-machine agentic data and execution infrastructure: one .vdisk container carries FS, vector memory, event trace, checkpoints, WAL and run state, plus the VScript safe workflow language.\n"
+        "zh": "单机 Agentic 数据与执行基础设施：一个 .vdisk 容器承载文件系统、向量记忆、事件轨迹、检查点、WAL 与运行状态，并内置 VScript 安全工作流语言。核心不依赖标准库之外的任何东西，Linux 与 Windows 同一套代码；AgentSandbox 让这个容器可以直接当成 Agent 工作区使用。\n",
+        "en": "Single-machine agentic data and execution infrastructure: one .vdisk container carries FS, vector memory, event trace, checkpoints, WAL and run state, plus the VScript safe workflow language. The core depends on nothing outside the standard library and runs on Linux and Windows alike, and AgentSandbox makes the container directly usable as an agent workspace.\n"
       },
       "source": [],
       "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
+      "updated_at": "2026-09-24T13:45:00Z",
       "fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "repository": "https://github.com/HeDaas-Code/pyvdisk",
       "aggregate": {
-        "descendant_count": 271,
+        "descendant_count": 289,
         "own_api_count": 0,
-        "inherited_api_count": 794,
+        "inherited_api_count": 844,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.agent": {
+      "uid": "a0000335",
+      "id": "pyvdisk.agent",
+      "parent": "pyvdisk",
+      "tree": "pyvdisk",
+      "depth": 2,
+      "name": {
+        "zh": "Agent 工作区",
+        "en": "Agent Workspace"
+      },
+      "description": {
+        "zh": "把 DataDisk 包成可以直接交给 Agent 框架的工作区：工具 schema、调用分发、路径约束与哈希链审计。对接面只有两个调用：tools() 与 dispatch()。\n",
+        "en": "Wraps a DataDisk into a workspace an agent framework can be handed: tool schemas, call dispatch, path confinement and a hash-chained audit trail. The integration surface is two calls, tools() and dispatch().\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/sandbox.py",
+          "line": 198,
+          "end_line": 314
+        },
+        {
+          "path": "pyvdisk/sandbox.py",
+          "line": 387,
+          "end_line": 474
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "16f85eddeab0b3086fcfd918528a3d307ffcfbfa3cf7f030223ac20f360a198d",
+      "aggregate": {
+        "descendant_count": 5,
+        "own_api_count": 0,
+        "inherited_api_count": 21,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.agent.audit": {
+      "uid": "a000033a",
+      "id": "pyvdisk.agent.audit",
+      "parent": "pyvdisk.agent",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "工具调用审计",
+        "en": "Tool Call Audit"
+      },
+      "description": {
+        "zh": "每次调用——包括每次被拒的调用——都写入哈希链流 agent-audit，记录工具名、参数、状态、错误类型与能力摘要。\"模型是不是读了不该读的路径\"这个问题，事后可以从日志里回答。\n",
+        "en": "Every call -- including every refusal -- is written to the hash-chained stream agent-audit with its tool name, arguments, status, error type and capability summary. An agent that read a path it should not have is a question the log can answer after the fact.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/sandbox.py",
+          "line": 584,
+          "end_line": 665
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "16f85eddeab0b3086fcfd918528a3d307ffcfbfa3cf7f030223ac20f360a198d",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.audit",
+          "description": {
+            "zh": "审计行，由旧到新。过滤条件为 sink 自身支持的若干项，外加 tool——它按行里记录的工具名筛选。\n",
+            "en": "Audit rows, oldest first. Filters are the sink's own plus tool, which selects on the tool name recorded in the row.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.audit"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.verify_audit",
+          "description": {
+            "zh": "校验整条哈希链；在 sink 之外追加的行会把它断开。\n",
+            "en": "Check the hash chain end to end; a row appended outside the sink breaks it.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.verify_audit"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.retain_audit",
+          "description": {
+            "zh": "按流上的保留策略裁剪，同时保持哈希链仍可校验。\n",
+            "en": "Apply the stream's retention policy while keeping the chain verifiable.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.retain_audit"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.stats",
+          "description": {
+            "zh": "调用与失败计数、工具集与磁盘占用，可序列化为 JSON 进日志。\n",
+            "en": "Call and failure counters, the tool set and disk usage, JSON-serialisable for logs.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.stats"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 4,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.agent.paths": {
+      "uid": "a0000337",
+      "id": "pyvdisk.agent.paths",
+      "parent": "pyvdisk.agent",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "路径约束",
+        "en": "Path Confinement"
+      },
+      "description": {
+        "zh": "沙箱内\"路径意味着什么\"的唯一一份定义。反斜杠输入被归一化，Windows 样式的路径留在镜像内部，.. 是拒绝而不是解析，容器自身的簿记对读写与列举一律不可见。\n",
+        "en": "The one definition of what a path means inside the sandbox: backslash input is normalised, Windows-looking paths stay inside the image, .. is refused rather than resolved, and the container's own bookkeeping is hidden from reads, writes and listings alike.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/sandbox.py",
+          "line": 60,
+          "end_line": 195
+        },
+        {
+          "path": "pyvdisk/sandbox.py",
+          "line": 387,
+          "end_line": 420
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "16f85eddeab0b3086fcfd918528a3d307ffcfbfa3cf7f030223ac20f360a198d",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox._normalize",
+          "description": {
+            "zh": "把模型给的路径映射进沙箱命名空间：反斜杠归一化，C:\\Windows 变成 /C:/Windows。\n",
+            "en": "Map a model-supplied path into the sandbox namespace: backslashes are normalised and C:\\Windows becomes /C:/Windows.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox._normalize"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox._visible",
+          "description": {
+            "zh": "先归一化，再拒绝容器自身的簿记路径。\n",
+            "en": "Normalise, then refuse the container's own bookkeeping paths.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox._visible"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:_hidden",
+          "description": {
+            "zh": "路径是否属于 /.system、/.vectors、/.logs，或是根目录下的清单文件。\n",
+            "en": "Whether a path is under /.system, /.vectors or /.logs, or is one of the root-level manifests.\n"
+          },
+          "key": "rpc:sandbox:_hidden"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 3,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.agent.sandbox": {
+      "uid": "a0000336",
+      "id": "pyvdisk.agent.sandbox",
+      "parent": "pyvdisk.agent",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "沙箱门面",
+        "en": "Sandbox Facade"
+      },
+      "description": {
+        "zh": "门面本体：create/open、Python 动词（write/read/list/make_directory/delete/exists）、脚本入口，以及 close/上下文管理器生命周期。read_only 由 capability 层强制，而不只是把工具藏起来，所以直接调用动词同样被拒。\n",
+        "en": "The facade itself: create/open, the Python verbs (write/read/list/make_directory/delete/exists), the script entry, and the close/context-manager lifecycle. read_only is enforced by the capability layer rather than by hiding tools, so a direct verb is refused too.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/sandbox.py",
+          "line": 316,
+          "end_line": 474
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "16f85eddeab0b3086fcfd918528a3d307ffcfbfa3cf7f030223ac20f360a198d",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.write",
+          "description": {
+            "zh": "写入文本或字节，沿途自动建父目录。拒绝容器内部目录，也拒绝任何会越出根目录的路径。\n",
+            "en": "Write text or bytes, creating parent directories on the way. Refuses hidden bookkeeping paths and anything that would escape the root.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.write"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.read",
+          "description": {
+            "zh": "读取原始字节；read_text() 返回解码后的字符串。\n",
+            "en": "Read raw bytes, then read_text() for a decoded string.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.read"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.list",
+          "description": {
+            "zh": "列出条目及其类型与大小。容器内部路径会被过滤，模型不会看到一个用不了的名字。\n",
+            "en": "List entries with type and size. Hidden container paths are filtered out, so the agent never sees a name it cannot use.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.list"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.make_directory",
+          "description": {
+            "zh": "创建目录，自动建父级。\n",
+            "en": "Make a directory, creating parents.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.make_directory"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.delete",
+          "description": {
+            "zh": "删除文件；recursive 为真时删整棵目录树。\n",
+            "en": "Delete a file, or a directory tree when recursive is set.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.delete"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.exists",
+          "description": {
+            "zh": "可见路径是否存在。内部路径一律返回 False。\n",
+            "en": "Whether a visible path exists. Hidden paths always answer False.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.exists"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.create",
+          "description": {
+            "zh": "新建或打开沙箱背后的镜像，可传 read_only、allow_delete、宿主根目录与审计上限等选项。\n",
+            "en": "Open or create the image behind the sandbox, with options such as read_only, allow_delete, host roots and audit limits.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.create"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.open",
+          "description": {
+            "zh": "重新打开已有镜像；工作区与审计记录都保留。\n",
+            "en": "Reopen an existing image; the workspace and the audit trail both survive.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.open"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 8,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 1
+      }
+    },
+    "pyvdisk.agent.script": {
+      "uid": "a0000339",
+      "id": "pyvdisk.agent.script",
+      "parent": "pyvdisk.agent",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "盘内脚本",
+        "en": "Sandboxed Scripts"
+      },
+      "description": {
+        "zh": "盘内 VScript 入口：脚本带着沙箱挂载运行，默认禁止宿主访问，stdout 返回给模型。挂载前面的适配器同样把容器簿记从 listdir、walk、glob 里滤掉，脚本入口不会变成规则更松的第二个入口。\n",
+        "en": "The in-disk VScript entry: a script runs with the sandbox mounted, host access denied by default, and its stdout returned to the model. The adapter in front of the mount filters container bookkeeping out of listdir, walk and glob as well, so the script door is not a second entrance with looser rules.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/sandbox.py",
+          "line": 72,
+          "end_line": 195
+        },
+        {
+          "path": "pyvdisk/sandbox.py",
+          "line": 476,
+          "end_line": 510
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "16f85eddeab0b3086fcfd918528a3d307ffcfbfa3cf7f030223ac20f360a198d",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.run",
+          "description": {
+            "zh": "执行 VScript 程序，沙箱绑定为变量 sandbox。未配置宿主根目录时宿主访问一律被拒；墙钟时间、输出与写入字节数都有上限。\n",
+            "en": "Run a VScript program with the sandbox bound as the variable sandbox. Host access is refused unless roots were configured; wall time, output and written bytes are all capped.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.run"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:_SandboxFS",
+          "description": {
+            "zh": "脚本看到的文件系统。每个路径都走与 Python 动词相同的可见性规则，两个入口不可能出现不一致。\n",
+            "en": "The filesystem a script sees. Every path is translated through the same visibility rule the Python verbs use, so the two entrances cannot disagree.\n"
+          },
+          "key": "rpc:sandbox:_SandboxFS"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 2,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.agent.tools": {
+      "uid": "a0000338",
+      "id": "pyvdisk.agent.tools",
+      "parent": "pyvdisk.agent",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "工具面",
+        "en": "Tool Surface"
+      },
+      "description": {
+        "zh": "六个内置工具：write_file、read_file、list_files、make_directory、delete_file、run_script，以及面向各框架约定的 schema 渲染，和在真正碰磁盘之前先校验参数的分发。\n",
+        "en": "The six built-in tools: write_file, read_file, list_files, make_directory, delete_file and run_script, plus the schema rendering for each framework convention and the dispatch that validates arguments before anything touches the disk.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/sandbox.py",
+          "line": 198,
+          "end_line": 314
+        },
+        {
+          "path": "pyvdisk/sandbox.py",
+          "line": 512,
+          "end_line": 583
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "16f85eddeab0b3086fcfd918528a3d307ffcfbfa3cf7f030223ac20f360a198d",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.tools",
+          "description": {
+            "zh": "交给模型的工具定义。openai 与 anthropic 共用 {name, description, parameters}；mcp 把 schema 键换成 inputSchema。\n",
+            "en": "The tool definitions to hand the model. openai and anthropic share {name, description, parameters}; mcp renames the schema key to inputSchema.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.tools"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.dispatch",
+          "description": {
+            "zh": "执行工具并始终返回字符串——拒绝也是字符串，因此可以原样回灌消息列表。\n",
+            "en": "Run a named tool and always return a string -- a refusal is a string too, so it goes back into the message list unchanged.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.dispatch"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:AgentSandbox.call",
+          "description": {
+            "zh": "dispatch 的结构化形式：ok、content、tool、error，供需要分支判断的调用方使用。\n",
+            "en": "The structured form of dispatch: ok, content, tool and error, for callers that branch on the outcome.\n"
+          },
+          "key": "rpc:sandbox:AgentSandbox.call"
+        },
+        {
+          "protocol": "rpc",
+          "path": "sandbox:TOOLS",
+          "description": {
+            "zh": "六个内置的文件系统与脚本工具及其 JSON Schema 参数。\n",
+            "en": "The six built-in filesystem and script tools, with their JSON Schema parameters.\n"
+          },
+          "key": "rpc:sandbox:TOOLS"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 4,
+        "inherited_api_count": 0,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -74,17 +485,17 @@
         "en": "Public Facade"
       },
       "description": {
-        "zh": "公开门面：调用方直接从 pyvdisk 包根导入的存储、执行与契约名称。\n",
-        "en": "Public facade: the storage, execution and contract names that callers import directly from the pyvdisk package root.\n"
+        "zh": "公开门面：调用方直接从 pyvdisk 包根导入的存储、执行、Agent 与契约名称。\n",
+        "en": "Public facade: the storage, execution, agent and contract names that callers import directly from the pyvdisk package root.\n"
       },
       "source": [
         {
           "path": "pyvdisk/__init__.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:14:45.848Z",
-      "fingerprint": "1e6d5c306ceb1123c99b098fd82cda1a805d9c5f23aa12f22d64f3bd129a5da7",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "829b9ac86974d0b749ac032ca0809ff290509d8be9218da09a8823562bd84a3b",
       "apis": [
         {
           "protocol": "rpc",
@@ -157,13 +568,72 @@
             "en": "Run handle returned by the execution plane.\n"
           },
           "key": "rpc:pyvdisk.RunHandle"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.AgentSandbox",
+          "description": {
+            "zh": "Agent 工作区门面：Agent 框架只需要这一个导入。\n",
+            "en": "The agent workspace facade: the one import an agent framework needs.\n"
+          },
+          "key": "rpc:pyvdisk.AgentSandbox"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat",
+          "description": {
+            "zh": "平台适配层；导出后调用方可以查询当前用的是哪套实现。\n",
+            "en": "The platform layer, exported so callers can ask which implementation is live.\n"
+          },
+          "key": "rpc:pyvdisk.compat"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.FlatIndex",
+          "description": {
+            "zh": "无外部依赖的精确向量索引。\n",
+            "en": "The dependency-free exact vector index.\n"
+          },
+          "key": "rpc:pyvdisk.FlatIndex"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "reference",
+          "to": "pyvdisk.agent.sandbox",
+          "from_api": "rpc:pyvdisk.AgentSandbox",
+          "label": {
+            "zh": "转出沙箱门面",
+            "en": "re-exports the sandbox"
+          },
+          "cross_tree": false
+        },
+        {
+          "kind": "reference",
+          "to": "pyvdisk.platform",
+          "from_api": "rpc:pyvdisk.compat",
+          "label": {
+            "zh": "转出平台适配层",
+            "en": "re-exports the platform layer"
+          },
+          "cross_tree": false
+        },
+        {
+          "kind": "reference",
+          "to": "pyvdisk.storage.vector.flat-index",
+          "from_api": "rpc:pyvdisk.FlatIndex",
+          "label": {
+            "zh": "转出扁平索引",
+            "en": "re-exports the flat index"
+          },
+          "cross_tree": false
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 8,
+        "own_api_count": 11,
         "inherited_api_count": 0,
-        "dep_out": 0,
+        "dep_out": 3,
         "dep_in": 0
       }
     },
@@ -1887,13 +2357,13 @@
           "path": ".github/workflows/pylint.yml"
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.215Z",
-      "fingerprint": "7b8e690a61c134d576c6f09d81d7bc29a6ab4028d80f74d3320a15c7b43cf8bc",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "ffb2fa1aa3e3cc015e3b71a246768d8b6ebbd7ef155a40d3000dafa42f532369",
       "aggregate": {
         "descendant_count": 3,
         "own_api_count": 0,
-        "inherited_api_count": 5,
+        "inherited_api_count": 6,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -1909,17 +2379,17 @@
         "en": "Test Workflow"
       },
       "description": {
-        "zh": "CI 工作流：在 push 与 pull request 上安装 dev extras 并在 3.9–3.12 矩阵上运行 pytest，使声明的 requires-python 下限由最老的矩阵任务强制，而不是靠假设。\n",
-        "en": "CI workflow: installs the dev extras and runs the pytest suite on push and pull request across the 3.9-3.12 matrix, so the declared requires-python floor is enforced by the oldest job rather than assumed.\n"
+        "zh": "CI 工作流：安装 dev 与 vector extras，在 push 与 pull request 上跨 3.9–3.12 矩阵跑 pytest，让声明的 requires-python 下限由最老的矩阵任务强制而不是靠假设。另有独立任务只装基础包并断言加速器确实缺席，零依赖的承诺因此不是自说自话。\n",
+        "en": "CI workflow: installs the dev and vector extras and runs pytest on push and pull request across the 3.9-3.12 matrix, so the declared requires-python floor is enforced by the oldest job rather than assumed. A second job installs the package without extras and asserts the accelerators are absent, which keeps the zero-dependency claim honest.\n"
       },
       "source": [
         {
           "path": ".github/workflows/ci.yml"
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.215Z",
-      "fingerprint": "b1583a09123f8c3ad3d2e52ae4bc88ff01e6db7a88c3336853b06482634e20eb",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "2bf7b99f2ff50585631ea75453ea75cc457a6fe7bece3d39c4fd4b40d5eadc13",
       "apis": [
         {
           "protocol": "file",
@@ -1929,11 +2399,20 @@
             "en": "Main test workflow: install and run the pytest suite.\n"
           },
           "key": "file:.github/workflows/ci.yml"
+        },
+        {
+          "protocol": "file",
+          "path": ".github/workflows/ci.yml#no-dependencies",
+          "description": {
+            "zh": "零依赖任务：只装 [dev]，断言 hnswlib、fusepy、numpy 都不可导入，然后跑整套用例。\n",
+            "en": "Zero-dependency job: installs [dev] only, asserts hnswlib, fusepy and numpy are absent, then runs the suite.\n"
+          },
+          "key": "file:.github/workflows/ci.yml#no-dependencies"
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 1,
+        "own_api_count": 2,
         "inherited_api_count": 0,
         "dep_out": 0,
         "dep_in": 0
@@ -1991,8 +2470,8 @@
         "en": "Packaging Metadata"
       },
       "description": {
-        "zh": "分发元数据：以 hnswlib 为依赖、fuse 与 dev extras、py.typed 标记，以及把 LICENSE 与 CHANGELOG.md 一并打包的 sdist 清单。\n",
-        "en": "Distribution metadata: cffi-free dependency set with hnswlib, the fuse and dev extras, the py.typed marker, and the sdist manifest that ships LICENSE plus CHANGELOG.md.\n"
+        "zh": "分发元数据：运行时依赖为空，hnswlib 与 fusepy 下沉到 vector、fuse 两个 extra，外加 py.typed 标记，以及把 LICENSE 与 CHANGELOG.md 一并打包的 sdist 清单。\n",
+        "en": "Distribution metadata: no runtime dependencies at all, with hnswlib and fusepy moved to the vector and fuse extras, the py.typed marker, and the sdist manifest that ships LICENSE plus CHANGELOG.md.\n"
       },
       "source": [
         {
@@ -2004,9 +2483,9 @@
           "line": 1
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.216Z",
-      "fingerprint": "eef1180eeb651e5a6edbef6a63bd38eb0f2e3244b7c927f12a61c503b23ac266",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "e83415f6936531ac1130878c36a08b49e1795946d20ecc3bf95a507560e0a608",
       "apis": [
         {
           "protocol": "file",
@@ -2078,9 +2557,9 @@
           "path": "docs/VSCRIPT_SPEC.md"
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T10:00:52.069Z",
-      "fingerprint": "08fd9522bb3a8bd1bc169f548c3c3e441fb6cd89f089c8e4206604371248a807",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "7967b9cf3de163a9defdd8db9f1f6647edc58752751bf6ca540bbeb8155ad7d7",
       "aggregate": {
         "descendant_count": 6,
         "own_api_count": 0,
@@ -2186,8 +2665,8 @@
         "en": "Changelog"
       },
       "description": {
-        "zh": "变更日志：按 issue #1 的清单编号记录用户可见变更，并列出四条明确留待后续的项目。\n",
-        "en": "Changelog: user-visible changes keyed to the issue #1 inventory ids, plus the four deliberately deferred items.\n"
+        "zh": "用户可见变更日志，版本号与 pyproject.toml 保持一致。条目按主题分组（零依赖与跨平台在前），并保留\"已知未完成\"一节，未完成项要看得见，而不是被静默遗忘。\n",
+        "en": "User-visible change log, versioned in step with pyproject.toml. Entries are grouped by theme (zero dependency and cross-platform first) and carry the residual-limits section, so unfixed items stay visible instead of being quietly forgotten.\n"
       },
       "source": [
         {
@@ -2196,9 +2675,9 @@
           "end_line": 47
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.211Z",
-      "fingerprint": "ea3f46a9c65b19826cd309658416f1fe840116fa730bfc745a4cf6b95f77858a",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "9648b98246e1e081401981daab12fa29c679efa0b189fb23fcb8542b565e7536",
       "apis": [
         {
           "protocol": "file",
@@ -2270,17 +2749,17 @@
         "en": "Project Overview"
       },
       "description": {
-        "zh": "README 总览：项目定位、快速开始、核心能力、CLI 用法与验证方式；徽章与声明的 Python 下限及当前用例数一致。\n",
-        "en": "README overview: positioning, quick start, core capabilities, CLI usage and how it is verified, with badges that match the declared Python floor and the current suite size.\n"
+        "zh": "README 总览：定位、零依赖快速开始、十行 Agent 框架对接 Demo、核心能力、CLI 用法与验证方式；徽章与声明的 Python 下限及当前用例数一致。\n",
+        "en": "README overview: positioning, zero-dependency quick start, a ten-line agent-framework demo, core capabilities, CLI usage and how it is verified, with badges that match the declared Python floor and the current suite size.\n"
       },
       "source": [
         {
           "path": "README.md"
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T10:00:52.068Z",
-      "fingerprint": "fd96eaab9b9f839e266b3f990012c5cc034178b7e0a534eb15be4c397a525f55",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "ee385479b03b021e1a6204295602c53737107b4071bdf81038483f4865f230ef",
       "apis": [
         {
           "protocol": "file",
@@ -2344,6 +2823,125 @@
             "en": "VScript language and safety specification.\n"
           },
           "key": "file:docs/VSCRIPT_SPEC.md"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.examples": {
+      "uid": "a000033b",
+      "id": "pyvdisk.examples",
+      "parent": "pyvdisk",
+      "tree": "pyvdisk",
+      "depth": 2,
+      "name": {
+        "zh": "可运行示例",
+        "en": "Runnable Examples"
+      },
+      "description": {
+        "zh": "可运行的示例，同时也是最快看懂整条栈怎么跑起来的方式。仅用标准库，从源码目录直接运行无需安装——零依赖的承诺也是靠它们被测试的。\n",
+        "en": "Runnable examples that double as the fastest way to see the whole stack work. They are standard-library only and run from a checkout without installing anything, which is also how the zero-dependency claim is tested.\n"
+      },
+      "source": [
+        {
+          "path": "examples/quickstart.py"
+        },
+        {
+          "path": "examples/agent_tools.py"
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "4ccb5dedebd50551824b10ba22dd7ff4632c7df7b194307e3779d79c0585e4f2",
+      "aggregate": {
+        "descendant_count": 2,
+        "own_api_count": 0,
+        "inherited_api_count": 2,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.examples.agent-tools": {
+      "uid": "a000033d",
+      "id": "pyvdisk.examples.agent-tools",
+      "parent": "pyvdisk.examples",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "tags": [
+        "agent",
+        "example"
+      ],
+      "name": {
+        "zh": "Agent 对接示例",
+        "en": "Agent Loop Demo"
+      },
+      "description": {
+        "zh": "带脚本化\"模型\"的完整 agent loop，因此不需要 API key 与网络，可以进 CI。循环本身与对接真实客户端时完全一致，只替掉 scripted_model。示例里包含一次越权读取被拒，说明拒绝会像普通工具结果一样回灌。\n",
+        "en": "A complete agent loop with a scripted model, so it needs no API key and no network and can run in CI. The loop is the one you would write against a real client; only scripted_model is replaced. It includes a refused out-of-root read, showing a denial flows back like any other tool result.\n"
+      },
+      "source": [
+        {
+          "path": "examples/agent_tools.py"
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "021820b569bcab563e878c2d7331874621e55ca5641bac090f379fbf54f5efc1",
+      "apis": [
+        {
+          "protocol": "file",
+          "path": "examples/agent_tools.py:scripted_model",
+          "description": {
+            "zh": "聊天补全调用的替身：返回下一条预置的工具调用，\"模型\"不再调用工具时返回 None。\n",
+            "en": "A stand-in for a chat completion call: returns the next scripted tool call, or None when the model would stop.\n"
+          },
+          "key": "file:examples/agent_tools.py:scripted_model"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.examples.quickstart": {
+      "uid": "a000033c",
+      "id": "pyvdisk.examples.quickstart",
+      "parent": "pyvdisk.examples",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "快速上手",
+        "en": "Quickstart Tour"
+      },
+      "description": {
+        "zh": "单文件、仅标准库、Windows 与 Linux 通用。从裸块设备一路走到 AgentSandbox，跑一遍就能看清分层，并如实报告用的是哪个索引后端。测试在屏蔽 hnswlib 的子进程里跑它，这正是它能当好\"最初五分钟\"的原因。\n",
+        "en": "One file, standard library only, Windows and Linux. It walks from a raw block device up to AgentSandbox so the layering is visible in one run, and reports which index backend it got. Tests run it in a subprocess with hnswlib blocked, which is what keeps this usable as a first five minutes.\n"
+      },
+      "source": [
+        {
+          "path": "examples/quickstart.py"
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "366abf85eb8b872da8170a251e0d9afc62647e6ff779753eeac8db7c8900e224",
+      "apis": [
+        {
+          "protocol": "file",
+          "path": "examples/quickstart.py",
+          "description": {
+            "zh": "在一个进程里自底向上跑通整条栈：块设备、事务、向量检索、日志、VScript，最后是沙箱。\n",
+            "en": "Run the whole stack bottom-up in one process: block device, transactions, vector search, logs, VScript, then the sandbox.\n"
+          },
+          "key": "file:examples/quickstart.py"
         }
       ],
       "aggregate": {
@@ -4315,6 +4913,314 @@
         "dep_in": 2
       }
     },
+    "pyvdisk.platform": {
+      "uid": "a000032f",
+      "id": "pyvdisk.platform",
+      "parent": "pyvdisk",
+      "tree": "pyvdisk",
+      "depth": 2,
+      "name": {
+        "zh": "平台适配层",
+        "en": "Platform Adaptation"
+      },
+      "description": {
+        "zh": "唯一直接触碰操作系统原语的地方：定位读写、整文件锁、目录 fsync、进程身份与符号链接支持。其余模块一律经由它，平台差异只处理一次，而不是在每个调用点各写一份。\n",
+        "en": "The single place that touches operating-system primitives: positional IO, whole-file locking, directory fsync, process identity and symlink support. Every other module goes through it, so Windows differences are handled once instead of at each call site.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/compat.py"
+        },
+        {
+          "path": "pyvdisk/disk.py"
+        },
+        {
+          "path": "pyvdisk/infrastructure/checkpoint.py"
+        },
+        {
+          "path": "pyvdisk/vscript/host.py"
+        },
+        {
+          "path": "pyvdisk/fuse_mount.py"
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "184149afe73afbc06aac483b2bfd4c3def5db0e514b75c6e3b4c2835102d728f",
+      "aggregate": {
+        "descendant_count": 4,
+        "own_api_count": 0,
+        "inherited_api_count": 13,
+        "dep_out": 0,
+        "dep_in": 1
+      }
+    },
+    "pyvdisk.platform.dispatch": {
+      "uid": "a0000330",
+      "id": "pyvdisk.platform.dispatch",
+      "parent": "pyvdisk.platform",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "实现选择",
+        "en": "Implementation Dispatch"
+      },
+      "description": {
+        "zh": "决定当前生效的实现并对外描述它。Windows 判定基于 sys.platform；use_implementation() 是测试缝，让模拟分支能在 Linux 上真正被执行；describe() 如实报告当前实现，调用方不必猜。\n",
+        "en": "Chooses the implementation in force and describes it. Windows detection is sys.platform based; use_implementation() is the seam that lets the emulated branches be exercised on Linux, and describe() reports what is actually live so a caller never has to guess.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/compat.py",
+          "line": 41,
+          "end_line": 100
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T11:40:54.220Z",
+      "fingerprint": "079a5edb2e3962afd8293877a634189cbdef72a96e9d5881983523ef5a531fb1",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.implementation",
+          "description": {
+            "zh": "当前生效的实现：posix 或 windows。\n",
+            "en": "The implementation in force: posix or windows.\n"
+          },
+          "key": "rpc:pyvdisk.compat.implementation"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.use_implementation",
+          "description": {
+            "zh": "临时强制指定实现；上下文管理器，退出时还原，供测试在 Linux 上执行 Windows 分支。\n",
+            "en": "Temporarily force an implementation; a context manager that restores the previous one, used by tests to execute the Windows branches on Linux.\n"
+          },
+          "key": "rpc:pyvdisk.compat.use_implementation"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.describe",
+          "description": {
+            "zh": "当前实现的可读说明：定位读写、文件锁、目录 fsync、身份与符号链接各由什么原语支撑。\n",
+            "en": "Human-readable description of the live implementation: which primitive backs positional IO, locking, directory fsync, identity and symlinks.\n"
+          },
+          "key": "rpc:pyvdisk.compat.describe"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 3,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.platform.durability": {
+      "uid": "a0000333",
+      "id": "pyvdisk.platform.durability",
+      "parent": "pyvdisk.platform",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "持久化与身份",
+        "en": "Durability and Identity"
+      },
+      "description": {
+        "zh": "其余平台差异：改名后刷盘目录、报告进程身份、探测符号链接支持、选择当前实现。它们都返回可判断的值而非抛异常，因为单拿出来都不致命。\n",
+        "en": "The remaining platform differences: flushing a directory after a rename, reporting process identity, probing symlink support, and selecting the implementation in force. Each returns a value the caller can branch on instead of raising, because none of them is fatal on its own.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/compat.py",
+          "line": 202,
+          "end_line": 283
+        },
+        {
+          "path": "pyvdisk/compat.py",
+          "line": 41,
+          "end_line": 100
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T11:40:47.981Z",
+      "fingerprint": "079a5edb2e3962afd8293877a634189cbdef72a96e9d5881983523ef5a531fb1",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.fsync_dir",
+          "description": {
+            "zh": "刷盘目录，让改名能抵住崩溃。真的执行了才返回 True；Windows 无法把目录当文件打开，所以返回 False 表示\"未执行\"，而不是假装成功。\n",
+            "en": "Flush a directory so a rename survives a crash. Returns True when it actually ran; Windows cannot open a directory as a file, so it returns False to mean not performed rather than claiming success.\n"
+          },
+          "key": "rpc:pyvdisk.compat.fsync_dir"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.uid",
+          "description": {
+            "zh": "进程 uid；平台没有该概念时返回 0。\n",
+            "en": "Effective uid, or 0 where the platform has no such notion.\n"
+          },
+          "key": "rpc:pyvdisk.compat.uid"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.gid",
+          "description": {
+            "zh": "进程 gid；平台没有该概念时返回 0。\n",
+            "en": "Effective gid, or 0 where the platform has no such notion.\n"
+          },
+          "key": "rpc:pyvdisk.compat.gid"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.uid_or",
+          "description": {
+            "zh": "取 uid，无该概念时用传入的缺省值。用它而不是 `uid() or default`：uid 0 是 root，不是\"未设置\"。\n",
+            "en": "uid, or the given fallback. Prefer this over `uid() or default`: uid 0 is root, not unset.\n"
+          },
+          "key": "rpc:pyvdisk.compat.uid_or"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.gid_or",
+          "description": {
+            "zh": "取 gid，无该概念时用传入的缺省值。\n",
+            "en": "gid, or the given fallback.\n"
+          },
+          "key": "rpc:pyvdisk.compat.gid_or"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.can_symlink",
+          "description": {
+            "zh": "探测指定目录下能否创建符号链接（不抛异常）。Windows 需要开发者模式，调用方据此降级而不是直接失败。\n",
+            "en": "Probe whether a symlink can be created in the given directory without raising. Windows needs developer mode, so callers degrade instead of failing.\n"
+          },
+          "key": "rpc:pyvdisk.compat.can_symlink"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 6,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 2
+      }
+    },
+    "pyvdisk.platform.locking": {
+      "uid": "a0000332",
+      "id": "pyvdisk.platform.locking",
+      "parent": "pyvdisk.platform",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "跨进程文件锁",
+        "en": "Cross-Process Locking"
+      },
+      "description": {
+        "zh": "跨线程、跨进程的整文件写串行化：POSIX 用 fcntl.flock，Windows 用 msvcrt 字节区间锁。Windows 路径刻意用 LK_NBLCK 轮询：LK_LOCK 约十秒后会报错，而 flock 会一直等下去。\n",
+        "en": "Whole-file write serialisation across threads and processes: fcntl.flock on POSIX, an msvcrt byte range on Windows. The Windows path polls with LK_NBLCK on purpose: LK_LOCK errors out after about ten seconds where flock keeps waiting.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/compat.py",
+          "line": 128,
+          "end_line": 198
+        },
+        {
+          "path": "pyvdisk/compat.py",
+          "line": 55
+        },
+        {
+          "path": "pyvdisk/compat.py",
+          "line": 58
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T11:41:06.398Z",
+      "fingerprint": "079a5edb2e3962afd8293877a634189cbdef72a96e9d5881983523ef5a531fb1",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.lock",
+          "description": {
+            "zh": "取得整文件锁。blocking=True 等待，timeout=N 秒后放弃并返回 False，blocking=False 只试一次。返回是否拿到锁。\n",
+            "en": "Take the whole-file lock. blocking=True waits, timeout=N seconds gives up and returns False, blocking=False tries once. Returns whether the lock is held.\n"
+          },
+          "key": "rpc:pyvdisk.compat.lock"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.unlock",
+          "description": {
+            "zh": "释放锁。句柄已关闭也能调用，因为卸载路径与出错路径都会走到它。\n",
+            "en": "Release the lock. Tolerates an already-closed handle, because unmount and error paths both call it.\n"
+          },
+          "key": "rpc:pyvdisk.compat.unlock"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 2,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 2
+      }
+    },
+    "pyvdisk.platform.positional": {
+      "uid": "a0000331",
+      "id": "pyvdisk.platform.positional",
+      "parent": "pyvdisk.platform",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "定位读写",
+        "en": "Positioned IO"
+      },
+      "description": {
+        "zh": "不依赖也不改动文件游标的原子定位读写。模拟实现不只是方便：没有那把锁，两个线程共用一个句柄时会互相越位 seek，直接写坏数据块。\n",
+        "en": "Atomic positioned reads and writes that neither depend on nor disturb the file cursor. The emulation is not merely a convenience: without the lock, two threads sharing a handle would seek past each other and corrupt blocks.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/compat.py",
+          "line": 102,
+          "end_line": 127
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T11:41:00.670Z",
+      "fingerprint": "079a5edb2e3962afd8293877a634189cbdef72a96e9d5881983523ef5a531fb1",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.pread",
+          "description": {
+            "zh": "从 offset 处读取至多 length 字节。POSIX 用 os.pread；模拟实现用进程级互斥锁包住 lseek+read，避免与其它线程的 seek 交错。\n",
+            "en": "Positioned read of up to length bytes. POSIX uses os.pread; the emulation holds a process-wide lock across lseek+read so the pair is not interleaved with another thread's seek.\n"
+          },
+          "key": "rpc:pyvdisk.compat.pread"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.compat.pwrite",
+          "description": {
+            "zh": "向 offset 处写入。POSIX 用 os.pwrite；模拟实现用同一把锁串行化 seek+write。\n",
+            "en": "Positioned write. POSIX uses os.pwrite; the emulation serialises seek+write under the same lock.\n"
+          },
+          "key": "rpc:pyvdisk.compat.pwrite"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 2,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 2
+      }
+    },
     "pyvdisk.storage": {
       "uid": "a0000301",
       "id": "pyvdisk.storage",
@@ -4376,13 +5282,13 @@
           "path": "pyvdisk/infrastructure/checkpoint.py"
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.225Z",
-      "fingerprint": "3ed800d0914e362e6fa76cf02ccddaa8b41f54ffd8efabaebe018e25619b823f",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "80d794b29e5404773680587fc27ceeac047cd72e0ab8cc13715f9aaa02d75a68",
       "aggregate": {
-        "descendant_count": 107,
+        "descendant_count": 108,
         "own_api_count": 0,
-        "inherited_api_count": 377,
+        "inherited_api_count": 384,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -4406,9 +5312,9 @@
           "path": "pyvdisk/disk.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "f3dafc0720e696593d7bf2d99ff7d99856081e9e0c20a734b75f83098f1cfb80",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "88da0b2f3ce22b186edf88eab3d800c8e50671236a9ed1b9dbed478ff6837d16",
       "aggregate": {
         "descendant_count": 3,
         "own_api_count": 0,
@@ -4438,9 +5344,9 @@
           "end_line": 188
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.423Z",
-      "fingerprint": "f3dafc0720e696593d7bf2d99ff7d99856081e9e0c20a734b75f83098f1cfb80",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "88da0b2f3ce22b186edf88eab3d800c8e50671236a9ed1b9dbed478ff6837d16",
       "apis": [
         {
           "protocol": "rpc",
@@ -4498,13 +5404,23 @@
             "en": "positional read"
           },
           "cross_tree": false
+        },
+        {
+          "kind": "call",
+          "to": "pyvdisk.storage.block.io",
+          "from_api": "rpc:pyvdisk.disk.VirtualDisk#write_block",
+          "label": {
+            "zh": "定位写入",
+            "en": "positioned write"
+          },
+          "cross_tree": false
         }
       ],
       "aggregate": {
         "descendant_count": 0,
         "own_api_count": 5,
         "inherited_api_count": 0,
-        "dep_out": 1,
+        "dep_out": 2,
         "dep_in": 3
       }
     },
@@ -4519,8 +5435,8 @@
         "en": "Image Lifecycle"
       },
       "description": {
-        "zh": "VirtualDisk 生命周期：稀疏创建、加锁打开、上下文管理、刷新与关闭。\n",
-        "en": "VirtualDisk lifecycle: sparse creation, locked open, context manager, flush and close.\n"
+        "zh": "VirtualDisk 生命周期：稀疏创建、加锁打开、上下文管理、刷新与关闭。锁来自平台适配层，因此写串行化在 POSIX 与 Windows 上都真实存在，而不是悄悄退化为空操作。\n",
+        "en": "VirtualDisk lifecycle: sparse creation, locked open, context manager, flush and close. The lock is taken from the platform layer, so write serialisation exists on both POSIX and Windows instead of silently degrading to a no-op.\n"
       },
       "source": [
         {
@@ -4529,9 +5445,9 @@
           "end_line": 141
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "f3dafc0720e696593d7bf2d99ff7d99856081e9e0c20a734b75f83098f1cfb80",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "88da0b2f3ce22b186edf88eab3d800c8e50671236a9ed1b9dbed478ff6837d16",
       "apis": [
         {
           "protocol": "rpc",
@@ -4555,8 +5471,8 @@
           "protocol": "rpc",
           "path": "pyvdisk.disk.VirtualDisk#open",
           "description": {
-            "zh": "打开镜像，写模式下获取 POSIX 写锁。\n",
-            "en": "Open the image with optional POSIX write lock acquisition.\n"
+            "zh": "打开镜像，写锁经由平台适配层获取：POSIX 用 flock，Windows 用 msvcrt 字节区间锁。抢锁失败会关掉句柄报错，而不是无声地无锁继续跑。\n",
+            "en": "Open the image, taking the write lock through the platform layer: flock on POSIX, an msvcrt byte range on Windows. A lock failure closes the handle and raises rather than silently continuing unlocked.\n"
           },
           "key": "rpc:pyvdisk.disk.VirtualDisk#open"
         },
@@ -4579,11 +5495,23 @@
           "key": "rpc:pyvdisk.disk.VirtualDisk#close"
         }
       ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "pyvdisk.platform.locking",
+          "from_api": "rpc:pyvdisk.disk.VirtualDisk#open",
+          "label": {
+            "zh": "整文件写锁",
+            "en": "whole-file write lock"
+          },
+          "cross_tree": false
+        }
+      ],
       "aggregate": {
         "descendant_count": 0,
         "own_api_count": 5,
         "inherited_api_count": 0,
-        "dep_out": 0,
+        "dep_out": 1,
         "dep_in": 2
       }
     },
@@ -4598,8 +5526,8 @@
         "en": "Positional IO"
       },
       "description": {
-        "zh": "无缓冲定位读写原语，供镜像上的所有块级与字节级访问使用。\n",
-        "en": "Unbuffered positional read/write primitives used by every block and byte access on the image.\n"
+        "zh": "无缓冲定位读写原语，供镜像上的所有块级与字节级访问使用；经由平台适配层，同一份代码在 Windows 上也能跑。\n",
+        "en": "Unbuffered positional read/write primitives used by every block and byte access on the image, routed through the platform layer so the same code runs on Windows.\n"
       },
       "source": [
         {
@@ -4608,16 +5536,16 @@
           "end_line": 57
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "f3dafc0720e696593d7bf2d99ff7d99856081e9e0c20a734b75f83098f1cfb80",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T11:41:14.329Z",
+      "fingerprint": "88da0b2f3ce22b186edf88eab3d800c8e50671236a9ed1b9dbed478ff6837d16",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.disk._pread_all",
           "description": {
-            "zh": "定位读取，除 EOF 外保证读满。\n",
-            "en": "Positional read that fills the buffer unless EOF is hit.\n"
+            "zh": "定位读取，除 EOF 外保证读满。转发给 compat.pread，因此 Windows 上得到的是加锁的 seek+read，而不是 os.pread。\n",
+            "en": "Positional read that fills the buffer unless EOF is hit. Delegates to compat.pread, so Windows gets a lock-protected seek+read instead of os.pread.\n"
           },
           "key": "rpc:pyvdisk.disk._pread_all"
         },
@@ -4625,18 +5553,42 @@
           "protocol": "rpc",
           "path": "pyvdisk.disk._pwrite_all",
           "description": {
-            "zh": "定位写入，保证写满全部字节。\n",
-            "en": "Positional write that guarantees every byte is written.\n"
+            "zh": "定位写入，保证写满全部字节。转发给 compat.pwrite，在 Windows 上用同一把锁串行化 seek+write。\n",
+            "en": "Positional write that guarantees every byte is written. Delegates to compat.pwrite, which serialises seek+write on Windows.\n"
           },
           "key": "rpc:pyvdisk.disk._pwrite_all"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "pyvdisk.platform.positional",
+          "from_api": "rpc:pyvdisk.disk._pread_all",
+          "to_api": "rpc:pyvdisk.compat.pread",
+          "label": {
+            "zh": "定位读取",
+            "en": "positioned read"
+          },
+          "cross_tree": false
+        },
+        {
+          "kind": "call",
+          "to": "pyvdisk.platform.positional",
+          "from_api": "rpc:pyvdisk.disk._pwrite_all",
+          "to_api": "rpc:pyvdisk.compat.pwrite",
+          "label": {
+            "zh": "定位写入",
+            "en": "positioned write"
+          },
+          "cross_tree": false
         }
       ],
       "aggregate": {
         "descendant_count": 0,
         "own_api_count": 2,
         "inherited_api_count": 0,
-        "dep_out": 0,
-        "dep_in": 1
+        "dep_out": 2,
+        "dep_in": 2
       }
     },
     "pyvdisk.storage.checkpoint": {
@@ -4658,9 +5610,9 @@
           "path": "pyvdisk/infrastructure/checkpoint.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "d96b0e630513ab3bea2172e2d6d091b3f50f62680b86ce05380946d8ce3e3424",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "9ca9673053b671140cc605c35d9a339dee71a77fee8e2598d5b2483bcfd26539",
       "aggregate": {
         "descendant_count": 3,
         "own_api_count": 0,
@@ -4690,9 +5642,9 @@
           "end_line": 145
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "d96b0e630513ab3bea2172e2d6d091b3f50f62680b86ce05380946d8ce3e3424",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "9ca9673053b671140cc605c35d9a339dee71a77fee8e2598d5b2483bcfd26539",
       "apis": [
         {
           "protocol": "rpc",
@@ -4750,8 +5702,8 @@
         "en": "Checkpoint Store"
       },
       "description": {
-        "zh": "检查点存储的构造与加锁：后端选择、VFS 或宿主背衬，以及独占写周期。\n",
-        "en": "Checkpoint store construction and locking: backend selection, VFS or host backing, and the exclusive write cycle.\n"
+        "zh": "检查点存储的构造与加锁：后端选择、VFS 或宿主背衬，以及独占写周期。本模块过去在顶层 import fcntl，导致整个包在 Windows 上无法导入；现在锁来自平台适配层。\n",
+        "en": "Checkpoint store construction and locking: backend selection, VFS or host backing, and the exclusive write cycle. This module used to import fcntl at the top level, which made the whole package unimportable on Windows; the lock now comes from the platform layer.\n"
       },
       "source": [
         {
@@ -4760,9 +5712,9 @@
           "end_line": 98
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.308Z",
-      "fingerprint": "d96b0e630513ab3bea2172e2d6d091b3f50f62680b86ce05380946d8ce3e3424",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T11:40:40.830Z",
+      "fingerprint": "9ca9673053b671140cc605c35d9a339dee71a77fee8e2598d5b2483bcfd26539",
       "apis": [
         {
           "protocol": "rpc",
@@ -4813,12 +5765,11 @@
       "deps": [
         {
           "kind": "call",
-          "to": "pyvdisk.storage.vfs.files",
-          "from_api": "rpc:pyvdisk.infrastructure.checkpoint.CheckpointStore#from_vfs",
-          "to_api": "rpc:pyvdisk.vfs.VFS#read_file",
+          "to": "pyvdisk.platform.locking",
+          "from_api": "rpc:pyvdisk.infrastructure.checkpoint.CheckpointStore#locked",
           "label": {
-            "zh": "经 VFS 读写",
-            "en": "reads via VFS"
+            "zh": "跨进程锁",
+            "en": "cross-process lock"
           },
           "cross_tree": false
         }
@@ -4852,9 +5803,9 @@
           "end_line": 152
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "d96b0e630513ab3bea2172e2d6d091b3f50f62680b86ce05380946d8ce3e3424",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "9ca9673053b671140cc605c35d9a339dee71a77fee8e2598d5b2483bcfd26539",
       "apis": [
         {
           "protocol": "rpc",
@@ -7789,9 +8740,9 @@
           "path": "pyvdisk/fuse_mount.py"
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.231Z",
-      "fingerprint": "b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "c711d0ed315e831e5d1d2873c7557dc5e72c8dcb01ee91556eb39cb3065c5d76",
       "aggregate": {
         "descendant_count": 4,
         "own_api_count": 0,
@@ -7821,9 +8772,9 @@
           "end_line": 121
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.232Z",
-      "fingerprint": "b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "c711d0ed315e831e5d1d2873c7557dc5e72c8dcb01ee91556eb39cb3065c5d76",
       "apis": [
         {
           "protocol": "rpc",
@@ -7931,9 +8882,9 @@
           "end_line": 233
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.232Z",
-      "fingerprint": "b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "c711d0ed315e831e5d1d2873c7557dc5e72c8dcb01ee91556eb39cb3065c5d76",
       "apis": [
         {
           "protocol": "rpc",
@@ -8018,8 +8969,8 @@
         "en": "FUSE Attributes"
       },
       "description": {
-        "zh": "FUSE 可用性检测，以及操作表中属性与目录列举部分。\n",
-        "en": "FUSE availability check and the attribute/listing half of the operation table.\n"
+        "zh": "stat 到 fuse 的映射与目录项对象：类型、mode、大小、时间戳与属主。身份来自平台适配层，同时修掉一个真实缺陷：此前 uid 0（root）与\"平台没有 uid\"无法区分。\n",
+        "en": "Stat-to-fuse mapping and the entry object: type, mode, size, timestamps and ownership. Identity comes from the platform layer, which also fixes a real bug: uid 0 (root) was previously indistinguishable from \"no uid available\".\n"
       },
       "source": [
         {
@@ -8028,9 +8979,9 @@
           "end_line": 80
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.232Z",
-      "fingerprint": "b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T11:37:33.368Z",
+      "fingerprint": "c711d0ed315e831e5d1d2873c7557dc5e72c8dcb01ee91556eb39cb3065c5d76",
       "apis": [
         {
           "protocol": "rpc",
@@ -8072,12 +9023,11 @@
       "deps": [
         {
           "kind": "call",
-          "to": "pyvdisk.storage.vfs.stat",
+          "to": "pyvdisk.platform.durability",
           "from_api": "rpc:pyvdisk.fuse_mount._VFuseOperations#_getattr",
-          "to_api": "rpc:pyvdisk.vfs.VFS#stat",
           "label": {
-            "zh": "取 stat",
-            "en": "stats path"
+            "zh": "进程身份",
+            "en": "process identity"
           },
           "cross_tree": false
         }
@@ -8111,9 +9061,9 @@
           "end_line": 283
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.233Z",
-      "fingerprint": "b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "c711d0ed315e831e5d1d2873c7557dc5e72c8dcb01ee91556eb39cb3065c5d76",
       "apis": [
         {
           "protocol": "rpc",
@@ -9559,13 +10509,13 @@
           "path": "pyvdisk/vector_disk.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "f3bc6b45a520369279ba039c4bf06fb0bfce7e84df609d7d20d81ad24a85dc35",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "ee801e56c4d436543de323aa02bb0c3a4e78339ef28b5c1ec180ad68cee817b0",
       "aggregate": {
-        "descendant_count": 4,
+        "descendant_count": 5,
         "own_api_count": 0,
-        "inherited_api_count": 16,
+        "inherited_api_count": 23,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -9591,9 +10541,9 @@
           "end_line": 163
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "f3bc6b45a520369279ba039c4bf06fb0bfce7e84df609d7d20d81ad24a85dc35",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "ee801e56c4d436543de323aa02bb0c3a4e78339ef28b5c1ec180ad68cee817b0",
       "apis": [
         {
           "protocol": "rpc",
@@ -9631,6 +10581,117 @@
         "dep_in": 1
       }
     },
+    "pyvdisk.storage.vector.flat-index": {
+      "uid": "a0000334",
+      "id": "pyvdisk.storage.vector.flat-index",
+      "parent": "pyvdisk.storage.vector",
+      "tree": "pyvdisk",
+      "depth": 4,
+      "tags": [
+        "zero-dependency",
+        "vector"
+      ],
+      "name": {
+        "zh": "扁平索引后端",
+        "en": "Flat Index Backend"
+      },
+      "description": {
+        "zh": "纯 Python 精确索引，接口形状对齐 hnswlib，VectorDisk 因此可以直接回退而不必在调用点分支。查询是 O(n) 且向量常驻内存：适合中小集合，不是大规模下 HNSW 的替代品。\n",
+        "en": "A pure-Python exact index that mirrors hnswlib's calling shape, so VectorDisk can fall back to it without branching. Query is O(n) and the vectors stay in memory: correct for small and medium collections, not a replacement for HNSW at scale.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/vector_index.py",
+          "line": 38,
+          "end_line": 47
+        },
+        {
+          "path": "pyvdisk/vector_index.py",
+          "line": 51,
+          "end_line": 83
+        },
+        {
+          "path": "pyvdisk/vector_index.py",
+          "line": 169,
+          "end_line": 251
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "c2a8e20da7599125065676cf6a3cea638d1a8108df234b9873b098dbfffb547d",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "vector_index:distance",
+          "description": {
+            "zh": "按 hnswlib 的约定计算距离，两种后端在调用点可直接互换：cosine = 1 - 相似度，l2 = 平方欧氏距离，ip = 1 - 点积。\n",
+            "en": "Distance in the convention hnswlib uses, so the two backends are interchangeable at the call site: cosine = 1 - similarity, l2 = squared euclidean, ip = 1 - dot product.\n"
+          },
+          "key": "rpc:vector_index:distance"
+        },
+        {
+          "protocol": "rpc",
+          "path": "vector_index:read_kind",
+          "description": {
+            "zh": "从索引文件读出写入方标识：是 hnswlib 写的还是 flat 后端写的，不需要解析其余内容。\n",
+            "en": "Read the writer's tag from an index file: whether it was written by hnswlib or by the flat backend, without parsing the rest.\n"
+          },
+          "key": "rpc:vector_index:read_kind"
+        },
+        {
+          "protocol": "rpc",
+          "path": "vector_index:serialize",
+          "description": {
+            "zh": "序列化为 flat 格式：8 字节魔数、空间与维度，然后是标签与 float32 向量。\n",
+            "en": "Serialise to the flat format: an 8-byte magic, the space and dimension, then labels and float32 vectors.\n"
+          },
+          "key": "rpc:vector_index:serialize"
+        },
+        {
+          "protocol": "rpc",
+          "path": "vector_index:deserialize",
+          "description": {
+            "zh": "解析 flat 索引；内容被截断或根本不是该格式时报错，而不是当成正确数据读下去。\n",
+            "en": "Parse a flat index, rejecting a truncated or foreign payload instead of misreading it.\n"
+          },
+          "key": "rpc:vector_index:deserialize"
+        },
+        {
+          "protocol": "rpc",
+          "path": "vector_index:serialize_from_backend",
+          "description": {
+            "zh": "序列化任一后端的索引：flat 索引直接写自己，hnswlib 索引走它自己的 save_index 落到临时文件，需要负责清理。\n",
+            "en": "Serialise an index of either backend: a flat index writes itself, an hnswlib index goes through its own save_index into a temporary file that must be unlinked.\n"
+          },
+          "key": "rpc:vector_index:serialize_from_backend"
+        },
+        {
+          "protocol": "rpc",
+          "path": "vector_index:FlatIndex.add_item",
+          "description": {
+            "zh": "写入一条带标签的向量。维度与索引不一致时报错，维度尚未确定的空索引也拒绝写入。\n",
+            "en": "Add a labelled vector. Rejects a vector whose dimension disagrees with the index, and refuses a fresh index whose dimension was never set.\n"
+          },
+          "key": "rpc:vector_index:FlatIndex.add_item"
+        },
+        {
+          "protocol": "rpc",
+          "path": "vector_index:FlatIndex.knn_query",
+          "description": {
+            "zh": "精确 k 近邻搜索。距离相同时按标签排序，保证多次运行结果稳定；可选断言用于筛选候选记录。\n",
+            "en": "Exact k-nearest search. Ties break on the label so results are stable across runs, and an optional predicate filters the candidate records.\n"
+          },
+          "key": "rpc:vector_index:FlatIndex.knn_query"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 7,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 2
+      }
+    },
     "pyvdisk.storage.vector.open": {
       "uid": "a0000601",
       "id": "pyvdisk.storage.vector.open",
@@ -9642,8 +10703,8 @@
         "en": "Vector Disk Open"
       },
       "description": {
-        "zh": "VectorDisk 生命周期，以及后续操作共用的 JSON 辅助与集合路径键化。\n",
-        "en": "VectorDisk lifecycle plus the JSON helpers and collection-path keying used by every later operation.\n"
+        "zh": "VectorDisk 的构建与挂载。这里不再要求装 hnswlib：集合用内置 flat 索引也能打开并作答，只有恰好装了加速器才会用它。\n",
+        "en": "VectorDisk construction and mounting. Nothing here requires hnswlib: a collection opens and answers with the built-in flat index, and the accelerator is picked up only if it happens to be installed.\n"
       },
       "source": [
         {
@@ -9652,9 +10713,9 @@
           "end_line": 127
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.309Z",
-      "fingerprint": "f3bc6b45a520369279ba039c4bf06fb0bfce7e84df609d7d20d81ad24a85dc35",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "ee801e56c4d436543de323aa02bb0c3a4e78339ef28b5c1ec180ad68cee817b0",
       "apis": [
         {
           "protocol": "rpc",
@@ -9744,9 +10805,9 @@
           "end_line": 221
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.025Z",
-      "fingerprint": "f3bc6b45a520369279ba039c4bf06fb0bfce7e84df609d7d20d81ad24a85dc35",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "ee801e56c4d436543de323aa02bb0c3a4e78339ef28b5c1ec180ad68cee817b0",
       "apis": [
         {
           "protocol": "rpc",
@@ -9812,7 +10873,7 @@
         "own_api_count": 5,
         "inherited_api_count": 0,
         "dep_out": 1,
-        "dep_in": 3
+        "dep_in": 2
       }
     },
     "pyvdisk.storage.vector.search": {
@@ -9826,8 +10887,8 @@
         "en": "Vector Search"
       },
       "description": {
-        "zh": "HNSW 图上的索引管理与相似度检索，支持元数据过滤。\n",
-        "en": "Index management and similarity search over the HNSW graph with metadata filtering.\n"
+        "zh": "索引构建、加载与查询。后端在加载时由文件魔数决定：装了 hnswlib 就用它，否则用内置 flat 索引。以一次改名发布，并发读方看到的要么是旧索引要么是新索引。\n",
+        "en": "Index construction, loading and query. The backend is chosen at load time from the file's magic tag: hnswlib when installed, the built-in flat index otherwise. Published with a single rename, so a concurrent reader sees either the old index or the new one.\n"
       },
       "source": [
         {
@@ -9836,16 +10897,16 @@
           "end_line": 267
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.423Z",
-      "fingerprint": "f3bc6b45a520369279ba039c4bf06fb0bfce7e84df609d7d20d81ad24a85dc35",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "ee801e56c4d436543de323aa02bb0c3a4e78339ef28b5c1ec180ad68cee817b0",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.vector_disk.VectorDisk#_rebuild_index",
           "description": {
-            "zh": "从持久记录重建 HNSW 索引。\n",
-            "en": "Rebuild the HNSW index from the persisted records.\n"
+            "zh": "由记录重建索引，并以一次改名原子发布，读方不会看到写了一半的索引。\n",
+            "en": "Rebuild the index from the records and publish it with one rename, so a reader never sees a half-written index.\n"
           },
           "key": "rpc:pyvdisk.vector_disk.VectorDisk#_rebuild_index"
         },
@@ -9853,8 +10914,8 @@
           "protocol": "rpc",
           "path": "pyvdisk.vector_disk.VectorDisk#_load_index",
           "description": {
-            "zh": "加载盘上索引，缺失时重建。\n",
-            "en": "Load the on-disk index or rebuild it when absent.\n"
+            "zh": "加载集合索引。由文件魔数决定路径：flat 直接解析，hnswlib 索引经 hnswlib 加载，缺 hnswlib 时回退为按记录重建的精确索引。\n",
+            "en": "Load the collection index. The file's magic decides how: flat parses directly, hnswlib loads through hnswlib, and a missing hnswlib falls back to an exact index over the records.\n"
           },
           "key": "rpc:pyvdisk.vector_disk.VectorDisk#_load_index"
         },
@@ -9862,21 +10923,20 @@
           "protocol": "rpc",
           "path": "pyvdisk.vector_disk.VectorDisk#search",
           "description": {
-            "zh": "相似度检索：k 结果、可选元数据过滤，以及是否返回向量。\n",
-            "en": "Similarity search with k results, an optional metadata filter and include/exclude of vectors.\n"
+            "zh": "最近邻检索，可带元数据过滤。\n",
+            "en": "Nearest-neighbour search with an optional metadata filter.\n"
           },
           "key": "rpc:pyvdisk.vector_disk.VectorDisk#search"
         }
       ],
       "deps": [
         {
-          "kind": "dataflow",
-          "to": "pyvdisk.storage.vector.records",
-          "from_api": "rpc:pyvdisk.vector_disk.VectorDisk#_rebuild_index",
-          "to_api": "rpc:pyvdisk.vector_disk.VectorDisk#get",
+          "kind": "call",
+          "to": "pyvdisk.storage.vector.flat-index",
+          "from_api": "rpc:pyvdisk.vector_disk.VectorDisk#_load_index",
           "label": {
-            "zh": "读取记录",
-            "en": "reads records"
+            "zh": "后端回退",
+            "en": "backend fallback"
           },
           "cross_tree": false
         }
@@ -10185,7 +11245,7 @@
         "own_api_count": 3,
         "inherited_api_count": 0,
         "dep_out": 1,
-        "dep_in": 4
+        "dep_in": 3
       }
     },
     "pyvdisk.storage.vfs.hostio": {
@@ -10836,7 +11896,7 @@
         "own_api_count": 5,
         "inherited_api_count": 0,
         "dep_out": 1,
-        "dep_in": 1
+        "dep_in": 0
       }
     },
     "pyvdisk.storage.vfs.vfile": {
@@ -12064,8 +13124,8 @@
         "en": "Test Suite"
       },
       "description": {
-        "zh": "测试套件：391 项可执行校验，覆盖文件系统、卷、身份、锁、队列、事务、VScript、审计轨迹、FUSE 桥与打包。\n",
-        "en": "Test suite: 391 executable checks covering the filesystem, volumes, identity, locking, the queue, transactions, VScript, the audit trail, the FUSE bridge and packaging.\n"
+        "zh": "测试套件：444 项可执行校验，覆盖文件系统、卷、身份、锁、队列、事务、VScript、审计轨迹、FUSE 桥、平台适配层、沙箱与打包。缺 hnswlib 时有 4 项对照用例跳过。\n",
+        "en": "Test suite: 444 executable checks covering the filesystem, volumes, identity, locking, the queue, transactions, VScript, the audit trail, the FUSE bridge, the platform layer, the sandbox and packaging. Four comparison cases skip when hnswlib is absent.\n"
       },
       "source": [
         {
@@ -12079,12 +13139,53 @@
         }
       ],
       "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.240Z",
+      "updated_at": "2026-09-24T13:45:00Z",
       "fingerprint": "b6440af3d48834c687f05de99c57cf0e3582d53a09d2ffb04b28579e901b64b1",
       "aggregate": {
-        "descendant_count": 55,
+        "descendant_count": 58,
         "own_api_count": 0,
-        "inherited_api_count": 71,
+        "inherited_api_count": 74,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.tests.agent-sandbox": {
+      "uid": "a000033f",
+      "id": "pyvdisk.tests.agent-sandbox",
+      "parent": "pyvdisk.tests",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "沙箱测试",
+        "en": "Sandbox Tests"
+      },
+      "description": {
+        "zh": "把 AgentSandbox 当作一组承诺来测，而不是按实现来测：越权路径、Windows 样式路径、被隐藏的容器簿记、只读与禁删模式、含伪造行的审计链、脚本的宿主隔离与输出上限，以及\"脚本入口与 Python 入口共用一个根\"这条规则。\n",
+        "en": "Tests AgentSandbox as a set of promises rather than an implementation: escape attempts, Windows-looking paths, hidden bookkeeping, read-only and no-delete modes, the audit trail including forged rows, script host isolation and output caps, and the rule that the script door and the Python door share one root.\n"
+      },
+      "source": [
+        {
+          "path": "tests/test_agent_sandbox.py"
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "edf41d7c5682215a34e651deccb8a108c248aad110293e0dd67c0e56a01c7290",
+      "apis": [
+        {
+          "protocol": "file",
+          "path": "tests/test_agent_sandbox.py",
+          "description": {
+            "zh": "沙箱的承诺：路径约束、只读、审计链与脚本隔离。\n",
+            "en": "Sandbox promises: path confinement, read-only, audit chain and script isolation.\n"
+          },
+          "key": "file:tests/test_agent_sandbox.py"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -12411,6 +13512,47 @@
         "own_api_count": 1,
         "inherited_api_count": 0,
         "dep_out": 1,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.tests.compat": {
+      "uid": "a000033e",
+      "id": "pyvdisk.tests.compat",
+      "parent": "pyvdisk.tests",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "平台兼容测试",
+        "en": "Platform Compat Tests"
+      },
+      "description": {
+        "zh": "在 Linux 上执行 Windows 模拟：用 msvcrt 替身加 use_implementation() 让模拟分支在真实文件上运行，覆盖锁竞争与超时分支，并与原生实现逐字节对照一整套操作。替身锁是进程内的，因此无法证明两个进程之间互斥——这仍然需要 Windows runner，文件里写明了这一点。守卫测试会在 compat.py 之外任何模块直接使用 fcntl、msvcrt、os.pread、os.pwrite 时失败。\n",
+        "en": "Exercises the Windows emulation from Linux: a stand-in for msvcrt plus use_implementation() runs the emulated branches against real files, including lock contention and the timeout path, and compares a whole workload against the native implementation byte for byte. The stand-in's lock is in-process, so it cannot show two processes contending -- that needs a Windows runner, and the file says so. A guard test fails if any module outside compat.py reaches for fcntl, msvcrt, os.pread or os.pwrite.\n"
+      },
+      "source": [
+        {
+          "path": "tests/test_compat.py"
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "27901dc78ca371a0a4fb38f74f89616e6b40b5cf776510c92021ff8155f5970c",
+      "apis": [
+        {
+          "protocol": "file",
+          "path": "tests/test_compat.py",
+          "description": {
+            "zh": "把平台切到模拟实现跑整条用例。\n",
+            "en": "Run the whole suite with the platform switched to the emulated implementation.\n"
+          },
+          "key": "file:tests/test_compat.py"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 0,
         "dep_in": 0
       }
     },
@@ -13043,6 +14185,47 @@
         "own_api_count": 1,
         "inherited_api_count": 0,
         "dep_out": 1,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.tests.no-dependency": {
+      "uid": "a0000340",
+      "id": "pyvdisk.tests.no-dependency",
+      "parent": "pyvdisk.tests",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "name": {
+        "zh": "零依赖测试",
+        "en": "Zero Dependency Tests"
+      },
+      "description": {
+        "zh": "同一个承诺的三层校验：pyproject 不声明运行时依赖且把加速器留在 extra 里；屏蔽 hnswlib 时 VectorDisk 仍能正确作答，两种后端结果一致且能互读对方写的盘；examples/quickstart.py 在屏蔽 hnswlib 的子进程里能跑完，示例不会悄悄地开始依赖它。\n",
+        "en": "Three layers of the same claim: pyproject declares no runtime dependencies and keeps the accelerators as extras; VectorDisk answers correctly with hnswlib blocked, and the two backends agree and read each other's files; and examples/quickstart.py runs to completion in a subprocess with hnswlib blocked, so the example cannot quietly start needing it.\n"
+      },
+      "source": [
+        {
+          "path": "tests/test_no_dependency_path.py"
+        }
+      ],
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:40:00Z",
+      "fingerprint": "aca58c61b9b691e1849bc2f3a598cbaa1fd1e5c7db7193c969d3adbeb0c37073",
+      "apis": [
+        {
+          "protocol": "file",
+          "path": "tests/test_no_dependency_path.py",
+          "description": {
+            "zh": "零依赖承诺：从打包、后端与示例三个层面校验。\n",
+            "en": "The zero-dependency promise, checked at packaging, backend and example level.\n"
+          },
+          "key": "file:tests/test_no_dependency_path.py"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 0,
         "dep_in": 0
       }
     },
@@ -15063,9 +16246,9 @@
           "line": 1
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.257Z",
-      "fingerprint": "c7844269be626ed5058001514ea274cee3b6c62a247f7b5afbeca90ed7c02b66",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "98f6c61340ebda42ddbd0fced95d0ae3c9f008ca45b2b60b7730cb2330c980a6",
       "aggregate": {
         "descendant_count": 41,
         "own_api_count": 0,
@@ -16439,9 +17622,9 @@
           "path": "pyvdisk/vscript/host.py"
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.260Z",
-      "fingerprint": "baf58ee2c4dbda56cd6c7afb131bba217cd12b97019cd89fbebb5a1a7edad7c2",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "b041b5a92b2d5d9ff7cfc03f3d5bd925f17d1a1137ec559745e0608f984f0d8a",
       "aggregate": {
         "descendant_count": 2,
         "own_api_count": 0,
@@ -16461,8 +17644,8 @@
         "en": "Host Confinement"
       },
       "description": {
-        "zh": "宿主隔离：声明脚本可读写的宿主目录，其余路径一律拒绝。该策略现在有真实入口——CLI 注入声明的根目录——host.* 不再因根目录为空而不可用。\n",
-        "en": "Host confinement: declares which host directories a script may read and write and refuses everything else. The policy now has a real entry point -- the CLI injects the declared roots -- so host.* is reachable instead of failing with an empty root set.\n"
+        "zh": "宿主隔离：声明脚本可读写的宿主目录，其余路径一律拒绝。写入末尾会刷盘目录，让改名本身落地；该刷盘经由平台适配层，因为 Windows 无法把目录当文件打开。\n",
+        "en": "Host confinement: declares which host directories a script may read and write and refuses everything else. Writes end with a directory flush so the rename itself is durable; that flush goes through the platform layer, since Windows cannot open a directory as a file.\n"
       },
       "source": [
         {
@@ -16471,9 +17654,9 @@
           "end_line": 79
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.260Z",
-      "fingerprint": "baf58ee2c4dbda56cd6c7afb131bba217cd12b97019cd89fbebb5a1a7edad7c2",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "b041b5a92b2d5d9ff7cfc03f3d5bd925f17d1a1137ec559745e0608f984f0d8a",
       "apis": [
         {
           "protocol": "rpc",
@@ -16530,11 +17713,23 @@
           "key": "rpc:pyvdisk.vscript.host.HostProxy#write"
         }
       ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "pyvdisk.platform.durability",
+          "from_api": "rpc:pyvdisk.vscript.host.HostProxy#write",
+          "label": {
+            "zh": "刷盘目录",
+            "en": "flush the directory"
+          },
+          "cross_tree": false
+        }
+      ],
       "aggregate": {
         "descendant_count": 0,
         "own_api_count": 6,
         "inherited_api_count": 0,
-        "dep_out": 0,
+        "dep_out": 1,
         "dep_in": 2
       }
     },
@@ -16559,9 +17754,9 @@
           "end_line": 92
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T09:58:38.261Z",
-      "fingerprint": "baf58ee2c4dbda56cd6c7afb131bba217cd12b97019cd89fbebb5a1a7edad7c2",
+      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
+      "updated_at": "2026-09-24T13:45:00Z",
+      "fingerprint": "b041b5a92b2d5d9ff7cfc03f3d5bd925f17d1a1137ec559745e0608f984f0d8a",
       "apis": [
         {
           "protocol": "rpc",
@@ -18026,17 +19221,24 @@
   },
   "api_index": {
     "file:.github/workflows/ci.yml": "pyvdisk.delivery.ci",
+    "file:.github/workflows/ci.yml#no-dependencies": "pyvdisk.delivery.ci",
     "file:.github/workflows/pylint.yml": "pyvdisk.delivery.lint",
     "file:CHANGELOG.md": "pyvdisk.docs.changelog",
     "file:docs/API_GOVERNANCE.md": "pyvdisk.docs.api-governance",
     "file:docs/ARCHITECTURE.md": "pyvdisk.docs.architecture",
     "file:docs/CONTRACTS.md": "pyvdisk.docs.contracts",
     "file:docs/VSCRIPT_SPEC.md": "pyvdisk.docs.vscript-spec",
+    "file:examples/agent_tools.py:scripted_model": "pyvdisk.examples.agent-tools",
+    "file:examples/quickstart.py": "pyvdisk.examples.quickstart",
     "file:MANIFEST.in": "pyvdisk.delivery.packaging",
     "file:pyproject.toml": "pyvdisk.delivery.packaging",
     "file:pyvdisk/__main__.py": "pyvdisk.cli.entry",
     "file:pyvdisk/py.typed": "pyvdisk.delivery.packaging",
     "file:README.md": "pyvdisk.docs.readme",
+    "file:tests/test_agent_sandbox.py": "pyvdisk.tests.agent-sandbox",
+    "file:tests/test_compat.py": "pyvdisk.tests.compat",
+    "file:tests/test_no_dependency_path.py": "pyvdisk.tests.no-dependency",
+    "rpc:pyvdisk.AgentSandbox": "pyvdisk.api",
     "rpc:pyvdisk.CheckpointStore": "pyvdisk.api",
     "rpc:pyvdisk.cli._add_cred_args": "pyvdisk.cli.format",
     "rpc:pyvdisk.cli._human_size": "pyvdisk.cli.format",
@@ -18096,6 +19298,20 @@
     "rpc:pyvdisk.cli.cmd_vol_status": "pyvdisk.cli.volume",
     "rpc:pyvdisk.cli.cmd_write": "pyvdisk.cli.file-ops",
     "rpc:pyvdisk.cli.main": "pyvdisk.cli.main",
+    "rpc:pyvdisk.compat": "pyvdisk.api",
+    "rpc:pyvdisk.compat.can_symlink": "pyvdisk.platform.durability",
+    "rpc:pyvdisk.compat.describe": "pyvdisk.platform.dispatch",
+    "rpc:pyvdisk.compat.fsync_dir": "pyvdisk.platform.durability",
+    "rpc:pyvdisk.compat.gid": "pyvdisk.platform.durability",
+    "rpc:pyvdisk.compat.gid_or": "pyvdisk.platform.durability",
+    "rpc:pyvdisk.compat.implementation": "pyvdisk.platform.dispatch",
+    "rpc:pyvdisk.compat.lock": "pyvdisk.platform.locking",
+    "rpc:pyvdisk.compat.pread": "pyvdisk.platform.positional",
+    "rpc:pyvdisk.compat.pwrite": "pyvdisk.platform.positional",
+    "rpc:pyvdisk.compat.uid": "pyvdisk.platform.durability",
+    "rpc:pyvdisk.compat.uid_or": "pyvdisk.platform.durability",
+    "rpc:pyvdisk.compat.unlock": "pyvdisk.platform.locking",
+    "rpc:pyvdisk.compat.use_implementation": "pyvdisk.platform.dispatch",
     "rpc:pyvdisk.contracts.BlockDevice": "pyvdisk.contracts.storage",
     "rpc:pyvdisk.contracts.BlockDevice#read_block": "pyvdisk.contracts.storage",
     "rpc:pyvdisk.contracts.BlockDevice#write_block": "pyvdisk.contracts.storage",
@@ -18177,6 +19393,7 @@
     "rpc:pyvdisk.execution.ExecutionService#submit": "pyvdisk.execution.service.submit",
     "rpc:pyvdisk.execution.ExecutionService#worker_count": "pyvdisk.execution.service.setup",
     "rpc:pyvdisk.ExecutionService": "pyvdisk.api",
+    "rpc:pyvdisk.FlatIndex": "pyvdisk.api",
     "rpc:pyvdisk.fs._ceil_div": "pyvdisk.storage.fs.names",
     "rpc:pyvdisk.fs._decode_name": "pyvdisk.storage.fs.names",
     "rpc:pyvdisk.fs._disk_lock_key": "pyvdisk.storage.fs.locking",
@@ -18748,6 +19965,27 @@
     "rpc:pyvdisk.vscript.wal.encode_record": "pyvdisk.storage.wal.undo",
     "rpc:pyvdisk.vscript.wal.RECORD_KINDS": "pyvdisk.storage.wal.undo",
     "rpc:pyvdisk.vscript.wal.WriteAheadLog": "pyvdisk.storage.wal.undo",
+    "rpc:sandbox:_hidden": "pyvdisk.agent.paths",
+    "rpc:sandbox:_SandboxFS": "pyvdisk.agent.script",
+    "rpc:sandbox:AgentSandbox._normalize": "pyvdisk.agent.paths",
+    "rpc:sandbox:AgentSandbox._visible": "pyvdisk.agent.paths",
+    "rpc:sandbox:AgentSandbox.audit": "pyvdisk.agent.audit",
+    "rpc:sandbox:AgentSandbox.call": "pyvdisk.agent.tools",
+    "rpc:sandbox:AgentSandbox.create": "pyvdisk.agent.sandbox",
+    "rpc:sandbox:AgentSandbox.delete": "pyvdisk.agent.sandbox",
+    "rpc:sandbox:AgentSandbox.dispatch": "pyvdisk.agent.tools",
+    "rpc:sandbox:AgentSandbox.exists": "pyvdisk.agent.sandbox",
+    "rpc:sandbox:AgentSandbox.list": "pyvdisk.agent.sandbox",
+    "rpc:sandbox:AgentSandbox.make_directory": "pyvdisk.agent.sandbox",
+    "rpc:sandbox:AgentSandbox.open": "pyvdisk.agent.sandbox",
+    "rpc:sandbox:AgentSandbox.read": "pyvdisk.agent.sandbox",
+    "rpc:sandbox:AgentSandbox.retain_audit": "pyvdisk.agent.audit",
+    "rpc:sandbox:AgentSandbox.run": "pyvdisk.agent.script",
+    "rpc:sandbox:AgentSandbox.stats": "pyvdisk.agent.audit",
+    "rpc:sandbox:AgentSandbox.tools": "pyvdisk.agent.tools",
+    "rpc:sandbox:AgentSandbox.verify_audit": "pyvdisk.agent.audit",
+    "rpc:sandbox:AgentSandbox.write": "pyvdisk.agent.sandbox",
+    "rpc:sandbox:TOOLS": "pyvdisk.agent.tools",
     "rpc:tests/conftest.py": "pyvdisk.tests.fixtures",
     "rpc:tests/test_agentic_cli.py": "pyvdisk.tests.agentic-cli",
     "rpc:tests/test_api_governance.py": "pyvdisk.tests.api-governance",
@@ -18818,9 +20056,49 @@
     "rpc:tests/test_vscript.py::VScriptTests": "pyvdisk.tests.vscript",
     "rpc:tests/test_wal_abort_recovery.py": "pyvdisk.tests.wal-recovery",
     "rpc:tests/test_wal_checkpoint_and_recovery.py": "pyvdisk.tests.wal-checkpoint",
-    "rpc:tests/test_worker_cancellation.py": "pyvdisk.tests.cancellation"
+    "rpc:tests/test_worker_cancellation.py": "pyvdisk.tests.cancellation",
+    "rpc:vector_index:deserialize": "pyvdisk.storage.vector.flat-index",
+    "rpc:vector_index:distance": "pyvdisk.storage.vector.flat-index",
+    "rpc:vector_index:FlatIndex.add_item": "pyvdisk.storage.vector.flat-index",
+    "rpc:vector_index:FlatIndex.knn_query": "pyvdisk.storage.vector.flat-index",
+    "rpc:vector_index:read_kind": "pyvdisk.storage.vector.flat-index",
+    "rpc:vector_index:serialize": "pyvdisk.storage.vector.flat-index",
+    "rpc:vector_index:serialize_from_backend": "pyvdisk.storage.vector.flat-index"
   },
   "edges": [
+    {
+      "from": "pyvdisk.api",
+      "from_api": "rpc:pyvdisk.AgentSandbox",
+      "to": "pyvdisk.agent.sandbox",
+      "kind": "reference",
+      "cross_tree": false,
+      "label": {
+        "zh": "转出沙箱门面",
+        "en": "re-exports the sandbox"
+      }
+    },
+    {
+      "from": "pyvdisk.api",
+      "from_api": "rpc:pyvdisk.compat",
+      "to": "pyvdisk.platform",
+      "kind": "reference",
+      "cross_tree": false,
+      "label": {
+        "zh": "转出平台适配层",
+        "en": "re-exports the platform layer"
+      }
+    },
+    {
+      "from": "pyvdisk.api",
+      "from_api": "rpc:pyvdisk.FlatIndex",
+      "to": "pyvdisk.storage.vector.flat-index",
+      "kind": "reference",
+      "cross_tree": false,
+      "label": {
+        "zh": "转出扁平索引",
+        "en": "re-exports the flat index"
+      }
+    },
     {
       "from": "pyvdisk.cli.open",
       "from_api": "rpc:pyvdisk.cli._open_vfs",
@@ -19025,15 +20303,60 @@
       }
     },
     {
-      "from": "pyvdisk.storage.checkpoint.open",
-      "from_api": "rpc:pyvdisk.infrastructure.checkpoint.CheckpointStore#from_vfs",
-      "to": "pyvdisk.storage.vfs.files",
-      "to_api": "rpc:pyvdisk.vfs.VFS#read_file",
+      "from": "pyvdisk.storage.block.access",
+      "from_api": "rpc:pyvdisk.disk.VirtualDisk#write_block",
+      "to": "pyvdisk.storage.block.io",
       "kind": "call",
       "cross_tree": false,
       "label": {
-        "zh": "经 VFS 读写",
-        "en": "reads via VFS"
+        "zh": "定位写入",
+        "en": "positioned write"
+      }
+    },
+    {
+      "from": "pyvdisk.storage.block.image",
+      "from_api": "rpc:pyvdisk.disk.VirtualDisk#open",
+      "to": "pyvdisk.platform.locking",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "整文件写锁",
+        "en": "whole-file write lock"
+      }
+    },
+    {
+      "from": "pyvdisk.storage.block.io",
+      "from_api": "rpc:pyvdisk.disk._pread_all",
+      "to": "pyvdisk.platform.positional",
+      "to_api": "rpc:pyvdisk.compat.pread",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "定位读取",
+        "en": "positioned read"
+      }
+    },
+    {
+      "from": "pyvdisk.storage.block.io",
+      "from_api": "rpc:pyvdisk.disk._pwrite_all",
+      "to": "pyvdisk.platform.positional",
+      "to_api": "rpc:pyvdisk.compat.pwrite",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "定位写入",
+        "en": "positioned write"
+      }
+    },
+    {
+      "from": "pyvdisk.storage.checkpoint.open",
+      "from_api": "rpc:pyvdisk.infrastructure.checkpoint.CheckpointStore#locked",
+      "to": "pyvdisk.platform.locking",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "跨进程锁",
+        "en": "cross-process lock"
       }
     },
     {
@@ -19301,13 +20624,12 @@
     {
       "from": "pyvdisk.storage.fuse.meta",
       "from_api": "rpc:pyvdisk.fuse_mount._VFuseOperations#_getattr",
-      "to": "pyvdisk.storage.vfs.stat",
-      "to_api": "rpc:pyvdisk.vfs.VFS#stat",
+      "to": "pyvdisk.platform.durability",
       "kind": "call",
       "cross_tree": false,
       "label": {
-        "zh": "取 stat",
-        "en": "stats path"
+        "zh": "进程身份",
+        "en": "process identity"
       }
     },
     {
@@ -19468,14 +20790,13 @@
     },
     {
       "from": "pyvdisk.storage.vector.search",
-      "from_api": "rpc:pyvdisk.vector_disk.VectorDisk#_rebuild_index",
-      "to": "pyvdisk.storage.vector.records",
-      "to_api": "rpc:pyvdisk.vector_disk.VectorDisk#get",
-      "kind": "dataflow",
+      "from_api": "rpc:pyvdisk.vector_disk.VectorDisk#_load_index",
+      "to": "pyvdisk.storage.vector.flat-index",
+      "kind": "call",
       "cross_tree": false,
       "label": {
-        "zh": "读取记录",
-        "en": "reads records"
+        "zh": "后端回退",
+        "en": "backend fallback"
       }
     },
     {
@@ -20120,6 +21441,17 @@
       }
     },
     {
+      "from": "pyvdisk.vscript.host.guard",
+      "from_api": "rpc:pyvdisk.vscript.host.HostProxy#write",
+      "to": "pyvdisk.platform.durability",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "刷盘目录",
+        "en": "flush the directory"
+      }
+    },
+    {
       "from": "pyvdisk.vscript.host.module",
       "from_api": "rpc:pyvdisk.vscript.host.create_host_module",
       "to": "pyvdisk.vscript.host.guard",
@@ -20278,12 +21610,12 @@
     "pyvdisk": {
       "schema_version": 1,
       "id": "pyvdisk",
-      "updated_at": "2026-09-23T07:23:36.674Z",
+      "updated_at": "2026-09-24T11:39:34.471Z",
       "mode": "groups",
       "max_columns": 4,
       "reading": {
-        "zh": "从底向上读：storage 是块设备、文件系统、容器与数据服务；execution 在其上提供执行平面；governance 是能力门禁；vscript 是可执行脚本语言；cli 是用户入口；contracts 是被各方实现的抽象契约；api/compat 是导出面；tests/docs/delivery 是保障与交付。",
-        "en": "Read bottom-up: storage holds block devices, filesystems, containers and data services; execution layers the execution plane on top; governance is the capability gate; vscript is the executable script language; cli is the user entry; contracts are the abstractions others implement; api/compat are the exported surface; tests/docs/delivery provide assurance."
+        "zh": "从底向上读：storage 是块设备、文件系统、容器与数据服务；execution 在其上提供执行平面；governance 是能力门禁；vscript 是可执行脚本语言；cli 是用户入口；contracts 是被各方实现的抽象契约；接着是对外一组——Agent 工作区与沙箱、导出面、以及沉底的平台适配层；examples/tests/docs/delivery 是示例、保障与交付。",
+        "en": "Read bottom-up: storage holds block devices, filesystems, containers and data services; execution layers the execution plane on top; governance is the capability gate; vscript is the executable script language; cli is the user entry; contracts are the abstractions others implement; then the outward-facing group -- the agent workspace and its sandbox, the exported API, and the platform layer everything sits on; examples/docs/tests/delivery provide assurance and delivery."
       },
       "order": [
         "pyvdisk.storage",
@@ -20292,8 +21624,11 @@
         "pyvdisk.vscript",
         "pyvdisk.cli",
         "pyvdisk.contracts",
+        "pyvdisk.agent",
         "pyvdisk.api",
         "pyvdisk.compat",
+        "pyvdisk.platform",
+        "pyvdisk.examples",
         "pyvdisk.tests",
         "pyvdisk.docs",
         "pyvdisk.delivery"
@@ -20326,24 +21661,69 @@
         {
           "id": "surface",
           "title": {
-            "zh": "对外接口",
-            "en": "Public Surface"
+            "zh": "对外接口与 Agent 入口",
+            "en": "Public Surface and Agent Entry"
           },
           "children": [
+            "pyvdisk.agent",
             "pyvdisk.api",
-            "pyvdisk.compat"
+            "pyvdisk.compat",
+            "pyvdisk.platform"
           ]
         },
         {
           "id": "meta",
           "title": {
-            "zh": "文档、测试与交付",
-            "en": "Docs, Tests and Delivery"
+            "zh": "示例、文档、测试与交付",
+            "en": "Examples, Docs, Tests and Delivery"
           },
           "children": [
+            "pyvdisk.examples",
             "pyvdisk.tests",
             "pyvdisk.docs",
             "pyvdisk.delivery"
+          ]
+        }
+      ]
+    },
+    "pyvdisk.agent": {
+      "schema_version": 1,
+      "id": "pyvdisk.agent",
+      "updated_at": "2026-09-24T11:33:31.064Z",
+      "mode": "groups",
+      "reading": {
+        "zh": "从左到右：路径能指向什么，有哪些工具，把两者合起来的门面，最后是调用在哪里执行、留下什么记录。",
+        "en": "Left to right: what a path may name, what tools exist, the facade that ties them together, then where a call runs and what it leaves behind."
+      },
+      "order": [
+        "pyvdisk.agent.paths",
+        "pyvdisk.agent.tools",
+        "pyvdisk.agent.sandbox",
+        "pyvdisk.agent.script",
+        "pyvdisk.agent.audit"
+      ],
+      "groups": [
+        {
+          "id": "surface",
+          "title": {
+            "zh": "模型看到的面",
+            "en": "What the model sees"
+          },
+          "children": [
+            "pyvdisk.agent.paths",
+            "pyvdisk.agent.tools",
+            "pyvdisk.agent.sandbox"
+          ]
+        },
+        {
+          "id": "execution",
+          "title": {
+            "zh": "执行与留痕",
+            "en": "Execution and evidence"
+          },
+          "children": [
+            "pyvdisk.agent.script",
+            "pyvdisk.agent.audit"
           ]
         }
       ]
@@ -20517,6 +21897,20 @@
         "pyvdisk.docs.changelog"
       ]
     },
+    "pyvdisk.examples": {
+      "schema_version": 1,
+      "id": "pyvdisk.examples",
+      "updated_at": "2026-09-24T11:34:32.619Z",
+      "mode": "grid",
+      "reading": {
+        "zh": "两个入口：自底向上跑通整条栈的导览，以及演示框架如何对接的 agent loop。",
+        "en": "Two entries: the bottom-up tour of the whole stack, and the agent loop that shows how a framework talks to it."
+      },
+      "order": [
+        "pyvdisk.examples.quickstart",
+        "pyvdisk.examples.agent-tools"
+      ]
+    },
     "pyvdisk.execution": {
       "schema_version": 1,
       "id": "pyvdisk.execution",
@@ -20631,6 +22025,38 @@
         "pyvdisk.governance.files",
         "pyvdisk.governance.data",
         "pyvdisk.governance.scoped"
+      ]
+    },
+    "pyvdisk.platform": {
+      "schema_version": 1,
+      "id": "pyvdisk.platform",
+      "updated_at": "2026-09-24T11:34:38.929Z",
+      "mode": "grid",
+      "max_columns": 2,
+      "reading": {
+        "zh": "先看当前用的是哪套实现，再看其余模块都会经过的四类原语：定位读写、文件锁、持久化与身份。",
+        "en": "Which implementation is in force, then the four primitive groups every other module goes through: positioned IO, locking, and durability/identity."
+      },
+      "order": [
+        "pyvdisk.platform.dispatch",
+        "pyvdisk.platform.positional",
+        "pyvdisk.platform.locking",
+        "pyvdisk.platform.durability"
+      ],
+      "groups": [
+        {
+          "id": "primitives",
+          "title": {
+            "zh": "四类原语",
+            "en": "Primitives"
+          },
+          "children": [
+            "pyvdisk.platform.dispatch",
+            "pyvdisk.platform.positional",
+            "pyvdisk.platform.locking",
+            "pyvdisk.platform.durability"
+          ]
+        }
       ]
     },
     "pyvdisk.storage": {
@@ -20996,15 +22422,18 @@
     "pyvdisk.storage.vector": {
       "schema_version": 1,
       "id": "pyvdisk.storage.vector",
-      "updated_at": "2026-09-23T07:24:02.752Z",
+      "updated_at": "2026-09-24T11:32:36.825Z",
+      "mode": "grid",
+      "max_columns": 3,
       "reading": {
-        "zh": "先挂载向量盘、管理集合，再写入与读取记录，最后在索引上做相似度检索。",
-        "en": "Mount the vector disk, manage collections, write and read records, then run similarity search over the built index."
+        "zh": "先看集合簿记与记录，再看索引后端，最后是消费它的检索。",
+        "en": "Collection bookkeeping and records first, then the index backend, then the search that consumes it."
       },
       "order": [
         "pyvdisk.storage.vector.open",
         "pyvdisk.storage.vector.collections",
         "pyvdisk.storage.vector.records",
+        "pyvdisk.storage.vector.flat-index",
         "pyvdisk.storage.vector.search"
       ]
     },
@@ -21118,12 +22547,12 @@
     "pyvdisk.tests": {
       "schema_version": 1,
       "id": "pyvdisk.tests",
-      "updated_at": "2026-09-24T09:56:06.550Z",
+      "updated_at": "2026-09-24T11:39:19.907Z",
       "mode": "groups",
       "max_columns": 4,
       "reading": {
-        "zh": "按所验证的子系统分组：夹具与文件系统持久性（新增 FUSE 桥）、事务/参与者补偿/崩溃矩阵、执行平面、队列与精确一次保证、VScript 语言及其审计轨迹/撤销/cron/触发器、治理与契约，最后是日志盘、CLI 与打包检查。",
-        "en": "Grouped by the subsystem each module validates: fixtures and filesystem durability (now including the FUSE bridge), transactions, participant compensation and crash matrices, the execution plane, queue and exactly-once guarantees, the VScript language with its audit trail, undo, cron and triggers, governance and contracts, and finally log-disk, CLI and packaging checks."
+        "zh": "按所验证的子系统分组：夹具、文件系统持久性与平台适配层、事务与崩溃、执行平面、队列与精确一次保证、VScript、治理与沙箱，最后是日志盘、CLI、打包与零依赖检查。",
+        "en": "Grouped by the subsystem each module validates: fixtures, filesystem durability and the platform layer, transactions and crashes, the execution plane, queue and exactly-once guarantees, VScript, governance and the sandbox, then log-disk, CLI, packaging and the zero-dependency check."
       },
       "order": [
         "pyvdisk.tests.fixtures",
@@ -21132,6 +22561,7 @@
         "pyvdisk.tests.submit-conflict",
         "pyvdisk.tests.wal-recovery",
         "pyvdisk.tests.fuse-mount",
+        "pyvdisk.tests.compat",
         "pyvdisk.tests.tx-rollback",
         "pyvdisk.tests.tx-idempotency",
         "pyvdisk.tests.crash-matrix",
@@ -21158,10 +22588,12 @@
         "pyvdisk.tests.governance",
         "pyvdisk.tests.api-governance",
         "pyvdisk.tests.contracts",
+        "pyvdisk.tests.agent-sandbox",
         "pyvdisk.tests.logdisk-compact",
         "pyvdisk.tests.logdisk-retention",
         "pyvdisk.tests.agentic-cli",
-        "pyvdisk.tests.packaging"
+        "pyvdisk.tests.packaging",
+        "pyvdisk.tests.no-dependency"
       ],
       "groups": [
         {
@@ -21176,7 +22608,8 @@
             "pyvdisk.tests.atomic-save",
             "pyvdisk.tests.submit-conflict",
             "pyvdisk.tests.wal-recovery",
-            "pyvdisk.tests.fuse-mount"
+            "pyvdisk.tests.fuse-mount",
+            "pyvdisk.tests.compat"
           ]
         },
         {
@@ -21241,13 +22674,14 @@
         {
           "id": "gov",
           "title": {
-            "zh": "治理与契约",
-            "en": "Governance and Contracts"
+            "zh": "治理与沙箱",
+            "en": "Governance and Sandbox"
           },
           "children": [
             "pyvdisk.tests.governance",
             "pyvdisk.tests.api-governance",
-            "pyvdisk.tests.contracts"
+            "pyvdisk.tests.contracts",
+            "pyvdisk.tests.agent-sandbox"
           ]
         },
         {
@@ -21260,7 +22694,8 @@
             "pyvdisk.tests.logdisk-compact",
             "pyvdisk.tests.logdisk-retention",
             "pyvdisk.tests.agentic-cli",
-            "pyvdisk.tests.packaging"
+            "pyvdisk.tests.packaging",
+            "pyvdisk.tests.no-dependency"
           ]
         }
       ]
@@ -21539,6 +22974,15 @@
         "zh": "结构库同步 issue #1 的修复"
       },
       "updated_at": "2026-09-24T09:59:19.981Z"
+    },
+    {
+      "id": "2026-09-24-zero-dep-windows-agentsandbox",
+      "status": "verified",
+      "title": {
+        "en": "Zero dependency, Windows compat layer and AgentSandbox",
+        "zh": "零依赖 + Windows 兼容层 + AgentSandbox"
+      },
+      "updated_at": "2026-09-24T11:41:32.089Z"
     }
   ]
 }

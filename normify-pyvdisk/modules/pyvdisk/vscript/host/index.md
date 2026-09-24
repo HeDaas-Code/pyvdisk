@@ -11,9 +11,9 @@ description:
   en: >
       VScript host access: an allowlisted HostProxy that confines script file transfer to declared directory roots.
       
-revision: c3881eee5dced2b180cd3b383e5d848026224154
-updated_at: "2026-09-24T09:58:38.260Z"
-fingerprint: baf58ee2c4dbda56cd6c7afb131bba217cd12b97019cd89fbebb5a1a7edad7c2
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: b041b5a92b2d5d9ff7cfc03f3d5bd925f17d1a1137ec559745e0608f984f0d8a
 source:
   - path: "pyvdisk/vscript/host.py"
 ---

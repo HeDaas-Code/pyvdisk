@@ -6,14 +6,12 @@ tags: [docs, changelog]
 name: {zh: "变更日志", en: "Changelog"}
 description:
   zh: >
-      变更日志：按 issue #1 的清单编号记录用户可见变更，并列出四条明确留待后续的项目。
-      
+      用户可见变更日志，版本号与 pyproject.toml 保持一致。条目按主题分组（零依赖与跨平台在前），并保留"已知未完成"一节，未完成项要看得见，而不是被静默遗忘。
   en: >
-      Changelog: user-visible changes keyed to the issue #1 inventory ids, plus the four deliberately deferred items.
-      
-revision: c3881eee5dced2b180cd3b383e5d848026224154
-updated_at: "2026-09-24T09:58:38.211Z"
-fingerprint: ea3f46a9c65b19826cd309658416f1fe840116fa730bfc745a4cf6b95f77858a
+      User-visible change log, versioned in step with pyproject.toml. Entries are grouped by theme (zero dependency and cross-platform first) and carry the residual-limits section, so unfixed items stay visible instead of being quietly forgotten.
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: 9648b98246e1e081401981daab12fa29c679efa0b189fb23fcb8542b565e7536
 source:
   - path: "CHANGELOG.md"
     line: 1

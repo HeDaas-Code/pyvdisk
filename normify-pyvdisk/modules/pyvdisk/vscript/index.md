@@ -11,9 +11,9 @@ description:
   en: >
       VScript: a safe workflow language with lexer, parser, tree-walking runtime, capability-confined standard library, policy/budget, audit and scheduling.
       
-revision: c3881eee5dced2b180cd3b383e5d848026224154
-updated_at: "2026-09-24T09:58:38.257Z"
-fingerprint: c7844269be626ed5058001514ea274cee3b6c62a247f7b5afbeca90ed7c02b66
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: 98f6c61340ebda42ddbd0fced95d0ae3c9f008ca45b2b60b7730cb2330c980a6
 source:
   - path: "pyvdisk/vscript/__init__.py"
     line: 1

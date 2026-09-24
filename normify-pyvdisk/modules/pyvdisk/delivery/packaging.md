@@ -5,14 +5,12 @@ parent: pyvdisk.delivery
 name: {zh: "打包元数据", en: "Packaging Metadata"}
 description:
   zh: >
-      分发元数据：以 hnswlib 为依赖、fuse 与 dev extras、py.typed 标记，以及把 LICENSE 与 CHANGELOG.md 一并打包的 sdist 清单。
-      
+      分发元数据：运行时依赖为空，hnswlib 与 fusepy 下沉到 vector、fuse 两个 extra，外加 py.typed 标记，以及把 LICENSE 与 CHANGELOG.md 一并打包的 sdist 清单。
   en: >
-      Distribution metadata: cffi-free dependency set with hnswlib, the fuse and dev extras, the py.typed marker, and the sdist manifest that ships LICENSE plus CHANGELOG.md.
-      
-revision: c3881eee5dced2b180cd3b383e5d848026224154
-updated_at: "2026-09-24T09:58:38.216Z"
-fingerprint: eef1180eeb651e5a6edbef6a63bd38eb0f2e3244b7c927f12a61c503b23ac266
+      Distribution metadata: no runtime dependencies at all, with hnswlib and fusepy moved to the vector and fuse extras, the py.typed marker, and the sdist manifest that ships LICENSE plus CHANGELOG.md.
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: e83415f6936531ac1130878c36a08b49e1795946d20ecc3bf95a507560e0a608
 source:
   - path: "pyproject.toml"
     line: 1

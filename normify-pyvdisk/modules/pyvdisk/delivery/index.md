@@ -11,9 +11,9 @@ description:
   en: >
       Distribution and continuous integration: packaging metadata, PEP 561 typing marker and the GitHub Actions workflows.
       
-revision: c3881eee5dced2b180cd3b383e5d848026224154
-updated_at: "2026-09-24T09:58:38.215Z"
-fingerprint: 7b8e690a61c134d576c6f09d81d7bc29a6ab4028d80f74d3320a15c7b43cf8bc
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: ffb2fa1aa3e3cc015e3b71a246768d8b6ebbd7ef155a40d3000dafa42f532369
 source:
   - path: "pyproject.toml"
   - path: ".github/workflows/ci.yml"

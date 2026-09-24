@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "id": "pyvdisk.tests",
-  "updated_at": "2026-09-24T09:56:06.550Z",
+  "updated_at": "2026-09-24T11:39:19.907Z",
   "mode": "groups",
   "max_columns": 4,
   "reading": {
-    "zh": "按所验证的子系统分组：夹具与文件系统持久性（新增 FUSE 桥）、事务/参与者补偿/崩溃矩阵、执行平面、队列与精确一次保证、VScript 语言及其审计轨迹/撤销/cron/触发器、治理与契约，最后是日志盘、CLI 与打包检查。",
-    "en": "Grouped by the subsystem each module validates: fixtures and filesystem durability (now including the FUSE bridge), transactions, participant compensation and crash matrices, the execution plane, queue and exactly-once guarantees, the VScript language with its audit trail, undo, cron and triggers, governance and contracts, and finally log-disk, CLI and packaging checks."
+    "zh": "按所验证的子系统分组：夹具、文件系统持久性与平台适配层、事务与崩溃、执行平面、队列与精确一次保证、VScript、治理与沙箱，最后是日志盘、CLI、打包与零依赖检查。",
+    "en": "Grouped by the subsystem each module validates: fixtures, filesystem durability and the platform layer, transactions and crashes, the execution plane, queue and exactly-once guarantees, VScript, governance and the sandbox, then log-disk, CLI, packaging and the zero-dependency check."
   },
   "order": [
     "pyvdisk.tests.fixtures",
@@ -15,6 +15,7 @@
     "pyvdisk.tests.submit-conflict",
     "pyvdisk.tests.wal-recovery",
     "pyvdisk.tests.fuse-mount",
+    "pyvdisk.tests.compat",
     "pyvdisk.tests.tx-rollback",
     "pyvdisk.tests.tx-idempotency",
     "pyvdisk.tests.crash-matrix",
@@ -41,10 +42,12 @@
     "pyvdisk.tests.governance",
     "pyvdisk.tests.api-governance",
     "pyvdisk.tests.contracts",
+    "pyvdisk.tests.agent-sandbox",
     "pyvdisk.tests.logdisk-compact",
     "pyvdisk.tests.logdisk-retention",
     "pyvdisk.tests.agentic-cli",
-    "pyvdisk.tests.packaging"
+    "pyvdisk.tests.packaging",
+    "pyvdisk.tests.no-dependency"
   ],
   "groups": [
     {
@@ -59,7 +62,8 @@
         "pyvdisk.tests.atomic-save",
         "pyvdisk.tests.submit-conflict",
         "pyvdisk.tests.wal-recovery",
-        "pyvdisk.tests.fuse-mount"
+        "pyvdisk.tests.fuse-mount",
+        "pyvdisk.tests.compat"
       ]
     },
     {
@@ -124,13 +128,14 @@
     {
       "id": "gov",
       "title": {
-        "zh": "治理与契约",
-        "en": "Governance and Contracts"
+        "zh": "治理与沙箱",
+        "en": "Governance and Sandbox"
       },
       "children": [
         "pyvdisk.tests.governance",
         "pyvdisk.tests.api-governance",
-        "pyvdisk.tests.contracts"
+        "pyvdisk.tests.contracts",
+        "pyvdisk.tests.agent-sandbox"
       ]
     },
     {
@@ -143,7 +148,8 @@
         "pyvdisk.tests.logdisk-compact",
         "pyvdisk.tests.logdisk-retention",
         "pyvdisk.tests.agentic-cli",
-        "pyvdisk.tests.packaging"
+        "pyvdisk.tests.packaging",
+        "pyvdisk.tests.no-dependency"
       ]
     }
   ]

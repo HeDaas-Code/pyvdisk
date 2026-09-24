@@ -11,9 +11,9 @@ description:
   en: >
       Storage plane: block image, disk identity, on-disk filesystem, high-level VFS, multi-disk volumes, vector and log disks, structured logging, simulated drive bay, optional FUSE mount, the unified DataDisk container, WAL and checkpoints.
       
-revision: c3881eee5dced2b180cd3b383e5d848026224154
-updated_at: "2026-09-24T09:58:38.225Z"
-fingerprint: 3ed800d0914e362e6fa76cf02ccddaa8b41f54ffd8efabaebe018e25619b823f
+revision: 2c9009ba74afb515d301cc96e1946087268479a2
+updated_at: "2026-09-24T13:45:00Z"
+fingerprint: 80d794b29e5404773680587fc27ceeac047cd72e0ab8cc13715f9aaa02d75a68
 source:
   - path: "pyvdisk/disk.py"
   - path: "pyvdisk/identity.py"
