@@ -7,87 +7,26 @@
 from __future__ import annotations
 
 import os
-import threading
 import warnings
 import contextlib
 from typing import Optional
 
-try:  # POSIX advisory locking; Windows remains a safe no-op fallback.
-    import fcntl
-except ImportError:  # pragma: no cover - platform dependent
-    fcntl = None
+from . import compat
 
 DEFAULT_BLOCK_SIZE = 4096
-
-
-# ---- 定位 IO（pread/pwrite）的可移植层 -------------------------------------
-#
-# os.pread / os.pwrite 只在 POSIX 上存在，Windows 的 CPython 没有这两个函数。
-# 它们位于块设备这一层，每一次读/写一个块都要经过，所以缺了它们整个包在
-# Windows 上一个用例都跑不了。这里补一个等价实现：在同一块句柄上
-# lseek -> read/write -> lseek 回原位。
-#
-# 与 pread/pwrite 的差异只有"不是原子的"这一点，而这在本项目里是可接受的：
-#   * 镜像句柄以 buffering=0 打开，os.read/os.write 直达 OS，绕过 Python 缓冲，
-#     "跨句柄立即可见"的语义保持不变；
-#   * 同一进程内的并发由 FS 的读写锁（fs.py 的 _read_locked / _write_locked）
-#     串行化，这里再按 fd 加一道锁，保证 lseek 与 read 之间不被同句柄的另一次
-#     定位 IO 插队；
-#   * 跨进程互斥仍依赖 flock，Windows 上没有 flock， disk.py 顶部已按 no-op 降级，
-#     多进程共享同一镜像的用法因此只在 POSIX 上有保证。
-_HAS_POSITIONAL_IO = hasattr(os, "pread") and hasattr(os, "pwrite")
-_PIO_LOCKS: dict = {}
-_PIO_LOCKS_GUARD = threading.Lock()
-
-
-def _pio_lock(fd: int) -> threading.Lock:
-    """每个镜像句柄一把定位 IO 锁（fd 复用只会多抢一次锁，不影响正确性）。"""
-    with _PIO_LOCKS_GUARD:
-        lock = _PIO_LOCKS.get(fd)
-        if lock is None:
-            lock = _PIO_LOCKS[fd] = threading.Lock()
-        return lock
-
-
-def _pread(f, length: int, offset: int) -> bytes:
-    """在 offset 处读最多 length 字节，不改变句柄自身的使用方式。"""
-    if _HAS_POSITIONAL_IO:
-        return os.pread(f.fileno(), length, offset)
-    # 走文件对象而不是 os.lseek/os.read：同一个句柄上还会发生
-    # f.truncate()（mkfs/grow），Windows 下让 CRT 与 FileIO 各自记一份位置
-    # 会读到错位的块。统一用文件对象，位置就只有一份。
-    with _pio_lock(f.fileno()):
-        saved = f.tell()
-        f.seek(offset)
-        try:
-            return f.read(length)
-        finally:
-            f.seek(saved)
-
-
-def _pwrite(f, data, offset: int) -> int:
-    """在 offset 处写 data，返回写入字节数。"""
-    if _HAS_POSITIONAL_IO:
-        return os.pwrite(f.fileno(), data, offset)
-    with _pio_lock(f.fileno()):
-        saved = f.tell()
-        f.seek(offset)
-        try:
-            return f.write(data)
-        finally:
-            f.seek(saved)
 
 
 def _pread_all(f, offset: int, length: int) -> bytes:
     """从文件 f 的 offset 处读取 length 字节，保证读满（EOF 除外）。
 
-    使用 os.pread：原子定位读取，不依赖文件游标，且绕过 Python 缓冲。
+    使用 compat.pread：原子定位读取，不依赖文件游标，且绕过 Python 缓冲。
+    POSIX 上是 os.pread；Windows 上退化为加锁的 seek+read。
     """
     chunks = []
     remaining = length
     cur = offset
     while remaining > 0:
-        n = _pread(f, remaining, cur)
+        n = compat.pread(f.fileno(), remaining, cur)
         if not n:
             break  # EOF
         chunks.append(n)
@@ -102,14 +41,15 @@ def _pread_all(f, offset: int, length: int) -> bytes:
 def _pwrite_all(f, offset: int, data: bytes) -> None:
     """向文件 f 的 offset 处写入 data，保证写满。
 
-    使用 os.pwrite：原子定位写入，绕过 Python 缓冲，跨句柄立即可见。
+    使用 compat.pwrite：定位写入，绕过 Python 缓冲，跨句柄立即可见。
+    POSIX 上是 os.pwrite；Windows 上退化为加锁的 seek+write。
     """
     view = memoryview(data)
     cur = offset
     written = 0
     total = len(data)
     while written < total:
-        n = _pwrite(f, view[written:], cur)
+        n = compat.pwrite(f.fileno(), view[written:], cur)
         cur += n
         written += n
 
@@ -162,12 +102,14 @@ class VirtualDisk:
         # 这样多个文件句柄（多线程各自 open 同一镜像）能通过 OS 页缓存
         # 立即看到彼此的写入，避免陈旧读。
         self._f = open(self.path, mode, buffering=0)
-        if fcntl is not None and any(c in mode for c in "wa+"):
+        if any(c in mode for c in "wa+"):
             try:
                 # Blocking acquisition serializes writers across threads/processes.
                 # Non-blocking failure caused ordinary concurrent VFS operations to
                 # fail spuriously instead of waiting for the image lock.
-                fcntl.flock(self._f.fileno(), fcntl.LOCK_EX)
+                # compat.lock is fcntl.flock on POSIX and a whole-file msvcrt byte
+                # range on Windows, so both platforms actually serialize.
+                compat.lock(self._f.fileno())
                 self._locked = True
             except OSError:
                 self._f.close(); self._f = None
@@ -178,8 +120,8 @@ class VirtualDisk:
     def close(self) -> None:
         if self._f is not None:
             self._f.flush()
-            if self._locked and fcntl is not None:
-                fcntl.flock(self._f.fileno(), fcntl.LOCK_UN)
+            if self._locked:
+                compat.unlock(self._f.fileno())
             self._f.close()
             self._f = None
             self._locked = False

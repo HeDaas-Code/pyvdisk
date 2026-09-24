@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import stat
 import tempfile
+from .. import compat
 from .errors import CapabilityError, RuntimeError
 
 class HostCapability:
@@ -71,15 +72,10 @@ class HostProxy:
                 raise CapabilityError("目标不是普通文件")
             os.replace(tmp, p)
             tmp = None
-            if os.name == "posix":
-                # 目录项 fsync 是 POSIX 的做法：Windows 上不能 os.open 一个目录，
-                # 会抛 OSError，于是写入明明成功却被下面的 except 报成
-                # "写入宿主文件失败"。NTFS 的元数据持久性由 OS 负责，这里跳过。
-                dirfd = os.open(parent, os.O_RDONLY)
-                try:
-                    os.fsync(dirfd)
-                finally:
-                    os.close(dirfd)
+            # Make the rename itself durable.  Windows cannot open a directory as
+            # a file, so compat.fsync_dir is a no-op there and returns False --
+            # NTFS journals the rename, and the file data was already flushed.
+            compat.fsync_dir(parent)
         except OSError as e: raise RuntimeError("写入宿主文件失败") from e
         finally:
             if tmp is not None:

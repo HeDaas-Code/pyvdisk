@@ -21,6 +21,7 @@ import stat as _stat
 import time
 from typing import Any, Optional
 
+from . import compat
 from .fs import FSError, T_DIR, T_FILE, T_SYMLINK
 from .vfs import VFS
 
@@ -62,8 +63,8 @@ class _VFuseOperations:
             "st_mode": mode,
             "st_dev": 0,
             "st_nlink": st.nlink,
-            "st_uid": os.getuid() if hasattr(os, "getuid") else st.uid,
-            "st_gid": os.getgid() if hasattr(os, "getgid") else st.gid,
+            "st_uid": compat.uid_or(st.uid),
+            "st_gid": compat.gid_or(st.gid),
             "st_size": st.size,
             "st_atime": st.atime or now,
             "st_mtime": st.mtime or now,

@@ -12,39 +12,7 @@ import threading
 import time
 from pathlib import Path
 
-try:  # POSIX 建议锁；与 pyvdisk/disk.py 的写法保持一致。
-    import fcntl
-except ImportError:  # pragma: no cover - platform dependent
-    fcntl = None
-
-try:  # Windows 用字节范围锁顶上，保住"跨进程互斥"这条契约而不是直接降级。
-    import msvcrt
-except ImportError:  # pragma: no cover - platform dependent
-    msvcrt = None
-
-
-def _acquire(fd: int) -> None:
-    if fcntl is not None:
-        fcntl.flock(fd, fcntl.LOCK_EX)
-        return
-    if msvcrt is None:  # pragma: no cover - 既无 flock 也无 locking 的平台
-        return
-    while True:
-        try:
-            msvcrt.locking(fd, msvcrt.LK_LOCK, 1)
-            return
-        except OSError:  # LK_LOCK 重试约 10 次后放弃，这里自己等下去
-            time.sleep(0.01)
-
-
-def _release(fd: int) -> None:
-    if fcntl is not None:
-        fcntl.flock(fd, fcntl.LOCK_UN)
-    elif msvcrt is not None:  # pragma: no cover - platform dependent
-        try:
-            msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
-        except OSError:
-            pass
+from .. import compat
 
 class CheckpointStore:
     """JSON checkpoints using an explicit VFS or host storage backend."""
@@ -102,7 +70,7 @@ class CheckpointStore:
         lockfile.parent.mkdir(parents=True, exist_ok=True)
         fd = os.open(str(lockfile), os.O_CREAT | os.O_RDWR, 0o644)
         try:
-            _acquire(fd)
+            compat.lock(fd)
             local.held = True
             local.fd = fd
             local.depth = 1
@@ -112,7 +80,7 @@ class CheckpointStore:
                 local.depth -= 1
                 if local.depth <= 0:
                     try:
-                        _release(fd)
+                        compat.unlock(fd)
                     finally:
                         os.close(fd)
                     local.held = False
