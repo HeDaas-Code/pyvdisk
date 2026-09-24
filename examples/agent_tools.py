@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+"""Wire AgentSandbox into an agent loop -- offline, no API key, no network.
+
+    python examples/agent_tools.py [workdir]
+
+The "model" here is a scripted list of tool calls, so this runs anywhere. The
+loop is exactly the one you write against a real framework: ask the model, run
+every tool call it asks for, feed the results back, repeat until it stops asking.
+Swap ``scripted_model`` for an [OI]-compatible client and nothing else changes --
+``box.tools()`` and ``box.dispatch()`` are the whole integration surface.
+
+Note the last scripted call: the model asks to read ``/etc/passwd`` and gets a
+refusal, which is fed back like any other tool result. That is the point of
+running an agent against a sandbox rather than a directory.
+"""
+from __future__ import annotations
+
+import importlib.util
+import json
+import os
+import sys
+import tempfile
+
+if importlib.util.find_spec("pyvdisk") is None:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from pyvdisk import AgentSandbox  # noqa: E402 - the path fix has to run first
+
+#: What a model would have produced.  Each entry is one assistant turn.
+SCRIPTED_TURNS = [
+    {"tool": "list_files", "arguments": {"path": "/"}},
+    {"tool": "write_file", "arguments": {
+        "path": "/report.md",
+        "content": "# Findings\n\nThe sandbox works.\n",
+    }},
+    {"tool": "run_script", "arguments": {"source": (
+        'import std.fs as fs;\n'
+        'let names = fs.listdir(sandbox, "/");\n'
+        'print("files:", names);\n'
+        'fs.write(sandbox, "/from-script.txt", "written inside the sandbox");\n'
+    )}},
+    {"tool": "read_file", "arguments": {"path": "/report.md"}},
+    {"tool": "read_file", "arguments": {"path": "/etc/passwd"}},   # refused
+    {"tool": "read_file", "arguments": {"path": "/from-script.txt"}},
+]
+
+
+def scripted_model(messages):
+    """Stand-in for a chat completion call: returns the next tool call, or None."""
+    asked = sum(1 for message in messages if message["role"] == "tool")
+    return SCRIPTED_TURNS[asked] if asked < len(SCRIPTED_TURNS) else None
+
+
+def main(argv):
+    work = argv[1] if len(argv) > 1 else tempfile.mkdtemp(prefix="pyvdisk-agent-")
+    os.makedirs(work, exist_ok=True)
+
+    with AgentSandbox.create(os.path.join(work, "agent.vdisk"), size_bytes=32 << 20) as box:
+        print("tools offered to the model:", ", ".join(tool["name"] for tool in box.tools()))
+        print("json schema of one tool:", json.dumps(box.tools()[0], ensure_ascii=False)[:120], "...\n")
+
+        messages = [{"role": "user", "content": "Summarise the workspace and write /report.md"}]
+        for turn in range(1, 12):
+            call = scripted_model(messages)
+            if call is None:
+                break
+            result = box.dispatch(call["tool"], call["arguments"])
+            messages.append({"role": "tool", "name": call["tool"], "content": result})
+            print(f"[{turn}] {call['tool']}({json.dumps(call['arguments'], ensure_ascii=False)[:60]})")
+            print("     ->", result.replace("\n", "\n        "))
+
+        print("\nfinal /report.md:", repr(box.read_text("/report.md")))
+        report = box.verify_audit()
+        print(f"audit: {report['length']} chained records, chain ok = {report['ok']}")
+        print("refusals recorded:",
+              [row["metrics"]["tool"] for row in box.audit(status="failure")])
+        print("\nEvery call above is durable, hash-chained and replayable: reopen",
+              os.path.join(work, "agent.vdisk"), "to see it.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

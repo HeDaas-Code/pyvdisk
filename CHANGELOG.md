@@ -5,6 +5,18 @@
 
 ## [Unreleased]
 
+### 新增 — 零依赖与跨平台（issue #2）
+- **Windows 兼容层**：新增 `pyvdisk/compat.py`，把全部平台原语收敛到一处 —— 定位读写（`os.pread/pwrite` ↔ `lseek`+`read/write` + 互斥）、文件锁（`fcntl.flock` ↔ `msvcrt.locking`）、目录 `fsync`、`uid/gid`、符号链接探测。此前 `pyvdisk/infrastructure/checkpoint.py` 顶层 `import fcntl`，在 Windows 上连导入都会失败。现在除 `compat.py` 外，包内不再直接触碰这些原语，`tests/test_compat.py` 用一条守卫测试固定该约束。
+- **去外部依赖**：`dependencies` 由 `["hnswlib>=0.8.0"]` 改为 `[]`。`VectorDisk` 新增内置 flat 索引后端（`pyvdisk/vector_index.py`），无 hnswlib 时自动回退，查询由 O(log n) 变 O(n) 但结果一致；索引文件带 `PVFLAT01` 魔数标识写入方，**两种后端互相可读**（hnswlib 写的盘无 hnswlib 也能查，反之亦然）。hnswlib / fusepy 降级为可选 extra：`pyvdisk[vector]`、`pyvdisk[fuse]`。
+- **单文件快速上手**：新增 `examples/quickstart.py`（仅标准库，Windows / Linux 通用，无外部依赖），自底向上演示块设备、事务与检查点、向量检索、结构化日志、VScript、AgentSandbox。
+
+### 新增 — AgentSandbox（issue #2）
+- **`AgentSandbox`**：把 DataDisk 包成可直接交给 Agent 框架的工作区。`create()` / `open()`、`tools(style="openai"|"anthropic"|"mcp")`、`dispatch(name, arguments)`、`call()`（返回结构化 `ToolResult`）、`stats()`。
+- **六个内置工具**：`write_file`、`read_file`、`list_files`、`make_directory`、`delete_file`、`run_script`；`read_only=True` 时按 capability 层拒绝写（不只是隐藏工具），`allow_delete=False` 可单独关掉删除。
+- **路径空间是镜像不是宿主**：`..` 直接拒绝（不解析，便于审计留痕），`C:\Windows\x` 映射为镜像内 `/C:/Windows/x`；`/.system`、`/.vectors`、`/.logs` 及其清单文件对读写与列举一律不可见，脚本入口（`_SandboxFS`）与 Python 入口共用同一套路径规则。
+- **审计**：每次工具调用（含被拒绝的调用）写入哈希链审计流 `agent-audit`，记录工具名、参数、状态、错误类型与能力摘要；`audit()` / `verify_audit()` / `retain_audit()` 可查、可校验、可裁剪。
+- **`run_script`**：盘内 VScript 执行，默认不允许宿主读写（`host_read_roots` / `host_write_roots` 显式开启），脚本超时与输出/写入字节数均受限，避免脚本刷爆模型上下文。
+
 ### 修复 — ACID 与事务
 - **A1** DataDisk 事务不再只覆盖 metadata：FS/Vector/Log 副作用走写前撤销日志（`kind=undo`），`abort()` 可回滚。
 - **A2** participant 副作用在崩溃后由持久化的写前补偿日志按逆序补偿，并写入 `compensated` 标记；补偿幂等，重复 mount 结果一致。

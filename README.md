@@ -6,7 +6,7 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-PyVDisk-181717?logo=github)](https://github.com/HeDaas-Code/pyvdisk)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-391%20passed-2ea44f)](#验证)
+[![Tests](https://img.shields.io/badge/Tests-444%20passed-2ea44f)](#验证)
 
 PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行基础设施项目：DataDisk 负责统一数据与执行基础设施，VScript 负责安全工作流语言、CLI、REPL 与运行时。
 
@@ -16,7 +16,7 @@ PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行
 
 ## 架构总览
 
-<div align="center"><table><tr><th colspan="3">Agent / 应用</th></tr><tr><td colspan="3">VScript · Python API · CLI · REPL · HostProxy</td></tr><tr><th>Execution</th><th>Capability</th><th>Storage</th></tr><tr><td>ExecutionService<br>DurableQueue<br>worker · lease · retry · DLQ<br>RunState · Audit</td><td>ScopedDataDisk<br>FS / Vector / Log / Checkpoint<br>逐操作权限</td><td>DataDisk<br>单一 .vdisk<br>WAL · transaction · recovery</td></tr><tr><th>FS</th><th>Vector</th><th>Log</th></tr><tr><td>workspace</td><td>HNSW memory<br>generation · checksum</td><td>trace<br>sequence · replay · ack</td></tr><tr><th colspan="3">VirtualDisk · Volume · lock · fsync · mirror degraded fallback</th></tr></table></div>
+<div align="center"><table><tr><th colspan="3">Agent / 应用</th></tr><tr><td colspan="3">VScript · Python API · CLI · REPL · HostProxy</td></tr><tr><th>Execution</th><th>Capability</th><th>Storage</th></tr><tr><td>ExecutionService<br>DurableQueue<br>worker · lease · retry · DLQ<br>RunState · Audit</td><td>ScopedDataDisk<br>FS / Vector / Log / Checkpoint<br>逐操作权限</td><td>DataDisk<br>单一 .vdisk<br>WAL · transaction · recovery</td></tr><tr><th>FS</th><th>Vector</th><th>Log</th></tr><tr><td>workspace</td><td>HNSW / flat memory<br>generation · checksum</td><td>trace<br>sequence · replay · ack</td></tr><tr><th colspan="3">VirtualDisk · Volume · lock · fsync · mirror degraded fallback</th></tr></table></div>
 
 ## 架构图谱
 
@@ -84,9 +84,17 @@ graph TD
 
 ## 快速开始
 
+**零依赖**：核心只用标准库，`pip install pyvdisk` 不需要编译任何东西（hnswlib / fusepy 都是可选加速项）。一条命令跑通全栈：
+
+```bash
+python examples/quickstart.py          # 单文件、无外部依赖，Windows / Linux 通用
+```
+
 ```bash
 python -m pip install -e .
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev]"      # 开发依赖
+python -m pip install -e ".[vector]"   # 可选：hnswlib 近似最近邻（不装则用内置 flat 索引）
+python -m pip install -e ".[fuse]"     # 可选：FUSE 挂载
 ```
 
 ```python
@@ -98,6 +106,25 @@ with DataDisk.create("agent.vdisk", 32 * 1024 * 1024) as disk:
     disk.log.create_stream("events")
     disk.log.append("events", level="INFO", logger="demo", message="started")
 ```
+
+### 对接 Agent 框架（10 行）
+
+`AgentSandbox` 把 DataDisk 包成一个"给模型用的工作区"：路径被限制在镜像内，工具调用全部落进哈希链审计流。
+
+```python
+from pyvdisk import AgentSandbox
+
+box = AgentSandbox.create("agent.vdisk")          # 或 AgentSandbox.open(...) 续用已有镜像
+client = OpenAI().chat.completions                 # 换成任意框架的客户端
+
+while True:                                        # 标准 agent loop
+    reply = client.create(model="gpt-4o", messages=messages, tools=box.tools())
+    call = reply.choices[0].message.tool_calls[0]  # 模型要调用的工具
+    result = box.dispatch(call.function.name, json.loads(call.function.arguments))
+    messages += [reply.choices[0].message, {"role": "tool", "tool_call_id": call.id, "content": result}]
+```
+
+`box.tools()` 支持 `openai` / `anthropic` / `mcp` 三种 schema；`box.dispatch()` 永远返回字符串（失败也是字符串），可以直接塞回消息列表。可运行版本见 [examples/agent_tools.py](examples/agent_tools.py)（内置脚本化"模型"，无需 API key）。
 
 ## VScript
 
@@ -112,6 +139,7 @@ pyvdisk vscript run-disk tools.vdisk:/.vscript/scripts/job.vds
 
 ## 核心能力
 
+- 零外部依赖：核心仅用标准库，`dependencies = []`；Windows / Linux 同一套代码（`pyvdisk/compat.py` 收敛定位读写、文件锁、目录 fsync、uid/gid 等平台差异）。hnswlib（近似最近邻）与 fusepy（FUSE 挂载）是可选加速项，不装也能跑全栈：`VectorDisk` 自动回退到内置 flat 索引，索引文件带写入方标识，两种后端互相可读。
 - Storage Plane：FS、Vector、Log、Checkpoint、Metadata、WAL、VirtualDisk、Volume。
 - Execution Plane：ExecutionService、DurableQueue、worker、lease、heartbeat、retry、idempotency、dead-letter、RunState、Audit。
 - WAL 检查点：日志结算后整段截断（`wal.ckpt.json` 记录明细），重挂载只重放检查点之后的尾巴；DataDisk 与 VScript 共用同一份 WAL 实现，`vscript run --wal` 是它的真实恢复入口。
@@ -149,5 +177,6 @@ pyvdisk info image.vdisk
 .venv/bin/python -m pytest -q
 ```
 
-当前回归：391 passed（本地 3.12；CI 覆盖 3.9 / 3.10 / 3.11 / 3.12 四个版本的同一套用例）
-其中 3.11 本地缺 hnswlib 时有 5 例跳过（该版本无法编译 hnswlib），CI 环境正常。
+当前回归：444 passed（本地 3.12；CI 覆盖 3.9 / 3.10 / 3.11 / 3.12 四个版本的同一套用例）
+
+不装 hnswlib 时同一套用例为 440 passed / 4 skipped —— 核心路径不再依赖任何第三方包，跳过的是"两种索引后端结果一致"这类对照用例。
