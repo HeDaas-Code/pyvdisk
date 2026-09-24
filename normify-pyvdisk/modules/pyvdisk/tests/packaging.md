@@ -6,11 +6,13 @@ name: {zh: "打包用例", en: "Packaging Tests"}
 description:
   zh: >
       验证包可构建安装，且 py.typed 标记与控制台入口完好。
+      
   en: >
       Verifies the package can be built and installed with its py.typed marker and console entry point intact.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: c295909cd9527a8811385a9037c6de7c869576eb726aabbc3212f43f3c442c88
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.241Z"
+fingerprint: 323dfc7f33246bdb08212b6f90101d3b268797f3d8a95fe64486043926249d3b
 source:
   - path: "tests/test_packaging.py"
 apis:
@@ -19,6 +21,8 @@ apis:
     description:
       zh: >
           打包与分发元数据断言。
+          
       en: >
           Packaging and distribution metadata assertions.
+          
 ---

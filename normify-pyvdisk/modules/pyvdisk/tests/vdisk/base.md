@@ -6,11 +6,13 @@ name: {zh: "VFS 测试基类", en: "VFS Test Base"}
 description:
   zh: >
       测试基类与基础路径用例：启动镜像的夹具，以及最小的 VFS 行为。
+      
   en: >
       Test base and the basic-path suite: the fixture that boots an image, plus the smallest VFS behaviours.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: 8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.242Z"
+fingerprint: 3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf
 source:
   - path: "tests/test_vdisk.py"
     line: 19
@@ -21,13 +23,17 @@ apis:
     description:
       zh: >
           为每个用例创建临时镜像并挂载 VFS 的共享夹具。
+          
       en: >
           Shared fixture that creates a temporary image and mounts a VFS for each test.
+          
   - protocol: rpc
     path: "tests/test_vdisk.py::TestBasic"
     description:
       zh: >
           根目录、mkdir、makedirs、小文件写、覆盖与追加重为。
+          
       en: >
           Root directory, mkdir, makedirs, small write, overwrite and append behaviour.
+          
 ---

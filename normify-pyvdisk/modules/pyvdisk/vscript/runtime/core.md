@@ -5,72 +5,72 @@ parent: pyvdisk.vscript.runtime
 name: {zh: "解释器核心", en: "Interpreter Core"}
 description:
   zh: >
-      解释器核心：构造与原生模块安装、带参数的顶层运行，以及撤销与操作登记。
+      解释器核心：构造与原生模块安装、带参数的顶层运行、原生模块调用的记账入口，以及语句块执行。
       
   en: >
-      Interpreter core: construction and native installation, top-level run with arguments, and undo and operation recording.
+      Interpreter core: construction and native-module installation, top-level run with arguments, the journaling entry point native modules call, and statement-block execution.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:20:48.310Z"
-fingerprint: 1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.262Z"
+fingerprint: 2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef
 source:
   - path: "pyvdisk/vscript/runtime.py"
-    line: 95
-    end_line: 138
+    line: 178
+    end_line: 223
 apis:
   - protocol: rpc
     path: "pyvdisk.vscript.runtime.Runtime"
     description:
       zh: >
-          树遍历解释器，绑定策略、挂载、标准库、审计与模块根。
+          解释器：策略、挂载、审计 Sink 与事务记账。
           
       en: >
-          Tree-walking interpreter binding policy, mounts, stdlib, audit and module roots.
+          The interpreter: policy, mounts, audit sink and transaction bookkeeping.
           
   - protocol: rpc
     path: "pyvdisk.vscript.runtime.Runtime#stringify"
     description:
       zh: >
-          把任意脚本值渲染为展示文本。
+          按 REPL 的方式渲染一个值。
           
       en: >
-          Render any script value as display text.
+          Renders one value the way the REPL prints it.
           
   - protocol: rpc
     path: "pyvdisk.vscript.runtime.Runtime#run"
     description:
       zh: >
-          带参数、绑定与 run id 运行已解析程序。
+          跑完一个程序并返回结果。
           
       en: >
-          Run a parsed program with arguments, bindings and a run id.
+          Runs a program to completion and returns its result.
           
   - protocol: rpc
-    path: "pyvdisk.vscript.runtime.Runtime#record_undo"
+    path: "pyvdisk.vscript.runtime.Runtime#journal"
     description:
       zh: >
-          在当前事务中登记撤销回调。
+          解释器自身的记账入口，供原生模块调用。
           
       en: >
-          Record an undo callback in the active transaction.
+          The interpreter's own journaling entry point, used by native modules.
           
   - protocol: rpc
-    path: "pyvdisk.vscript.runtime.Runtime#record_operation"
+    path: "pyvdisk.vscript.runtime.Runtime#transactions_open"
     description:
       zh: >
-          登记已执行操作以供审计。
+          当前尚未结算的事务数。
           
       en: >
-          Record an executed operation for audit.
+          How many transactions are still open.
           
   - protocol: rpc
     path: "pyvdisk.vscript.runtime.Runtime#exec_block"
     description:
       zh: >
-          在给定作用域内执行一个语句块。
+          在某个作用域中执行一个语句块。
           
       en: >
-          Execute a block of statements in a scope.
+          Executes one block of statements in a scope.
           
 deps:
   - kind: call

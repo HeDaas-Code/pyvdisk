@@ -5,27 +5,45 @@ parent: pyvdisk.delivery
 name: {zh: "打包元数据", en: "Packaging Metadata"}
 description:
   zh: >
-      分发元数据：包名、0.3.0 版本、依赖集、可选 fuse extra 与 py.typed 标记。
+      分发元数据：以 hnswlib 为依赖、fuse 与 dev extras、py.typed 标记，以及把 LICENSE 与 CHANGELOG.md 一并打包的 sdist 清单。
+      
   en: >
-      Distribution metadata: package name, version 0.3.0, dependency set, optional fuse extra and the py.typed marker.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: 3719372451f85f52b322431d54f57c051b4b16d0ecc5ad21d3f11aeae3d52827
+      Distribution metadata: cffi-free dependency set with hnswlib, the fuse and dev extras, the py.typed marker, and the sdist manifest that ships LICENSE plus CHANGELOG.md.
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.216Z"
+fingerprint: eef1180eeb651e5a6edbef6a63bd38eb0f2e3244b7c927f12a61c503b23ac266
 source:
   - path: "pyproject.toml"
+    line: 1
+  - path: "MANIFEST.in"
+    line: 1
 apis:
   - protocol: file
     path: "pyproject.toml"
     description:
       zh: >
-          分发元数据：名称、版本、依赖与 extras。
+          打包元数据：包名、版本、依赖、extras 与 pytest 配置。
+          
       en: >
-          Distribution metadata: name, version, dependencies and extras.
+          Packaging metadata: name, version, dependencies, extras and the pytest configuration.
+          
   - protocol: file
     path: "pyvdisk/py.typed"
     description:
       zh: >
-          随包发布的 PEP 561 内联类型标记。
+          PEP 561 类型标记，使类型检查器认可本包有类型。
+          
       en: >
-          PEP 561 inline type marker published with the package.
+          PEP 561 marker so type checkers see the package as typed.
+          
+  - protocol: file
+    path: "MANIFEST.in"
+    description:
+      zh: >
+          sdist 清单：把 LICENSE 与 CHANGELOG.md 一并打包，setuptools 不会自动带上它们。
+          
+      en: >
+          sdist manifest: ships LICENSE and CHANGELOG.md, which setuptools does not include by itself.
+          
 ---

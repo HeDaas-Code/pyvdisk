@@ -10,13 +10,13 @@ description:
   en: >
       FUSE data and namespace mutations: read, write, create, mkdir, rmdir, unlink and rename handlers.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:48.423Z"
-fingerprint: 5fe2c5a2cde43ccd63a7a2c90ca4f237f91e4c1de74900e83ebc49d9e6dc5193
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.232Z"
+fingerprint: b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47
 source:
   - path: "pyvdisk/fuse_mount.py"
-    line: 81
-    end_line: 117
+    line: 85
+    end_line: 121
 apis:
   - protocol: rpc
     path: "pyvdisk.fuse_mount._VFuseOperations#_read"

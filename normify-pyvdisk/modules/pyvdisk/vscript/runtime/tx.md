@@ -5,68 +5,71 @@ parent: pyvdisk.vscript.runtime
 name: {zh: "脚本事务", en: "Script Transaction"}
 description:
   zh: >
-      脚本事务支持：撤销与操作记账，以及 transaction 语句使用的提交与回滚。
+      脚本事务支持：每个可撤销的 fs 变更在生效前落账，进程内回滚与崩溃恢复走同一个撤销解释器，超过 64 KiB 的快照正文落到事务目录。
       
   en: >
-      Script transaction support: undo and operation journaling plus commit and rollback used by the transaction statement.
+      Script transaction support: every reversible fs change is journalled before it takes effect, in-process rollback and crash recovery run through the same undo interpreter, and snapshot bodies above 64 KiB spill to the transaction area.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:20:48.310Z"
-fingerprint: 1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.264Z"
+fingerprint: 2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef
 source:
   - path: "pyvdisk/vscript/runtime.py"
-    line: 9
-    end_line: 32
+    line: 11
+    end_line: 116
 apis:
   - protocol: rpc
     path: "pyvdisk.vscript.runtime.TransactionContext"
     description:
       zh: >
-          收集单次脚本事务的撤销回调与操作。
+          收集单次脚本事务的撤销记录与落盘槽位。
           
       en: >
-          Collects the undo callbacks and operations of one script transaction.
+          Collects one script transaction's undo records and its spill slots.
           
   - protocol: rpc
-    path: "pyvdisk.vscript.runtime.TransactionContext#add_operation"
+    path: "pyvdisk.vscript.runtime.TransactionContext#journal"
     description:
       zh: >
-          登记一个操作以供后续重放或审计。
+          在效果生效**之前**记入一条可撤销账，大正文落盘而不驻留内存。
           
       en: >
-          Register an operation for later replay or audit.
-          
-  - protocol: rpc
-    path: "pyvdisk.vscript.runtime.TransactionContext#add"
-    description:
-      zh: >
-          登记一个撤销回调。
-          
-      en: >
-          Register an undo callback.
+          Journals one reversible effect BEFORE it is applied, spilling large bodies out of memory.
           
   - protocol: rpc
     path: "pyvdisk.vscript.runtime.TransactionContext#commit"
     description:
       zh: >
-          应用全部已记录效果并清空日志。
+          结算事务并清理其落盘快照。
           
       en: >
-          Apply all recorded effects and clear the journal.
+          Settles the transaction and drops its spill files.
           
   - protocol: rpc
     path: "pyvdisk.vscript.runtime.TransactionContext#rollback"
     description:
       zh: >
-          按逆序撤销已记录效果。
+          按逆序通过共享撤销解释器回放账本。
           
       en: >
-          Undo recorded effects in reverse order.
+          Replays the journal in reverse order through the shared undo interpreter.
+          
+  - protocol: rpc
+    path: "pyvdisk.vscript.runtime.recover_wal"
+    description:
+      zh: >
+          崩溃恢复入口：用同一个撤销解释器回放持久化 WAL，并清理遗留快照。
+          
+      en: >
+          Crash-recovery entry point: replays a persisted WAL through the same undo interpreter and drops orphaned spills.
           
 deps:
   - kind: call
-    to: pyvdisk.storage.wal.undo
+    to: pyvdisk.vscript.undo
     from_api: "rpc:pyvdisk.vscript.runtime.TransactionContext#rollback"
-    to_api: "rpc:pyvdisk.vscript.wal.WriteAheadLog#recover"
-    label: {zh: "撤销宿主写入", en: "undoes host writes"}
+    label: {zh: "重放撤销记录", en: "replays undo records"}
+  - kind: call
+    to: pyvdisk.storage.wal.undo
+    from_api: "rpc:pyvdisk.vscript.runtime.recover_wal"
+    label: {zh: "消费事务 WAL", en: "consumes the tx WAL"}
 ---

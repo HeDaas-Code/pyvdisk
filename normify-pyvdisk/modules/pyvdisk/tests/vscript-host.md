@@ -10,9 +10,9 @@ description:
   en: >
       Verifies the host module rejects out-of-root paths - the security boundary VScript depends on.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:20:48.309Z"
-fingerprint: 4dc34e1600c660923f1dcb058df3edf5c50503760686bef5e842ccea2a101b8b
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.253Z"
+fingerprint: b0bfafaaf016b380762f3021f7ac6f169323bdcdfde4494aa05db3ab2841279b
 source:
   - path: "tests/test_vscript_host.py"
 apis:

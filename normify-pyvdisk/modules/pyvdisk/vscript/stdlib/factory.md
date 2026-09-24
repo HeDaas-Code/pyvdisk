@@ -5,14 +5,14 @@ parent: pyvdisk.vscript.stdlib
 name: {zh: "标准库工厂", en: "Stdlib Factory"}
 description:
   zh: >
-      标准库工厂：文件系统、向量、日志与 json 原生函数，均受能力守卫与字节预算约束。
+      标准库工厂：文件系统、向量、日志与 json 原生函数，均受能力守卫与字节预算约束。每个会改动的 fs 动词在触碰存储之前先记入撤销账，事务失败时可回滚，而不留半成品写入。
       
   en: >
-      The standard library factory: filesystem, vector, log and json natives, each confined by capability guards and byte budgets.
+      Stdlib factory: filesystem, vector, log and json native functions, all behind capability guards and byte budgets. Every mutating fs verb journals its undo record before it touches the store, so a failed transaction can be rolled back instead of leaving half-applied writes.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:13.026Z"
-fingerprint: 4a46271b1688a7dd1e764a4281feb9875dc7c8f8b117cab916ca481882cc7e91
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.264Z"
+fingerprint: c8f6852ff21b7b08e89e6c158274eeaef3d0a02376ac5600831b15124942de6e
 source:
   - path: "pyvdisk/vscript/stdlib.py"
     line: 46

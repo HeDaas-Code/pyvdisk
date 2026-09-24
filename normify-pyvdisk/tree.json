@@ -9,20 +9,20 @@
         "repository": "https://github.com/HeDaas-Code/pyvdisk"
       }
     ],
-    "compiled_at": "2026-09-23T07:27:10.642Z",
+    "compiled_at": "2026-09-24T10:00:54.895Z",
     "stats": {
       "tree_count": 1,
-      "module_count": 262,
-      "leaf_count": 224,
-      "api_count": 761,
-      "dep_count": 116,
+      "module_count": 272,
+      "leaf_count": 234,
+      "api_count": 794,
+      "dep_count": 124,
       "cross_tree_dep_count": 0,
       "max_depth": 4,
       "layout_count": 38,
       "planned_count": 0,
       "deprecated_count": 0,
       "policy_rule_count": 2,
-      "change_count": 0,
+      "change_count": 2,
       "open_change_count": 0
     }
   },
@@ -53,9 +53,9 @@
       "fingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "repository": "https://github.com/HeDaas-Code/pyvdisk",
       "aggregate": {
-        "descendant_count": 261,
+        "descendant_count": 271,
         "own_api_count": 0,
-        "inherited_api_count": 761,
+        "inherited_api_count": 794,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -1887,13 +1887,13 @@
           "path": ".github/workflows/pylint.yml"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "2e215e98290e3f087ed6c058749597d5308ff2ebeb3a51971d3ee91272413524",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.215Z",
+      "fingerprint": "7b8e690a61c134d576c6f09d81d7bc29a6ab4028d80f74d3320a15c7b43cf8bc",
       "aggregate": {
         "descendant_count": 3,
         "own_api_count": 0,
-        "inherited_api_count": 4,
+        "inherited_api_count": 5,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -1909,17 +1909,17 @@
         "en": "Test Workflow"
       },
       "description": {
-        "zh": "CI 工作流：在 push 与 pull request 上安装 dev extras 并运行 pytest 套件。\n",
-        "en": "CI workflow that installs the package with dev extras and runs the pytest suite on push and pull request.\n"
+        "zh": "CI 工作流：在 push 与 pull request 上安装 dev extras 并在 3.9–3.12 矩阵上运行 pytest，使声明的 requires-python 下限由最老的矩阵任务强制，而不是靠假设。\n",
+        "en": "CI workflow: installs the dev extras and runs the pytest suite on push and pull request across the 3.9-3.12 matrix, so the declared requires-python floor is enforced by the oldest job rather than assumed.\n"
       },
       "source": [
         {
           "path": ".github/workflows/ci.yml"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "0a0bcf375716cce59392d0ac9fcc4ece1907ceb1089749522f9738787e500b34",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.215Z",
+      "fingerprint": "b1583a09123f8c3ad3d2e52ae4bc88ff01e6db7a88c3336853b06482634e20eb",
       "apis": [
         {
           "protocol": "file",
@@ -1950,17 +1950,17 @@
         "en": "Lint Workflow"
       },
       "description": {
-        "zh": "独立于单元测试门禁的静态分析流水线，运行 pylint。\n",
-        "en": "Workflow running pylint as a static-analysis gate separate from the unit-test gate.\n"
+        "zh": "独立于单元测试门禁的静态分析流水线：pylint 只保留 error 类，使 Lint 失败不会被误认为测试失败。\n",
+        "en": "Static analysis pipeline, independent of the unit-test gate: pylint with the error class only, so a lint failure can never be mistaken for a test failure.\n"
       },
       "source": [
         {
           "path": ".github/workflows/pylint.yml"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "6e6bddfc03853c3f31fb6155a5820cd230812d5e35704de2e01fc1f9541ff6f2",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.216Z",
+      "fingerprint": "b8b7a5b39cc8e23ea498ca698d6446ab567057a9fe91d2088fb0b05d8f95e2ac",
       "apis": [
         {
           "protocol": "file",
@@ -1991,24 +1991,29 @@
         "en": "Packaging Metadata"
       },
       "description": {
-        "zh": "分发元数据：包名、0.3.0 版本、依赖集、可选 fuse extra 与 py.typed 标记。\n",
-        "en": "Distribution metadata: package name, version 0.3.0, dependency set, optional fuse extra and the py.typed marker.\n"
+        "zh": "分发元数据：以 hnswlib 为依赖、fuse 与 dev extras、py.typed 标记，以及把 LICENSE 与 CHANGELOG.md 一并打包的 sdist 清单。\n",
+        "en": "Distribution metadata: cffi-free dependency set with hnswlib, the fuse and dev extras, the py.typed marker, and the sdist manifest that ships LICENSE plus CHANGELOG.md.\n"
       },
       "source": [
         {
-          "path": "pyproject.toml"
+          "path": "pyproject.toml",
+          "line": 1
+        },
+        {
+          "path": "MANIFEST.in",
+          "line": 1
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "3719372451f85f52b322431d54f57c051b4b16d0ecc5ad21d3f11aeae3d52827",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.216Z",
+      "fingerprint": "eef1180eeb651e5a6edbef6a63bd38eb0f2e3244b7c927f12a61c503b23ac266",
       "apis": [
         {
           "protocol": "file",
           "path": "pyproject.toml",
           "description": {
-            "zh": "分发元数据：名称、版本、依赖与 extras。\n",
-            "en": "Distribution metadata: name, version, dependencies and extras.\n"
+            "zh": "打包元数据：包名、版本、依赖、extras 与 pytest 配置。\n",
+            "en": "Packaging metadata: name, version, dependencies, extras and the pytest configuration.\n"
           },
           "key": "file:pyproject.toml"
         },
@@ -2016,15 +2021,24 @@
           "protocol": "file",
           "path": "pyvdisk/py.typed",
           "description": {
-            "zh": "随包发布的 PEP 561 内联类型标记。\n",
-            "en": "PEP 561 inline type marker published with the package.\n"
+            "zh": "PEP 561 类型标记，使类型检查器认可本包有类型。\n",
+            "en": "PEP 561 marker so type checkers see the package as typed.\n"
           },
           "key": "file:pyvdisk/py.typed"
+        },
+        {
+          "protocol": "file",
+          "path": "MANIFEST.in",
+          "description": {
+            "zh": "sdist 清单：把 LICENSE 与 CHANGELOG.md 一并打包，setuptools 不会自动带上它们。\n",
+            "en": "sdist manifest: ships LICENSE and CHANGELOG.md, which setuptools does not include by itself.\n"
+          },
+          "key": "file:MANIFEST.in"
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 2,
+        "own_api_count": 3,
         "inherited_api_count": 0,
         "dep_out": 0,
         "dep_in": 0
@@ -2064,13 +2078,13 @@
           "path": "docs/VSCRIPT_SPEC.md"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "3997e51fc54a24315a1248b147ce2c2cb35f156c4f2083c433096b8d3625dda9",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T10:00:52.069Z",
+      "fingerprint": "08fd9522bb3a8bd1bc169f548c3c3e441fb6cd89f089c8e4206604371248a807",
       "aggregate": {
-        "descendant_count": 5,
+        "descendant_count": 6,
         "own_api_count": 0,
-        "inherited_api_count": 5,
+        "inherited_api_count": 6,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -2135,9 +2149,9 @@
           "path": "docs/ARCHITECTURE.md"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "0f58c7ff4e45ec0415d6853f2cdc9501cb0a7a8f6519297a6afc0c671483ff63",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.218Z",
+      "fingerprint": "040f8007c5e897dd23e12dacf31ff33c8f79d95afb231e115b8a2f919b1bdde0",
       "apis": [
         {
           "protocol": "file",
@@ -2157,6 +2171,53 @@
         "dep_in": 1
       }
     },
+    "pyvdisk.docs.changelog": {
+      "uid": "156bc3a8",
+      "id": "pyvdisk.docs.changelog",
+      "parent": "pyvdisk.docs",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "tags": [
+        "docs",
+        "changelog"
+      ],
+      "name": {
+        "zh": "变更日志",
+        "en": "Changelog"
+      },
+      "description": {
+        "zh": "变更日志：按 issue #1 的清单编号记录用户可见变更，并列出四条明确留待后续的项目。\n",
+        "en": "Changelog: user-visible changes keyed to the issue #1 inventory ids, plus the four deliberately deferred items.\n"
+      },
+      "source": [
+        {
+          "path": "CHANGELOG.md",
+          "line": 1,
+          "end_line": 47
+        }
+      ],
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.211Z",
+      "fingerprint": "ea3f46a9c65b19826cd309658416f1fe840116fa730bfc745a4cf6b95f77858a",
+      "apis": [
+        {
+          "protocol": "file",
+          "path": "CHANGELOG.md",
+          "description": {
+            "zh": "0.3.0 起的变更日志，含 issue #1 的修复清单与明确留待后续的条目。\n",
+            "en": "Changelog from 0.3.0 onward, including the issue #1 fix inventory and the items deliberately left open.\n"
+          },
+          "key": "file:CHANGELOG.md"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
     "pyvdisk.docs.contracts": {
       "uid": "a0000105",
       "id": "pyvdisk.docs.contracts",
@@ -2168,17 +2229,17 @@
         "en": "Contract Boundaries"
       },
       "description": {
-        "zh": "各平面的保证边界：存储、执行、事务与内部 exactly-once 承诺了什么、不承诺什么。\n",
-        "en": "Guarantee boundaries per plane: what storage, execution, transactions and internal exactly-once do and do not promise.\n"
+        "zh": "各平面的保证边界：存储、执行、事务与内部 exactly-once 承诺什么、不承诺什么；新增 VScript 事务的撤销记账、本地触发器与审计轨迹三节。\n",
+        "en": "Per-plane guarantee boundaries: what storage, execution, transactions and internal exactly-once promise and what they do not, now including the VScript transaction undo accounting, the local triggers and the audit trail.\n"
       },
       "source": [
         {
           "path": "docs/CONTRACTS.md"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "2ade0b7feb5878725543f83733e712b2dcec8b3a29acb55a29af8a5761c80ffa",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.218Z",
+      "fingerprint": "da48634bd787c62c762739c1f35a5c0ed86c7c8aa9e5a08ee5e9d350aeb9eed4",
       "apis": [
         {
           "protocol": "file",
@@ -2209,17 +2270,17 @@
         "en": "Project Overview"
       },
       "description": {
-        "zh": "README 总览：项目定位、快速开始、核心能力、CLI 用法与验证方式。\n",
-        "en": "README overview: positioning, quick start, core capabilities, CLI usage and the verification recipe.\n"
+        "zh": "README 总览：项目定位、快速开始、核心能力、CLI 用法与验证方式；徽章与声明的 Python 下限及当前用例数一致。\n",
+        "en": "README overview: positioning, quick start, core capabilities, CLI usage and how it is verified, with badges that match the declared Python floor and the current suite size.\n"
       },
       "source": [
         {
           "path": "README.md"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:22:04.609Z",
-      "fingerprint": "3d011b3cdc6a887e3884b77a55e5c39ca8a3f5b0657c0d2c1aca8aeee11c487d",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T10:00:52.068Z",
+      "fingerprint": "fd96eaab9b9f839e266b3f990012c5cc034178b7e0a534eb15be4c397a525f55",
       "apis": [
         {
           "protocol": "file",
@@ -3823,9 +3884,9 @@
           "path": "pyvdisk/infrastructure/capabilities.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "799d79402415a8648a6a253e7d9d33664cfd27b7cb5f751693abb7efd6c3cb64",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.219Z",
+      "fingerprint": "6e43b5202db42eeca8d389509c7b4cc39ed45eea060f91c8c3a05087de3f820f",
       "aggregate": {
         "descendant_count": 4,
         "own_api_count": 0,
@@ -3855,9 +3916,9 @@
           "end_line": 127
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.024Z",
-      "fingerprint": "799d79402415a8648a6a253e7d9d33664cfd27b7cb5f751693abb7efd6c3cb64",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.219Z",
+      "fingerprint": "6e43b5202db42eeca8d389509c7b4cc39ed45eea060f91c8c3a05087de3f820f",
       "apis": [
         {
           "protocol": "rpc",
@@ -3985,9 +4046,9 @@
           "end_line": 81
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.423Z",
-      "fingerprint": "799d79402415a8648a6a253e7d9d33664cfd27b7cb5f751693abb7efd6c3cb64",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.220Z",
+      "fingerprint": "6e43b5202db42eeca8d389509c7b4cc39ed45eea060f91c8c3a05087de3f820f",
       "apis": [
         {
           "protocol": "rpc",
@@ -4104,9 +4165,9 @@
           "end_line": 49
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.308Z",
-      "fingerprint": "799d79402415a8648a6a253e7d9d33664cfd27b7cb5f751693abb7efd6c3cb64",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.221Z",
+      "fingerprint": "6e43b5202db42eeca8d389509c7b4cc39ed45eea060f91c8c3a05087de3f820f",
       "apis": [
         {
           "protocol": "rpc",
@@ -4196,9 +4257,9 @@
           "end_line": 162
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.024Z",
-      "fingerprint": "799d79402415a8648a6a253e7d9d33664cfd27b7cb5f751693abb7efd6c3cb64",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.221Z",
+      "fingerprint": "6e43b5202db42eeca8d389509c7b4cc39ed45eea060f91c8c3a05087de3f820f",
       "apis": [
         {
           "protocol": "rpc",
@@ -4315,13 +4376,13 @@
           "path": "pyvdisk/infrastructure/checkpoint.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "436be34d0da90cb6f3278a96c3f7ec70da5b59a549e92a9ca704acad9bd6ffdb",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.225Z",
+      "fingerprint": "3ed800d0914e362e6fa76cf02ccddaa8b41f54ffd8efabaebe018e25619b823f",
       "aggregate": {
         "descendant_count": 107,
         "own_api_count": 0,
-        "inherited_api_count": 374,
+        "inherited_api_count": 377,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -4856,13 +4917,13 @@
           "path": "pyvdisk/infrastructure/disk.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.225Z",
+      "fingerprint": "9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93",
       "aggregate": {
         "descendant_count": 7,
         "own_api_count": 0,
-        "inherited_api_count": 38,
+        "inherited_api_count": 39,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -4884,13 +4945,13 @@
       "source": [
         {
           "path": "pyvdisk/infrastructure/disk.py",
-          "line": 368,
-          "end_line": 405
+          "line": 566,
+          "end_line": 609
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.025Z",
-      "fingerprint": "27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.225Z",
+      "fingerprint": "9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93",
       "apis": [
         {
           "protocol": "rpc",
@@ -5018,9 +5079,9 @@
           "end_line": 19
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.226Z",
+      "fingerprint": "9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93",
       "apis": [
         {
           "protocol": "rpc",
@@ -5087,26 +5148,26 @@
         "en": "DataDisk Core"
       },
       "description": {
-        "zh": "DataDisk 构造、元数据原子持久化与挂载时 WAL 恢复。\n",
-        "en": "DataDisk construction, atomic metadata persistence and mount-time WAL recovery.\n"
+        "zh": "DataDisk 构造、元数据原子持久化，以及挂载时的 WAL 重放与恢复报告。\n",
+        "en": "DataDisk construction, atomic metadata persistence, and the WAL replay performed on mount together with its recovery report.\n"
       },
       "source": [
         {
           "path": "pyvdisk/infrastructure/disk.py",
-          "line": 300,
-          "end_line": 367
+          "line": 407,
+          "end_line": 565
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.423Z",
-      "fingerprint": "27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.226Z",
+      "fingerprint": "9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.disk.DataDisk",
           "description": {
-            "zh": "把一个 VFS 绑定到文件系统、向量与日志命名空间的统一容器。\n",
-            "en": "The unified container binding one VFS to filesystem, vector and log namespaces.\n"
+            "zh": "磁盘容器本体。\n",
+            "en": "The disk container itself.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.disk.DataDisk"
         },
@@ -5114,8 +5175,8 @@
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.disk.DataDisk#create",
           "description": {
-            "zh": "创建并格式化 DataDisk 镜像。\n",
-            "en": "Create and format a DataDisk image.\n"
+            "zh": "按容量、块大小与标签创建磁盘镜像。\n",
+            "en": "Creates a disk image with a size, block size and label.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.disk.DataDisk#create"
         },
@@ -5123,8 +5184,8 @@
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.disk.DataDisk#_atomic_json",
           "description": {
-            "zh": "经临时文件加 rename 原子写入元数据值。\n",
-            "en": "Write a metadata value atomically through a temp file and rename.\n"
+            "zh": "原子写入 JSON 元数据。\n",
+            "en": "Writes JSON metadata atomically.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.disk.DataDisk#_atomic_json"
         },
@@ -5132,19 +5193,28 @@
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.disk.DataDisk#_append_metadata_wal",
           "description": {
-            "zh": "向元数据 WAL 追加一条记录。\n",
-            "en": "Append one record to the metadata WAL.\n"
+            "zh": "向事务 WAL 追加一条元数据记录。\n",
+            "en": "Appends one metadata record to the transaction WAL.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.disk.DataDisk#_append_metadata_wal"
         },
         {
           "protocol": "rpc",
-          "path": "pyvdisk.infrastructure.disk.DataDisk#_recover_metadata",
+          "path": "pyvdisk.infrastructure.disk.DataDisk#_recover_transactions",
           "description": {
-            "zh": "挂载时重放 WAL，处理未完成事务并清理临时文件。\n",
-            "en": "Replay the WAL on mount, resolving unfinished transactions and cleaning temp files.\n"
+            "zh": "挂载时重放 WAL：已提交事务重做，未提交事务回滚。\n",
+            "en": "Replays the WAL on mount: committed transactions redo, uncommitted roll back.\n"
           },
-          "key": "rpc:pyvdisk.infrastructure.disk.DataDisk#_recover_metadata"
+          "key": "rpc:pyvdisk.infrastructure.disk.DataDisk#_recover_transactions"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.infrastructure.disk.DataDisk#recovery_report",
+          "description": {
+            "zh": "最近一次恢复对每个事务做了什么。\n",
+            "en": "What the last recovery did, per transaction.\n"
+          },
+          "key": "rpc:pyvdisk.infrastructure.disk.DataDisk#recovery_report"
         }
       ],
       "deps": [
@@ -5162,7 +5232,7 @@
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 5,
+        "own_api_count": 6,
         "inherited_api_count": 0,
         "dep_out": 1,
         "dep_in": 2
@@ -5185,13 +5255,13 @@
       "source": [
         {
           "path": "pyvdisk/infrastructure/disk.py",
-          "line": 160,
-          "end_line": 263
+          "line": 246,
+          "end_line": 341
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.308Z",
-      "fingerprint": "27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.227Z",
+      "fingerprint": "9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93",
       "apis": [
         {
           "protocol": "rpc",
@@ -5304,13 +5374,13 @@
       "source": [
         {
           "path": "pyvdisk/infrastructure/disk.py",
-          "line": 265,
-          "end_line": 299
+          "line": 344,
+          "end_line": 405
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.025Z",
-      "fingerprint": "27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.227Z",
+      "fingerprint": "9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93",
       "apis": [
         {
           "protocol": "rpc",
@@ -5380,13 +5450,13 @@
       "source": [
         {
           "path": "pyvdisk/infrastructure/disk.py",
-          "line": 21,
-          "end_line": 107
+          "line": 103,
+          "end_line": 180
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.228Z",
+      "fingerprint": "9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93",
       "apis": [
         {
           "protocol": "rpc",
@@ -5462,19 +5532,19 @@
         "en": "Transaction Outcome"
       },
       "description": {
-        "zh": "事务的完整结局：进入、经 WAL 的持久提交、带撤销的回滚，以及异常驱动的自动回滚。\n",
-        "en": "End-to-end transaction outcome: entry, durable commit through the WAL, abort with undo, and exception-driven rollback.\n"
+        "zh": "事务的完整结局：进入、经 WAL 的持久提交、带撤销的回滚，以及异常驱动的自动回滚。abort 现在先把 intent 落盘，再按逆序在进程内通知每个已登记的 participant，最后才展开文件系统回退。\n",
+        "en": "How a transaction ends: enter, durable commit through the WAL, rollback with undo, and exception-driven auto-abort. Abort now persists the intents first and then notifies every enlisted participant in reverse order, in-process, before unwinding the filesystem.\n"
       },
       "source": [
         {
           "path": "pyvdisk/infrastructure/disk.py",
-          "line": 101,
-          "end_line": 158
+          "line": 181,
+          "end_line": 244
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.423Z",
-      "fingerprint": "27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.228Z",
+      "fingerprint": "9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93",
       "apis": [
         {
           "protocol": "rpc",
@@ -5531,7 +5601,7 @@
         "own_api_count": 4,
         "inherited_api_count": 0,
         "dep_out": 1,
-        "dep_in": 2
+        "dep_in": 3
       }
     },
     "pyvdisk.storage.driver": {
@@ -5553,9 +5623,9 @@
           "path": "pyvdisk/driver.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "29228013658c79f303b330f0476ea4155fd786b36aff9fc17e484203dc8a9edc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.229Z",
+      "fingerprint": "76f9a54ec25f379e05c35c2a7114db125da395fe4814209b88907793e6514122",
       "aggregate": {
         "descendant_count": 5,
         "own_api_count": 0,
@@ -5585,9 +5655,9 @@
           "end_line": 54
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "29228013658c79f303b330f0476ea4155fd786b36aff9fc17e484203dc8a9edc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.229Z",
+      "fingerprint": "76f9a54ec25f379e05c35c2a7114db125da395fe4814209b88907793e6514122",
       "apis": [
         {
           "protocol": "rpc",
@@ -5664,9 +5734,9 @@
           "end_line": 310
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "29228013658c79f303b330f0476ea4155fd786b36aff9fc17e484203dc8a9edc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.230Z",
+      "fingerprint": "76f9a54ec25f379e05c35c2a7114db125da395fe4814209b88907793e6514122",
       "apis": [
         {
           "protocol": "rpc",
@@ -5734,9 +5804,9 @@
           "end_line": 178
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.309Z",
-      "fingerprint": "29228013658c79f303b330f0476ea4155fd786b36aff9fc17e484203dc8a9edc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.230Z",
+      "fingerprint": "76f9a54ec25f379e05c35c2a7114db125da395fe4814209b88907793e6514122",
       "apis": [
         {
           "protocol": "rpc",
@@ -5826,9 +5896,9 @@
           "end_line": 258
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.025Z",
-      "fingerprint": "29228013658c79f303b330f0476ea4155fd786b36aff9fc17e484203dc8a9edc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.230Z",
+      "fingerprint": "76f9a54ec25f379e05c35c2a7114db125da395fe4814209b88907793e6514122",
       "apis": [
         {
           "protocol": "rpc",
@@ -5958,9 +6028,9 @@
           "end_line": 100
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "29228013658c79f303b330f0476ea4155fd786b36aff9fc17e484203dc8a9edc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.231Z",
+      "fingerprint": "76f9a54ec25f379e05c35c2a7114db125da395fe4814209b88907793e6514122",
       "apis": [
         {
           "protocol": "rpc",
@@ -7719,9 +7789,9 @@
           "path": "pyvdisk/fuse_mount.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "5fe2c5a2cde43ccd63a7a2c90ca4f237f91e4c1de74900e83ebc49d9e6dc5193",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.231Z",
+      "fingerprint": "b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47",
       "aggregate": {
         "descendant_count": 4,
         "own_api_count": 0,
@@ -7747,13 +7817,13 @@
       "source": [
         {
           "path": "pyvdisk/fuse_mount.py",
-          "line": 81,
-          "end_line": 117
+          "line": 85,
+          "end_line": 121
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.423Z",
-      "fingerprint": "5fe2c5a2cde43ccd63a7a2c90ca4f237f91e4c1de74900e83ebc49d9e6dc5193",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.232Z",
+      "fingerprint": "b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47",
       "apis": [
         {
           "protocol": "rpc",
@@ -7851,8 +7921,8 @@
         "en": "FUSE Link Ops"
       },
       "description": {
-        "zh": "其余 FUSE 处理：truncate、链接、open/release、chmod，以及动态 Operations 子类装配。\n",
-        "en": "Remaining FUSE handlers: truncate, links, open/release, chmod and the dynamic Operations subclass assembly.\n"
+        "zh": "其余 FUSE 处理：truncate、链接、open/release、chmod，以及动态 Operations 子类装配。readlink 以不追随后一段的方式解析，读符号链接返回目标路径而不是 EINVAL。\n",
+        "en": "The remaining FUSE handlers: truncate, links, open/release, chmod and the dynamic Operations subclass assembly. readlink resolves without following the final component, so reading a symlink returns its target instead of EINVAL.\n"
       },
       "source": [
         {
@@ -7861,9 +7931,9 @@
           "end_line": 233
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "5fe2c5a2cde43ccd63a7a2c90ca4f237f91e4c1de74900e83ebc49d9e6dc5193",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.232Z",
+      "fingerprint": "b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47",
       "apis": [
         {
           "protocol": "rpc",
@@ -7934,7 +8004,7 @@
         "own_api_count": 7,
         "inherited_api_count": 0,
         "dep_out": 0,
-        "dep_in": 0
+        "dep_in": 1
       }
     },
     "pyvdisk.storage.fuse.meta": {
@@ -7958,9 +8028,9 @@
           "end_line": 80
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.309Z",
-      "fingerprint": "5fe2c5a2cde43ccd63a7a2c90ca4f237f91e4c1de74900e83ebc49d9e6dc5193",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.232Z",
+      "fingerprint": "b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47",
       "apis": [
         {
           "protocol": "rpc",
@@ -8041,9 +8111,9 @@
           "end_line": 283
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.025Z",
-      "fingerprint": "5fe2c5a2cde43ccd63a7a2c90ca4f237f91e4c1de74900e83ebc49d9e6dc5193",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.233Z",
+      "fingerprint": "b4475de0aa022f77959dd296d825fe99caca40036a8a86be29dcd1e6d6c0cf47",
       "apis": [
         {
           "protocol": "rpc",
@@ -8408,9 +8478,9 @@
           "path": "pyvdisk/log_disk.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "11add7318163863decd8c69563dc471bc6d5ad17eb43f77208f2520e3c4397df",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.233Z",
+      "fingerprint": "4b31d03456b1ae4db1ebceef13f447e5093e6459bdea0d2d648139d215bd89a4",
       "aggregate": {
         "descendant_count": 6,
         "own_api_count": 0,
@@ -8437,12 +8507,12 @@
         {
           "path": "pyvdisk/log_disk.py",
           "line": 104,
-          "end_line": 148
+          "end_line": 149
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.025Z",
-      "fingerprint": "11add7318163863decd8c69563dc471bc6d5ad17eb43f77208f2520e3c4397df",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.233Z",
+      "fingerprint": "4b31d03456b1ae4db1ebceef13f447e5093e6459bdea0d2d648139d215bd89a4",
       "apis": [
         {
           "protocol": "rpc",
@@ -8505,9 +8575,9 @@
           "end_line": 37
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "11add7318163863decd8c69563dc471bc6d5ad17eb43f77208f2520e3c4397df",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.234Z",
+      "fingerprint": "4b31d03456b1ae4db1ebceef13f447e5093e6459bdea0d2d648139d215bd89a4",
       "apis": [
         {
           "protocol": "rpc",
@@ -8566,9 +8636,9 @@
           "end_line": 80
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.423Z",
-      "fingerprint": "11add7318163863decd8c69563dc471bc6d5ad17eb43f77208f2520e3c4397df",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.234Z",
+      "fingerprint": "4b31d03456b1ae4db1ebceef13f447e5093e6459bdea0d2d648139d215bd89a4",
       "apis": [
         {
           "protocol": "rpc",
@@ -8649,9 +8719,9 @@
           "end_line": 195
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.309Z",
-      "fingerprint": "11add7318163863decd8c69563dc471bc6d5ad17eb43f77208f2520e3c4397df",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.234Z",
+      "fingerprint": "4b31d03456b1ae4db1ebceef13f447e5093e6459bdea0d2d648139d215bd89a4",
       "apis": [
         {
           "protocol": "rpc",
@@ -8749,8 +8819,8 @@
         "en": "Retention and Compaction"
       },
       "description": {
-        "zh": "日志盘的存储治理：保留策略执行、压缩与统计。\n",
-        "en": "Storage hygiene on the log disk: retention enforcement, compaction and statistics.\n"
+        "zh": "日志盘的存储治理：保留策略执行、压缩与统计。保留如今同时清理被删事件的 event_ids 并校验消费者游标，不再留下指向已裁剪位置的游标。\n",
+        "en": "Log-disk storage governance: retention enforcement, compaction and statistics. Retention also drops the event ids it removed and re-validates consumer cursors, so it can no longer leave a cursor pointing past the trimmed history.\n"
       },
       "source": [
         {
@@ -8759,9 +8829,9 @@
           "end_line": 238
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.025Z",
-      "fingerprint": "11add7318163863decd8c69563dc471bc6d5ad17eb43f77208f2520e3c4397df",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.235Z",
+      "fingerprint": "4b31d03456b1ae4db1ebceef13f447e5093e6459bdea0d2d648139d215bd89a4",
       "apis": [
         {
           "protocol": "rpc",
@@ -8833,9 +8903,9 @@
           "end_line": 103
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "11add7318163863decd8c69563dc471bc6d5ad17eb43f77208f2520e3c4397df",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.235Z",
+      "fingerprint": "4b31d03456b1ae4db1ebceef13f447e5093e6459bdea0d2d648139d215bd89a4",
       "apis": [
         {
           "protocol": "rpc",
@@ -8892,9 +8962,9 @@
           "path": "pyvdisk/logging_core.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "fefd7a882d4b70ff980d0e54e1cafe1b91a0123ff526fca44181377d3f5cdd3f",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.235Z",
+      "fingerprint": "b09c0a892a4245c749b1b656f75fea42c069ef41438429402f0b180223f5b281",
       "aggregate": {
         "descendant_count": 5,
         "own_api_count": 0,
@@ -8924,9 +8994,9 @@
           "end_line": 125
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.423Z",
-      "fingerprint": "fefd7a882d4b70ff980d0e54e1cafe1b91a0123ff526fca44181377d3f5cdd3f",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.236Z",
+      "fingerprint": "b09c0a892a4245c749b1b656f75fea42c069ef41438429402f0b180223f5b281",
       "apis": [
         {
           "protocol": "rpc",
@@ -8989,9 +9059,9 @@
           "end_line": 59
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "fefd7a882d4b70ff980d0e54e1cafe1b91a0123ff526fca44181377d3f5cdd3f",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.236Z",
+      "fingerprint": "b09c0a892a4245c749b1b656f75fea42c069ef41438429402f0b180223f5b281",
       "apis": [
         {
           "protocol": "rpc",
@@ -9050,9 +9120,9 @@
           "end_line": 49
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "fefd7a882d4b70ff980d0e54e1cafe1b91a0123ff526fca44181377d3f5cdd3f",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.236Z",
+      "fingerprint": "b09c0a892a4245c749b1b656f75fea42c069ef41438429402f0b180223f5b281",
       "apis": [
         {
           "protocol": "rpc",
@@ -9120,9 +9190,9 @@
           "end_line": 110
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.309Z",
-      "fingerprint": "fefd7a882d4b70ff980d0e54e1cafe1b91a0123ff526fca44181377d3f5cdd3f",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.237Z",
+      "fingerprint": "b09c0a892a4245c749b1b656f75fea42c069ef41438429402f0b180223f5b281",
       "apis": [
         {
           "protocol": "rpc",
@@ -9212,9 +9282,9 @@
           "end_line": 81
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.025Z",
-      "fingerprint": "fefd7a882d4b70ff980d0e54e1cafe1b91a0123ff526fca44181377d3f5cdd3f",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.237Z",
+      "fingerprint": "b09c0a892a4245c749b1b656f75fea42c069ef41438429402f0b180223f5b281",
       "apis": [
         {
           "protocol": "rpc",
@@ -11699,8 +11769,8 @@
         "en": "Write-Ahead Log"
       },
       "description": {
-        "zh": "预写日志：DataDisk 事务用的 VFS 元数据 WAL，以及 VScript 事务撤销用的宿主路径 WAL。\n",
-        "en": "Write-ahead logs: a VFS-backed metadata WAL for DataDisk transactions and a host-path WAL for VScript transaction undo.\n"
+        "zh": "预写日志：同一套带检查点与截断的分段 WAL，由 DataDisk 事务与 VScript 事务撤销共用，而不是两份并行实现。\n",
+        "en": "Write-ahead logging: one segmented WAL implementation with checkpointing and truncation, shared by DataDisk transactions and VScript transaction undo instead of two parallel implementations.\n"
       },
       "source": [
         {
@@ -11710,13 +11780,13 @@
           "path": "pyvdisk/vscript/wal.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "a4a5b3c4756b2611748f7e727407eb351a48ebb75ffcc2d23207d431709d04a2",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.238Z",
+      "fingerprint": "50ae6934d1990a4ceaed243e96fd51f677869ffe1300820ea255672f1d3868fa",
       "aggregate": {
         "descendant_count": 3,
         "own_api_count": 0,
-        "inherited_api_count": 14,
+        "inherited_api_count": 16,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -11732,26 +11802,26 @@
         "en": "WAL Entries"
       },
       "description": {
-        "zh": "事务日志动词与崩溃恢复重放。\n",
-        "en": "Transaction journal verbs and crash recovery replay.\n"
+        "zh": "事务日志动词与崩溃恢复重放：begin/append/prepare/commit/abort，以及重放所依赖的读取入口。\n",
+        "en": "Transaction log verbs and crash-recovery replay: begin/append/prepare/commit/abort, plus the readers that replay consumes.\n"
       },
       "source": [
         {
           "path": "pyvdisk/infrastructure/wal.py",
-          "line": 30,
-          "end_line": 38
+          "line": 107,
+          "end_line": 139
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.025Z",
-      "fingerprint": "43c2df470c8470e355007b640747720bd497fae956929ae151b60094f86c1836",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.238Z",
+      "fingerprint": "0d8c340fb6943bf9dfde1cc4cb2cb552f203bcc13d2f2ff3586e378c57495e08",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.wal.WriteAheadLog#begin",
           "description": {
-            "zh": "开启事务并返回其 id。\n",
-            "en": "Open a transaction and return its id.\n"
+            "zh": "追加 begin 记录以开启事务。\n",
+            "en": "Opens a transaction by appending a begin record.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#begin"
         },
@@ -11759,8 +11829,8 @@
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.wal.WriteAheadLog#append",
           "description": {
-            "zh": "在已开启事务内记录一个操作。\n",
-            "en": "Record one operation inside an open transaction.\n"
+            "zh": "在已开启的事务中记录一个操作。\n",
+            "en": "Records one operation inside an open transaction.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#append"
         },
@@ -11768,8 +11838,8 @@
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.wal.WriteAheadLog#prepare",
           "description": {
-            "zh": "标记事务进入 prepare。\n",
-            "en": "Mark a transaction prepared.\n"
+            "zh": "标记事务已就绪待提交。\n",
+            "en": "Marks the transaction ready to commit.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#prepare"
         },
@@ -11778,7 +11848,7 @@
           "path": "pyvdisk.infrastructure.wal.WriteAheadLog#commit",
           "description": {
             "zh": "标记事务已提交。\n",
-            "en": "Mark a transaction committed.\n"
+            "en": "Marks the transaction committed.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#commit"
         },
@@ -11786,8 +11856,8 @@
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.wal.WriteAheadLog#abort",
           "description": {
-            "zh": "标记事务已回滚。\n",
-            "en": "Mark a transaction aborted.\n"
+            "zh": "标记事务已中止。\n",
+            "en": "Marks the transaction aborted.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#abort"
         },
@@ -11795,18 +11865,36 @@
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.wal.WriteAheadLog#recover",
           "description": {
-            "zh": "重放日志：对已开启事务调 undo、对已 prepare 未完成事务调 redo。\n",
-            "en": "Replay the journal, calling undo for begun and redo for prepared-but-unfinished transactions.\n"
+            "zh": "用传入的 undo/redo 回调重放日志，并报告未能结算的部分。\n",
+            "en": "Replays the log through the supplied undo and redo callables, and reports what stayed unresolved.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#recover"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.infrastructure.wal.WriteAheadLog#_read",
+          "description": {
+            "zh": "解码日志中当前的全部记录。\n",
+            "en": "Decodes every record currently in the log.\n"
+          },
+          "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#_read"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.infrastructure.wal.WriteAheadLog#_last_sequence",
+          "description": {
+            "zh": "已写入的最大序号。\n",
+            "en": "Highest sequence number written so far.\n"
+          },
+          "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#_last_sequence"
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 6,
+        "own_api_count": 8,
         "inherited_api_count": 0,
         "dep_out": 0,
-        "dep_in": 2
+        "dep_in": 3
       }
     },
     "pyvdisk.storage.wal.journal": {
@@ -11820,26 +11908,26 @@
         "en": "Metadata WAL"
       },
       "description": {
-        "zh": "DataDisk 事务使用的元数据预写日志：日志存储、行编解码与序号跟踪。\n",
-        "en": "Metadata write-ahead log used by DataDisk transactions: journal storage, line codec and sequence tracking.\n"
+        "zh": "DataDisk 事务使用的元数据预写日志：存储后端、行编解码，以及分配序号的追加写入。\n",
+        "en": "Metadata write-ahead log used by DataDisk transactions: the storage backends, the record codec and the append path that assigns sequence numbers.\n"
       },
       "source": [
         {
           "path": "pyvdisk/infrastructure/wal.py",
-          "line": 5,
-          "end_line": 29
+          "line": 80,
+          "end_line": 106
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.424Z",
-      "fingerprint": "43c2df470c8470e355007b640747720bd497fae956929ae151b60094f86c1836",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.239Z",
+      "fingerprint": "0d8c340fb6943bf9dfde1cc4cb2cb552f203bcc13d2f2ff3586e378c57495e08",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.wal.WriteAheadLog",
           "description": {
-            "zh": "VFS JSONL 日志之上的事务事件读写器。\n",
-            "en": "Transaction lifecycle event reader/writer over a VFS JSONL journal.\n"
+            "zh": "WAL 本体：存储后端、记录编码与带序号分配的追加。\n",
+            "en": "The WAL itself: storage backend, record encoding and append with sequence assignment.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog"
         },
@@ -11847,42 +11935,33 @@
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.wal.WriteAheadLog#__init__",
           "description": {
-            "zh": "把日志绑定到 VFS 与日志路径。\n",
-            "en": "Bind the log to a VFS and journal path.\n"
+            "zh": "把日志绑定到 VFS 路径或宿主文件。\n",
+            "en": "Binds the log to a VFS path or a host file.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#__init__"
         },
         {
           "protocol": "rpc",
-          "path": "pyvdisk.infrastructure.wal.WriteAheadLog#_read",
+          "path": "pyvdisk.infrastructure.wal.WriteAheadLog#append_record",
           "description": {
-            "zh": "读取并解析全部日志行。\n",
-            "en": "Read and parse every journal line.\n"
+            "zh": "追加一条完整记录，并分配其序号。\n",
+            "en": "Appends a fully formed record, allocating its sequence number.\n"
           },
-          "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#_read"
-        },
-        {
-          "protocol": "rpc",
-          "path": "pyvdisk.infrastructure.wal.WriteAheadLog#_last_sequence",
-          "description": {
-            "zh": "返回现存的最大序号。\n",
-            "en": "Return the highest sequence number present.\n"
-          },
-          "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#_last_sequence"
+          "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#append_record"
         },
         {
           "protocol": "rpc",
           "path": "pyvdisk.infrastructure.wal.WriteAheadLog#_append",
           "description": {
-            "zh": "追加一条带类型的日志记录。\n",
-            "en": "Append one typed journal record.\n"
+            "zh": "编码并追加一个 kind/txid 组合。\n",
+            "en": "Encodes and appends one kind/txid pair.\n"
           },
           "key": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#_append"
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 5,
+        "own_api_count": 4,
         "inherited_api_count": 0,
         "dep_out": 0,
         "dep_in": 2
@@ -11899,46 +11978,55 @@
         "en": "Host Undo WAL"
       },
       "description": {
-        "zh": "预写日志的宿主文件系统变体：生命周期动词一致，但记录旧文件内容以便事务失败时撤销。\n",
-        "en": "Host-filesystem variant of the write-ahead log: same lifetime verbs but records the previous file body so a failed transaction can be undone.\n"
+        "zh": "VScript 侧的 WAL 入口：独立的宿主路径实现已取消——本模块直接复用同一套 WriteAheadLog，并给出撤销记录使用的 kind 集与编解码。\n",
+        "en": "VScript-side WAL entry point: the separate host-path implementation is gone -- this module re-exports the shared WriteAheadLog together with the record kinds and codecs the undo records use.\n"
       },
       "source": [
         {
           "path": "pyvdisk/vscript/wal.py",
           "line": 1,
-          "end_line": 61
+          "end_line": 11
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:22:04.609Z",
-      "fingerprint": "db40c61d0287aa74638316dbb877367db4fda76f270bdefb13e13f200b0a991c",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.239Z",
+      "fingerprint": "52cf7418ca7ca365477273fa2f1cb4ad9c418bddbdc6413489ec12b2689d9015",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.vscript.wal.WriteAheadLog",
           "description": {
-            "zh": "用于 VScript 事务撤销的宿主路径预写日志。\n",
-            "en": "Host-path write-ahead log used for VScript transaction undo.\n"
+            "zh": "复用同一套 WAL 类，供 VScript 侧使用。\n",
+            "en": "The shared WAL class, re-exported for VScript.\n"
           },
           "key": "rpc:pyvdisk.vscript.wal.WriteAheadLog"
         },
         {
           "protocol": "rpc",
-          "path": "pyvdisk.vscript.wal.WriteAheadLog#_append",
+          "path": "pyvdisk.vscript.wal.RECORD_KINDS",
           "description": {
-            "zh": "追加一条携带旧文件内容的二进制帧记录。\n",
-            "en": "Append one binary-framed record carrying the previous file body.\n"
+            "zh": "两个平面现在共用的记录种类集合。\n",
+            "en": "Record kinds both planes now agree on.\n"
           },
-          "key": "rpc:pyvdisk.vscript.wal.WriteAheadLog#_append"
+          "key": "rpc:pyvdisk.vscript.wal.RECORD_KINDS"
         },
         {
           "protocol": "rpc",
-          "path": "pyvdisk.vscript.wal.WriteAheadLog#recover",
+          "path": "pyvdisk.vscript.wal.encode_record",
           "description": {
-            "zh": "重放日志，通过 undo 回调恢复旧内容。\n",
-            "en": "Replay the log, restoring previous bodies through the undo callback.\n"
+            "zh": "与 DataDisk 共用的记录编解码。\n",
+            "en": "Record codec shared with DataDisk.\n"
           },
-          "key": "rpc:pyvdisk.vscript.wal.WriteAheadLog#recover"
+          "key": "rpc:pyvdisk.vscript.wal.encode_record"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.wal.decode_records",
+          "description": {
+            "zh": "与 DataDisk 共用的批量解码。\n",
+            "en": "Batch decoder shared with DataDisk.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.wal.decode_records"
         }
       ],
       "deps": [
@@ -11948,15 +12036,15 @@
           "from_api": "rpc:pyvdisk.vscript.wal.WriteAheadLog",
           "to_api": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog",
           "label": {
-            "zh": "沿用 VFS WAL 的设计",
-            "en": "mirrors the VFS WAL design"
+            "zh": "复用共享 WAL 实现",
+            "en": "reuses the shared WAL"
           },
           "cross_tree": false
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 3,
+        "own_api_count": 4,
         "inherited_api_count": 0,
         "dep_out": 1,
         "dep_in": 1
@@ -11976,8 +12064,8 @@
         "en": "Test Suite"
       },
       "description": {
-        "zh": "测试套件：193 项可执行校验，覆盖文件系统、卷、身份、锁、队列、事务、VScript 与打包。\n",
-        "en": "Test suite: 193 executable checks covering the filesystem, volumes, identity, locking, queueing, transactions, VScript and packaging.\n"
+        "zh": "测试套件：391 项可执行校验，覆盖文件系统、卷、身份、锁、队列、事务、VScript、审计轨迹、FUSE 桥与打包。\n",
+        "en": "Test suite: 391 executable checks covering the filesystem, volumes, identity, locking, the queue, transactions, VScript, the audit trail, the FUSE bridge and packaging.\n"
       },
       "source": [
         {
@@ -11990,13 +12078,13 @@
           "path": "tests/test_vscript.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.424Z",
-      "fingerprint": "dbd32ee0065520c6c8a71c1c05a538bee3853be3eab2fbe4460d038d0fe1e78a",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.240Z",
+      "fingerprint": "b6440af3d48834c687f05de99c57cf0e3582d53a09d2ffb04b28579e901b64b1",
       "aggregate": {
-        "descendant_count": 48,
+        "descendant_count": 55,
         "own_api_count": 0,
-        "inherited_api_count": 64,
+        "inherited_api_count": 71,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -12148,6 +12236,66 @@
           "label": {
             "zh": "验证原子写入",
             "en": "verifies atomic write"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 1,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.tests.audit-trail": {
+      "uid": "c92e7198",
+      "id": "pyvdisk.tests.audit-trail",
+      "parent": "pyvdisk.tests",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "tags": [
+        "tests",
+        "audit"
+      ],
+      "name": {
+        "zh": "审计轨迹用例",
+        "en": "Audit Trail Tests"
+      },
+      "description": {
+        "zh": "审计轨迹用例：哈希链校验（含在真实日志段内篡改记录）、查询筛选与保留策略。\n",
+        "en": "Audit trail tests: hash-chain verification, including a record edited inside a real log segment, query filters and retention.\n"
+      },
+      "source": [
+        {
+          "path": "tests/test_audit_trail.py",
+          "line": 1,
+          "end_line": 336
+        }
+      ],
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.211Z",
+      "fingerprint": "90c6498b997b3407cee50ba6ed0b70222f14dcba819b2601da038e021aab0759",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "tests/test_audit_trail.py",
+          "description": {
+            "zh": "审计写入、哈希链、查询与保留的 29 个用例。\n",
+            "en": "29 cases over audit emission, the hash chain, query and retention.\n"
+          },
+          "key": "rpc:tests/test_audit_trail.py"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "pyvdisk.vscript.audit.sinks",
+          "from_api": "rpc:tests/test_audit_trail.py",
+          "to_api": "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#verify",
+          "label": {
+            "zh": "验证审计 Sink",
+            "en": "exercises audit sinks"
           },
           "cross_tree": false
         }
@@ -12339,7 +12487,7 @@
         }
       ],
       "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.025Z",
+      "updated_at": "2026-09-24T09:57:44.288Z",
       "fingerprint": "e5dc0b698260945083aefe94df8258b286a859f386a258384ff9e0008f568d27",
       "apis": [
         {
@@ -12356,10 +12504,11 @@
         {
           "kind": "call",
           "to": "pyvdisk.storage.datadisk.core",
-          "to_api": "rpc:pyvdisk.infrastructure.disk.DataDisk#_recover_metadata",
+          "from_api": "rpc:tests/test_datadisk_acid_crash_matrix.py",
+          "to_api": "rpc:pyvdisk.infrastructure.disk.DataDisk#_recover_transactions",
           "label": {
-            "zh": "验证恢复",
-            "en": "verifies recovery"
+            "zh": "验证事务重放",
+            "en": "verifies transaction replay"
           },
           "cross_tree": false
         }
@@ -12678,6 +12827,66 @@
         "dep_in": 0
       }
     },
+    "pyvdisk.tests.fuse-mount": {
+      "uid": "447d99b2",
+      "id": "pyvdisk.tests.fuse-mount",
+      "parent": "pyvdisk.tests",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "tags": [
+        "tests",
+        "fuse"
+      ],
+      "name": {
+        "zh": "FUSE 挂载用例",
+        "en": "FUSE Mount Tests"
+      },
+      "description": {
+        "zh": "FUSE 桥用例：属性与目录操作、truncate/link/chmod，以及此前对任何符号链接都返回 EINVAL 的 lstat 语义 readlink。\n",
+        "en": "FUSE bridge tests: attribute and directory operations, truncate/link/chmod, and the lstat-semantics readlink that used to fail every symlink with EINVAL.\n"
+      },
+      "source": [
+        {
+          "path": "tests/test_fuse_mount.py",
+          "line": 1,
+          "end_line": 251
+        }
+      ],
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.212Z",
+      "fingerprint": "b0e0301f87cd1dbd412bd5c29ce373d1bba6eb5e77134f89d377365a340a373b",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "tests/test_fuse_mount.py",
+          "description": {
+            "zh": "用桩 fuse 模块覆盖 FUSE 桥的 21 个用例。\n",
+            "en": "21 cases over the FUSE bridge with a stub fuse module.\n"
+          },
+          "key": "rpc:tests/test_fuse_mount.py"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "pyvdisk.storage.fuse.handlers",
+          "from_api": "rpc:tests/test_fuse_mount.py",
+          "to_api": "rpc:pyvdisk.fuse_mount._VFuseOperations#_readlink",
+          "label": {
+            "zh": "验证 FUSE 操作表",
+            "en": "exercises FUSE operations"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 1,
+        "dep_in": 0
+      }
+    },
     "pyvdisk.tests.governance": {
       "uid": "a0000e11",
       "id": "pyvdisk.tests.governance",
@@ -12856,9 +13065,9 @@
           "path": "tests/test_packaging.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "c295909cd9527a8811385a9037c6de7c869576eb726aabbc3212f43f3c442c88",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.241Z",
+      "fingerprint": "323dfc7f33246bdb08212b6f90101d3b268797f3d8a95fe64486043926249d3b",
       "apis": [
         {
           "protocol": "rpc",
@@ -12875,6 +13084,67 @@
         "own_api_count": 1,
         "inherited_api_count": 0,
         "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.tests.participant-compensation": {
+      "uid": "afb559b5",
+      "id": "pyvdisk.tests.participant-compensation",
+      "parent": "pyvdisk.tests",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "tags": [
+        "tests",
+        "transaction",
+        "acid"
+      ],
+      "name": {
+        "zh": "参与者补偿用例",
+        "en": "Participant Compensation Tests"
+      },
+      "description": {
+        "zh": "参与者补偿用例：持久化写前补偿、进程内 abort 的逆序分发、跨挂载的幂等重复补偿。\n",
+        "en": "Participant compensation tests: durable write-ahead compensation, reverse-order in-process abort dispatch, idempotent re-compensation across mounts.\n"
+      },
+      "source": [
+        {
+          "path": "tests/test_participant_compensation.py",
+          "line": 1,
+          "end_line": 358
+        }
+      ],
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.212Z",
+      "fingerprint": "64c934ebf5a17e261b860af5ab6856ead8c9072cf123163c17ba128406b349e0",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "tests/test_participant_compensation.py",
+          "description": {
+            "zh": "参与者登记、持久补偿日志与崩溃矩阵恢复的 38 个用例。\n",
+            "en": "38 cases over participant enlistment, the durable compensation log and crash-matrix recovery.\n"
+          },
+          "key": "rpc:tests/test_participant_compensation.py"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "pyvdisk.storage.datadisk.tx-lifecycle",
+          "from_api": "rpc:tests/test_participant_compensation.py",
+          "to_api": "rpc:pyvdisk.infrastructure.disk.MetadataTransaction#abort",
+          "label": {
+            "zh": "验证事务补偿",
+            "en": "exercises tx compensation"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 1,
         "dep_in": 0
       }
     },
@@ -13215,9 +13485,9 @@
           "path": "tests/test_vdisk.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.241Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "aggregate": {
         "descendant_count": 19,
         "own_api_count": 0,
@@ -13247,9 +13517,9 @@
           "end_line": 78
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.242Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13299,9 +13569,9 @@
           "end_line": 670
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.242Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13342,9 +13612,9 @@
           "end_line": 1208
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.243Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13385,9 +13655,9 @@
           "end_line": 681
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.244Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13428,9 +13698,9 @@
           "end_line": 1072
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.244Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13471,9 +13741,9 @@
           "end_line": 319
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.245Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13532,9 +13802,9 @@
           "end_line": 151
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.245Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13584,9 +13854,9 @@
           "end_line": 420
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.246Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13645,9 +13915,9 @@
           "end_line": 1418
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.246Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13697,9 +13967,9 @@
           "end_line": 1650
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.247Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13740,9 +14010,9 @@
           "end_line": 511
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.248Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13801,9 +14071,9 @@
           "end_line": 240
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.248Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13862,9 +14132,9 @@
           "end_line": 1536
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.249Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13905,9 +14175,9 @@
           "end_line": 535
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.249Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13948,9 +14218,9 @@
           "end_line": 1594
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.250Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -13991,9 +14261,9 @@
           "end_line": 781
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.251Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -14052,9 +14322,9 @@
           "end_line": 1006
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.252Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -14095,9 +14365,9 @@
           "end_line": 948
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.252Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -14156,9 +14426,9 @@
           "end_line": 850
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.253Z",
+      "fingerprint": "3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf",
       "apis": [
         {
           "protocol": "rpc",
@@ -14302,6 +14572,67 @@
         "dep_in": 0
       }
     },
+    "pyvdisk.tests.vscript-cron": {
+      "uid": "1cbfc35e",
+      "id": "pyvdisk.tests.vscript-cron",
+      "parent": "pyvdisk.tests",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "tags": [
+        "tests",
+        "vscript",
+        "cron"
+      ],
+      "name": {
+        "zh": "Cron 用例",
+        "en": "Cron Tests"
+      },
+      "description": {
+        "zh": "Cron 用例：字段解析、日/星期并集语义、步长与区间写法，以及下次触发时间计算。\n",
+        "en": "Cron tests: field parsing, DOM/DOW union semantics, step and range forms, and next-fire calculation.\n"
+      },
+      "source": [
+        {
+          "path": "tests/test_vscript_cron.py",
+          "line": 1,
+          "end_line": 109
+        }
+      ],
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.213Z",
+      "fingerprint": "2fbf8277488694b433afe2cca201c9ecdd57759b921b02f8a91484dfe7f331e2",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "tests/test_vscript_cron.py",
+          "description": {
+            "zh": "cron 字段解析、匹配与下次触发计算的 29 个用例。\n",
+            "en": "29 cases over cron field parsing, matching and next-fire computation.\n"
+          },
+          "key": "rpc:tests/test_vscript_cron.py"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "pyvdisk.vscript.cron",
+          "from_api": "rpc:tests/test_vscript_cron.py",
+          "to_api": "rpc:pyvdisk.vscript.cron.CronExpression#next_after",
+          "label": {
+            "zh": "验证 cron 表达式",
+            "en": "exercises cron expressions"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 1,
+        "dep_in": 0
+      }
+    },
     "pyvdisk.tests.vscript-host": {
       "uid": "a0000e04",
       "id": "pyvdisk.tests.vscript-host",
@@ -14321,9 +14652,9 @@
           "path": "tests/test_vscript_host.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.309Z",
-      "fingerprint": "4dc34e1600c660923f1dcb058df3edf5c50503760686bef5e842ccea2a101b8b",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.253Z",
+      "fingerprint": "b0bfafaaf016b380762f3021f7ac6f169323bdcdfde4494aa05db3ab2841279b",
       "apis": [
         {
           "protocol": "rpc",
@@ -14408,6 +14739,189 @@
         "dep_in": 0
       }
     },
+    "pyvdisk.tests.vscript-triggers": {
+      "uid": "35b668fb",
+      "id": "pyvdisk.tests.vscript-triggers",
+      "parent": "pyvdisk.tests",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "tags": [
+        "tests",
+        "vscript",
+        "triggers"
+      ],
+      "name": {
+        "zh": "触发器用例",
+        "en": "Trigger Tests"
+      },
+      "description": {
+        "zh": "触发器用例：单调水位线排序（此前用随机事件 id 作文本比较会静默丢事件）、注册时空 pattern/stream 的拒绝，以及 poll_once 行为。\n",
+        "en": "Trigger tests: monotonic watermark ordering (a random event id used as a text watermark silently dropped events), empty pattern/stream rejection at registration, and poll_once behaviour.\n"
+      },
+      "source": [
+        {
+          "path": "tests/test_vscript_triggers.py",
+          "line": 1,
+          "end_line": 282
+        }
+      ],
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.213Z",
+      "fingerprint": "b1079ad935b3695ebcb3c4682ab7849a80d348c1157e0634d225057496340185",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "tests/test_vscript_triggers.py",
+          "description": {
+            "zh": "文件与日志触发器、其水位线与注册规则的 19 个用例。\n",
+            "en": "19 cases over file and log triggers, their watermarks and their registration rules.\n"
+          },
+          "key": "rpc:tests/test_vscript_triggers.py"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "pyvdisk.vscript.triggers.daemon",
+          "from_api": "rpc:tests/test_vscript_triggers.py",
+          "to_api": "rpc:pyvdisk.vscript.triggers.SchedulerDaemon#poll_once",
+          "label": {
+            "zh": "验证触发器守护进程",
+            "en": "exercises trigger daemon"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 1,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.tests.vscript-undo": {
+      "uid": "c9d0c415",
+      "id": "pyvdisk.tests.vscript-undo",
+      "parent": "pyvdisk.tests",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "tags": [
+        "tests",
+        "vscript",
+        "undo"
+      ],
+      "name": {
+        "zh": "撤销用例",
+        "en": "Undo Tests"
+      },
+      "description": {
+        "zh": "撤销用例：每个 fs 动词在生效前记账、大正文落盘、restore_tree 与崩溃后遗留快照的清理。\n",
+        "en": "Undo tests: every fs verb journalled before it mutates, large bodies spilled to the transaction area, restore_tree and orphan-spill cleanup after a crash.\n"
+      },
+      "source": [
+        {
+          "path": "tests/test_vscript_undo.py",
+          "line": 1,
+          "end_line": 373
+        }
+      ],
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.214Z",
+      "fingerprint": "ac95991d897d56633679357d40f3e5463cee13f38c4e2730da86fb757cd72d7f",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "tests/test_vscript_undo.py",
+          "description": {
+            "zh": "撤销词汇表、落盘、崩溃恢复，以及词汇与动词覆盖校验的 22 个用例。\n",
+            "en": "22 cases over the undo vocabulary, spilling, crash recovery and the vocabulary-vs-verb coverage check.\n"
+          },
+          "key": "rpc:tests/test_vscript_undo.py"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "pyvdisk.vscript.undo",
+          "from_api": "rpc:tests/test_vscript_undo.py",
+          "to_api": "rpc:pyvdisk.vscript.undo.apply_undo",
+          "label": {
+            "zh": "验证撤销解释器",
+            "en": "exercises undo interpreter"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 1,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.tests.wal-checkpoint": {
+      "uid": "a8e30c5c",
+      "id": "pyvdisk.tests.wal-checkpoint",
+      "parent": "pyvdisk.tests",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "tags": [
+        "tests",
+        "wal",
+        "recovery"
+      ],
+      "name": {
+        "zh": "WAL 检查点用例",
+        "en": "WAL Checkpoint Tests"
+      },
+      "description": {
+        "zh": "WAL 检查点用例：检查点后的截断、不再全量重放的恢复，以及 DataDisk 与 VScript 共用的同一套实现。\n",
+        "en": "WAL checkpoint tests: truncation after a checkpoint, replay without rescanning the full log, and the shared implementation used by both DataDisk and VScript.\n"
+      },
+      "source": [
+        {
+          "path": "tests/test_wal_checkpoint_and_recovery.py",
+          "line": 1,
+          "end_line": 267
+        }
+      ],
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.214Z",
+      "fingerprint": "1c79a1bbb852a5a70a892b5919057cfef978163774e48defdcf15c74b4921b8d",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "tests/test_wal_checkpoint_and_recovery.py",
+          "description": {
+            "zh": "共享 WAL 的检查点、截断与恢复行为。\n",
+            "en": "Checkpoint, truncation and recovery behaviour of the shared WAL.\n"
+          },
+          "key": "rpc:tests/test_wal_checkpoint_and_recovery.py"
+        }
+      ],
+      "deps": [
+        {
+          "kind": "call",
+          "to": "pyvdisk.storage.wal.entries",
+          "from_api": "rpc:tests/test_wal_checkpoint_and_recovery.py",
+          "to_api": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#recover",
+          "label": {
+            "zh": "验证 WAL 检查点",
+            "en": "verifies WAL checkpointing"
+          },
+          "cross_tree": false
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 1,
+        "inherited_api_count": 0,
+        "dep_out": 1,
+        "dep_in": 0
+      }
+    },
     "pyvdisk.tests.wal-recovery": {
       "uid": "a0000e1b",
       "id": "pyvdisk.tests.wal-recovery",
@@ -14427,9 +14941,9 @@
           "path": "tests/test_wal_abort_recovery.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.309Z",
-      "fingerprint": "91f015f9a69c470bcd7c73dd7f5e312415bb1bf2a939050ee144cf3503ae8b06",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.253Z",
+      "fingerprint": "460baab1c07bd01c140b0540d8220942e6c883f3296de958426ed0a0d999e514",
       "apis": [
         {
           "protocol": "rpc",
@@ -14481,58 +14995,81 @@
       },
       "source": [
         {
-          "path": "pyvdisk/vscript/__init__.py"
+          "path": "pyvdisk/vscript/__init__.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/ast.py"
+          "path": "pyvdisk/vscript/ast.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/audit.py"
+          "path": "pyvdisk/vscript/audit.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/cli.py"
+          "path": "pyvdisk/vscript/cli.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/cron.py"
+          "path": "pyvdisk/vscript/cron.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/errors.py"
+          "path": "pyvdisk/vscript/errors.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/host.py"
+          "path": "pyvdisk/vscript/host.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/lexer.py"
+          "path": "pyvdisk/vscript/lexer.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/mounts.py"
+          "path": "pyvdisk/vscript/mounts.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/parser.py"
+          "path": "pyvdisk/vscript/parser.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/policy.py"
+          "path": "pyvdisk/vscript/policy.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/runtime.py"
+          "path": "pyvdisk/vscript/runtime.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/stdlib.py"
+          "path": "pyvdisk/vscript/stdlib.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/tokens.py"
+          "path": "pyvdisk/vscript/tokens.py",
+          "line": 1
         },
         {
-          "path": "pyvdisk/vscript/triggers.py"
+          "path": "pyvdisk/vscript/triggers.py",
+          "line": 1
+        },
+        {
+          "path": "pyvdisk/vscript/undo.py",
+          "line": 1
+        },
+        {
+          "path": "pyvdisk/vscript/wal.py",
+          "line": 1
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "d9201a2ab124afaaa2c31080601ee2c18b26cf638f3bacade8c56eeb7ea2325d",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.257Z",
+      "fingerprint": "c7844269be626ed5058001514ea274cee3b6c62a247f7b5afbeca90ed7c02b66",
       "aggregate": {
-        "descendant_count": 39,
+        "descendant_count": 41,
         "own_api_count": 0,
-        "inherited_api_count": 122,
+        "inherited_api_count": 143,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -14556,13 +15093,13 @@
           "path": "pyvdisk/vscript/audit.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "e6e0c4f6567b6878156a09474961840eaaf3271a6f54be1751ac87c88fbbcebc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.257Z",
+      "fingerprint": "e7c398721e85cdb58382b2b377443a1448877191f1be8c698b03443173fc2e4f",
       "aggregate": {
-        "descendant_count": 4,
+        "descendant_count": 5,
         "own_api_count": 0,
-        "inherited_api_count": 11,
+        "inherited_api_count": 25,
         "dep_out": 0,
         "dep_in": 0
       }
@@ -14588,9 +15125,9 @@
           "end_line": 104
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "e6e0c4f6567b6878156a09474961840eaaf3271a6f54be1751ac87c88fbbcebc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.258Z",
+      "fingerprint": "e7c398721e85cdb58382b2b377443a1448877191f1be8c698b03443173fc2e4f",
       "apis": [
         {
           "protocol": "rpc",
@@ -14630,8 +15167,8 @@
         "en": "Audit Hashing"
       },
       "description": {
-        "zh": "脚本与策略的确定性哈希，使审计记录可跨运行与跨机器关联。\n",
-        "en": "Deterministic hashing of scripts and policies so audit records can be correlated across runs and machines.\n"
+        "zh": "脚本与策略的确定性哈希，以及审计哈希链：每行都带上前驱哈希，verify 报告第一条不匹配的记录——包括在真实日志段内做的手脚。\n",
+        "en": "Deterministic hashing for scripts and policies, plus the audit hash chain: rows are stamped with their predecessor's hash, and verify reports the first record that does not match, including an edit made inside a real log segment.\n"
       },
       "source": [
         {
@@ -14640,16 +15177,16 @@
           "end_line": 37
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "e6e0c4f6567b6878156a09474961840eaaf3271a6f54be1751ac87c88fbbcebc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.258Z",
+      "fingerprint": "e7c398721e85cdb58382b2b377443a1448877191f1be8c698b03443173fc2e4f",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.vscript.audit.script_hash",
           "description": {
-            "zh": "用于关联审计记录的脚本源码稳定哈希。\n",
-            "en": "Stable content hash of a script source used to correlate audit records.\n"
+            "zh": "脚本的确定性哈希。\n",
+            "en": "Deterministic hash of a script.\n"
           },
           "key": "rpc:pyvdisk.vscript.audit.script_hash"
         },
@@ -14657,10 +15194,104 @@
           "protocol": "rpc",
           "path": "pyvdisk.vscript.audit.policy_hash",
           "description": {
-            "zh": "单次运行实际生效策略的稳定哈希。\n",
-            "en": "Stable hash of the effective policy for a run.\n"
+            "zh": "策略的确定性哈希。\n",
+            "en": "Deterministic hash of a policy.\n"
           },
           "key": "rpc:pyvdisk.vscript.audit.policy_hash"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.row_hash",
+          "description": {
+            "zh": "把一条审计行与其前驱一起哈希。\n",
+            "en": "Hashes one audit row together with its predecessor.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.row_hash"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.stamp_row",
+          "description": {
+            "zh": "为一行打上哈希链的链接字段。\n",
+            "en": "Stamps a row with the hash chain link.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.stamp_row"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.chain_rows",
+          "description": {
+            "zh": "对一批行重算整条链。\n",
+            "en": "Recomputes the chain across a list of rows.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.chain_rows"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.verify_chain",
+          "description": {
+            "zh": "校验一条链，断开时报告断裂位置。\n",
+            "en": "Verifies a chain and reports where it broke, if it did.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.verify_chain"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 6,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 0
+      }
+    },
+    "pyvdisk.vscript.audit.query": {
+      "uid": "a51f4f49",
+      "id": "pyvdisk.vscript.audit.query",
+      "parent": "pyvdisk.vscript.audit",
+      "tree": "pyvdisk",
+      "depth": 4,
+      "tags": [
+        "vscript",
+        "audit",
+        "query",
+        "retention"
+      ],
+      "name": {
+        "zh": "审计查询与保留",
+        "en": "Audit Query and Retention"
+      },
+      "description": {
+        "zh": "审计轨迹的读取侧：按运行/任务/状态/时间筛选记录，并支持显式保留裁剪，使轨迹既可查也可有界，而不是只能追加。\n",
+        "en": "Reading side of the audit trail: record selection by run/task/status/time and explicit retention, so a trail can be inspected and bounded instead of only appended to.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/vscript/audit.py",
+          "line": 108,
+          "end_line": 158
+        }
+      ],
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.210Z",
+      "fingerprint": "e7c398721e85cdb58382b2b377443a1448877191f1be8c698b03443173fc2e4f",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.query_rows",
+          "description": {
+            "zh": "按运行、任务、状态与时间窗筛选审计记录，可要求按最新优先。\n",
+            "en": "Selects audit records by run, task, status and time window, optionally newest first.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.query_rows"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.retain_rows",
+          "description": {
+            "zh": "按条数与时间裁剪记录列表，返回保留与丢弃两部分。\n",
+            "en": "Trims a record list by count and age, returning what was kept and what was dropped.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.retain_rows"
         }
       ],
       "aggregate": {
@@ -14682,19 +15313,19 @@
         "en": "Audit Record"
       },
       "description": {
-        "zh": "解释器、执行服务与 sink 共用的审计记录形态。\n",
-        "en": "The audit record shape shared by the interpreter, the execution service and the sinks.\n"
+        "zh": "解释器、执行服务与 Sink 共用的审计记录形态，含使其可校验（而非仅可追加）的链字段。\n",
+        "en": "The audit record shape shared by the interpreter, the execution service and the sinks, including the chain fields that make a trail verifiable rather than merely append-only.\n"
       },
       "source": [
         {
           "path": "pyvdisk/vscript/audit.py",
-          "line": 39,
-          "end_line": 58
+          "line": 160,
+          "end_line": 178
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "e6e0c4f6567b6878156a09474961840eaaf3271a6f54be1751ac87c88fbbcebc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.258Z",
+      "fingerprint": "e7c398721e85cdb58382b2b377443a1448877191f1be8c698b03443173fc2e4f",
       "apis": [
         {
           "protocol": "rpc",
@@ -14734,25 +15365,25 @@
         "en": "Audit Sinks"
       },
       "description": {
-        "zh": "持久审计目的地：检查点存储的有界保留，或日志盘上的只追加审计流。\n",
-        "en": "Durable audit destinations: bounded retention in a checkpoint store, or an append-only audit stream on a log disk.\n"
+        "zh": "持久审计目的地：检查点存储里的有界保留，或日志盘上的只追加审计流。两者现在都可读：查询筛选、显式保留、哈希链校验，以及供外部锚定的链头。\n",
+        "en": "Durable audit destinations: bounded retention in a checkpoint store, or an append-only audit stream on a log disk. Both are now readable: query filters, explicit retention, hash-chain verification and a head for external anchoring.\n"
       },
       "source": [
         {
           "path": "pyvdisk/vscript/audit.py",
-          "line": 60,
-          "end_line": 97
+          "line": 181,
+          "end_line": 307
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.026Z",
-      "fingerprint": "e6e0c4f6567b6878156a09474961840eaaf3271a6f54be1751ac87c88fbbcebc",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.259Z",
+      "fingerprint": "e7c398721e85cdb58382b2b377443a1448877191f1be8c698b03443173fc2e4f",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.vscript.audit.CheckpointAuditSink",
           "description": {
-            "zh": "把最新记录保存在检查点存储中的审计 sink。\n",
+            "zh": "把最新记录保存在检查点存储中的审计 Sink。\n",
             "en": "Audit sink that keeps the newest records in a checkpoint store.\n"
           },
           "key": "rpc:pyvdisk.vscript.audit.CheckpointAuditSink"
@@ -14762,7 +15393,7 @@
           "path": "pyvdisk.vscript.audit.CheckpointAuditSink#emit",
           "description": {
             "zh": "持久化一条审计记录。\n",
-            "en": "Persist one audit record.\n"
+            "en": "Persists one audit record.\n"
           },
           "key": "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#emit"
         },
@@ -14771,16 +15402,61 @@
           "path": "pyvdisk.vscript.audit.CheckpointAuditSink#records",
           "description": {
             "zh": "返回保留的审计记录。\n",
-            "en": "Return the retained audit records.\n"
+            "en": "Returns the retained audit records.\n"
           },
           "key": "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#records"
         },
         {
           "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.CheckpointAuditSink#query",
+          "description": {
+            "zh": "按运行、任务、状态或时间窗选取记录。\n",
+            "en": "Selects records by run, task, status or time window.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#query"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.CheckpointAuditSink#retain",
+          "description": {
+            "zh": "按条数与时间裁剪。\n",
+            "en": "Trims by count and age.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#retain"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.CheckpointAuditSink#verify",
+          "description": {
+            "zh": "校验哈希链。\n",
+            "en": "Verifies the hash chain.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#verify"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.CheckpointAuditSink#head",
+          "description": {
+            "zh": "当前链头，供外部锚定。\n",
+            "en": "Current chain head, for external anchoring.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#head"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.CheckpointAuditSink#adopt",
+          "description": {
+            "zh": "接管一个锚点，使重建的链能与记录值比对。\n",
+            "en": "Adopts an anchor so a rebuilt chain can be compared with a recorded one.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#adopt"
+        },
+        {
+          "protocol": "rpc",
           "path": "pyvdisk.vscript.audit.DataDiskAuditSink",
           "description": {
-            "zh": "把记录追加到日志盘流的审计 sink。\n",
-            "en": "Audit sink that appends records into a log-disk stream.\n"
+            "zh": "日志盘上的只追加审计流。\n",
+            "en": "Append-only audit stream on a log disk.\n"
           },
           "key": "rpc:pyvdisk.vscript.audit.DataDiskAuditSink"
         },
@@ -14789,9 +15465,36 @@
           "path": "pyvdisk.vscript.audit.DataDiskAuditSink#emit",
           "description": {
             "zh": "把一条审计记录追加到 audit 流。\n",
-            "en": "Append one audit record to the audit stream.\n"
+            "en": "Appends one audit record to the audit stream.\n"
           },
           "key": "rpc:pyvdisk.vscript.audit.DataDiskAuditSink#emit"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.DataDiskAuditSink#query",
+          "description": {
+            "zh": "把流读回为记录行。\n",
+            "en": "Reads the stream back as rows.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.DataDiskAuditSink#query"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.DataDiskAuditSink#retain",
+          "description": {
+            "zh": "保留策略委派给日志盘自身的执行。\n",
+            "en": "Delegates retention to the log disk's own enforcement.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.DataDiskAuditSink#retain"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.audit.DataDiskAuditSink#verify",
+          "description": {
+            "zh": "在流上校验哈希链。\n",
+            "en": "Verifies the chain over the stream.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.audit.DataDiskAuditSink#verify"
         }
       ],
       "deps": [
@@ -14820,10 +15523,10 @@
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 5,
+        "own_api_count": 13,
         "inherited_api_count": 0,
         "dep_out": 2,
-        "dep_in": 1
+        "dep_in": 2
       }
     },
     "pyvdisk.vscript.cli": {
@@ -14845,9 +15548,9 @@
           "path": "pyvdisk/vscript/cli.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8804f57427cc348f66a87e62a16cb43057e614c4d7ea12f01e4d8c384d5b716f",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.259Z",
+      "fingerprint": "b93664d4ede6142b0a1f77adbe3592f0ee285c15f7e00e3627f7acae3a5a3431",
       "aggregate": {
         "descendant_count": 3,
         "own_api_count": 0,
@@ -14867,8 +15570,8 @@
         "en": "VScript Commands"
       },
       "description": {
-        "zh": "VScript 命令接口：参数解析、挂载授权，以及 check 与 run 入口。\n",
-        "en": "VScript command surface: argument parsing, mount authorization and the check and run entry points.\n"
+        "zh": "VScript 命令接口：参数解析、挂载授权与 check/run 入口，含使 host.* 可用的宿主读/写根目录选项。\n",
+        "en": "VScript command surface: argument parsing, mount authorisation and the check/run entry points, including the host read/write root options that make host.* usable.\n"
       },
       "source": [
         {
@@ -14877,9 +15580,9 @@
           "end_line": 46
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.424Z",
-      "fingerprint": "8804f57427cc348f66a87e62a16cb43057e614c4d7ea12f01e4d8c384d5b716f",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.259Z",
+      "fingerprint": "b93664d4ede6142b0a1f77adbe3592f0ee285c15f7e00e3627f7acae3a5a3431",
       "apis": [
         {
           "protocol": "rpc",
@@ -14951,9 +15654,9 @@
           "end_line": 159
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "8804f57427cc348f66a87e62a16cb43057e614c4d7ea12f01e4d8c384d5b716f",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.260Z",
+      "fingerprint": "b93664d4ede6142b0a1f77adbe3592f0ee285c15f7e00e3627f7acae3a5a3431",
       "apis": [
         {
           "protocol": "rpc",
@@ -14994,9 +15697,9 @@
           "end_line": 151
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.310Z",
-      "fingerprint": "8804f57427cc348f66a87e62a16cb43057e614c4d7ea12f01e4d8c384d5b716f",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.260Z",
+      "fingerprint": "b93664d4ede6142b0a1f77adbe3592f0ee285c15f7e00e3627f7acae3a5a3431",
       "apis": [
         {
           "protocol": "rpc",
@@ -15130,7 +15833,7 @@
         "own_api_count": 5,
         "inherited_api_count": 0,
         "dep_out": 0,
-        "dep_in": 0
+        "dep_in": 1
       }
     },
     "pyvdisk.vscript.frontend": {
@@ -15736,9 +16439,9 @@
           "path": "pyvdisk/vscript/host.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "4bfbe1157d25b89c581f1b0dd4d4eb9d42fbe2c4b817c4371782f6bc007e4742",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.260Z",
+      "fingerprint": "baf58ee2c4dbda56cd6c7afb131bba217cd12b97019cd89fbebb5a1a7edad7c2",
       "aggregate": {
         "descendant_count": 2,
         "own_api_count": 0,
@@ -15758,8 +16461,8 @@
         "en": "Host Confinement"
       },
       "description": {
-        "zh": "宿主隔离：声明脚本可读写的宿主目录，并拒绝其余一切路径。\n",
-        "en": "Host confinement: declare which host directories a script may read and write, and reject everything else.\n"
+        "zh": "宿主隔离：声明脚本可读写的宿主目录，其余路径一律拒绝。该策略现在有真实入口——CLI 注入声明的根目录——host.* 不再因根目录为空而不可用。\n",
+        "en": "Host confinement: declares which host directories a script may read and write and refuses everything else. The policy now has a real entry point -- the CLI injects the declared roots -- so host.* is reachable instead of failing with an empty root set.\n"
       },
       "source": [
         {
@@ -15768,9 +16471,9 @@
           "end_line": 79
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "4bfbe1157d25b89c581f1b0dd4d4eb9d42fbe2c4b817c4371782f6bc007e4742",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.260Z",
+      "fingerprint": "baf58ee2c4dbda56cd6c7afb131bba217cd12b97019cd89fbebb5a1a7edad7c2",
       "apis": [
         {
           "protocol": "rpc",
@@ -15856,9 +16559,9 @@
           "end_line": 92
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.026Z",
-      "fingerprint": "4bfbe1157d25b89c581f1b0dd4d4eb9d42fbe2c4b817c4371782f6bc007e4742",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.261Z",
+      "fingerprint": "baf58ee2c4dbda56cd6c7afb131bba217cd12b97019cd89fbebb5a1a7edad7c2",
       "apis": [
         {
           "protocol": "rpc",
@@ -16182,9 +16885,9 @@
           "path": "pyvdisk/vscript/runtime.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.261Z",
+      "fingerprint": "2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef",
       "aggregate": {
         "descendant_count": 7,
         "own_api_count": 0,
@@ -16210,13 +16913,13 @@
       "source": [
         {
           "path": "pyvdisk/vscript/runtime.py",
-          "line": 57,
-          "end_line": 93
+          "line": 140,
+          "end_line": 176
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.261Z",
+      "fingerprint": "2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef",
       "apis": [
         {
           "protocol": "rpc",
@@ -16283,26 +16986,26 @@
         "en": "Interpreter Core"
       },
       "description": {
-        "zh": "解释器核心：构造与原生模块安装、带参数的顶层运行，以及撤销与操作登记。\n",
-        "en": "Interpreter core: construction and native installation, top-level run with arguments, and undo and operation recording.\n"
+        "zh": "解释器核心：构造与原生模块安装、带参数的顶层运行、原生模块调用的记账入口，以及语句块执行。\n",
+        "en": "Interpreter core: construction and native-module installation, top-level run with arguments, the journaling entry point native modules call, and statement-block execution.\n"
       },
       "source": [
         {
           "path": "pyvdisk/vscript/runtime.py",
-          "line": 95,
-          "end_line": 138
+          "line": 178,
+          "end_line": 223
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.310Z",
-      "fingerprint": "1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.262Z",
+      "fingerprint": "2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.vscript.runtime.Runtime",
           "description": {
-            "zh": "树遍历解释器，绑定策略、挂载、标准库、审计与模块根。\n",
-            "en": "Tree-walking interpreter binding policy, mounts, stdlib, audit and module roots.\n"
+            "zh": "解释器：策略、挂载、审计 Sink 与事务记账。\n",
+            "en": "The interpreter: policy, mounts, audit sink and transaction bookkeeping.\n"
           },
           "key": "rpc:pyvdisk.vscript.runtime.Runtime"
         },
@@ -16310,8 +17013,8 @@
           "protocol": "rpc",
           "path": "pyvdisk.vscript.runtime.Runtime#stringify",
           "description": {
-            "zh": "把任意脚本值渲染为展示文本。\n",
-            "en": "Render any script value as display text.\n"
+            "zh": "按 REPL 的方式渲染一个值。\n",
+            "en": "Renders one value the way the REPL prints it.\n"
           },
           "key": "rpc:pyvdisk.vscript.runtime.Runtime#stringify"
         },
@@ -16319,35 +17022,35 @@
           "protocol": "rpc",
           "path": "pyvdisk.vscript.runtime.Runtime#run",
           "description": {
-            "zh": "带参数、绑定与 run id 运行已解析程序。\n",
-            "en": "Run a parsed program with arguments, bindings and a run id.\n"
+            "zh": "跑完一个程序并返回结果。\n",
+            "en": "Runs a program to completion and returns its result.\n"
           },
           "key": "rpc:pyvdisk.vscript.runtime.Runtime#run"
         },
         {
           "protocol": "rpc",
-          "path": "pyvdisk.vscript.runtime.Runtime#record_undo",
+          "path": "pyvdisk.vscript.runtime.Runtime#journal",
           "description": {
-            "zh": "在当前事务中登记撤销回调。\n",
-            "en": "Record an undo callback in the active transaction.\n"
+            "zh": "解释器自身的记账入口，供原生模块调用。\n",
+            "en": "The interpreter's own journaling entry point, used by native modules.\n"
           },
-          "key": "rpc:pyvdisk.vscript.runtime.Runtime#record_undo"
+          "key": "rpc:pyvdisk.vscript.runtime.Runtime#journal"
         },
         {
           "protocol": "rpc",
-          "path": "pyvdisk.vscript.runtime.Runtime#record_operation",
+          "path": "pyvdisk.vscript.runtime.Runtime#transactions_open",
           "description": {
-            "zh": "登记已执行操作以供审计。\n",
-            "en": "Record an executed operation for audit.\n"
+            "zh": "当前尚未结算的事务数。\n",
+            "en": "How many transactions are still open.\n"
           },
-          "key": "rpc:pyvdisk.vscript.runtime.Runtime#record_operation"
+          "key": "rpc:pyvdisk.vscript.runtime.Runtime#transactions_open"
         },
         {
           "protocol": "rpc",
           "path": "pyvdisk.vscript.runtime.Runtime#exec_block",
           "description": {
-            "zh": "在给定作用域内执行一个语句块。\n",
-            "en": "Execute a block of statements in a scope.\n"
+            "zh": "在某个作用域中执行一个语句块。\n",
+            "en": "Executes one block of statements in a scope.\n"
           },
           "key": "rpc:pyvdisk.vscript.runtime.Runtime#exec_block"
         }
@@ -16401,13 +17104,13 @@
       "source": [
         {
           "path": "pyvdisk/vscript/runtime.py",
-          "line": 34,
-          "end_line": 54
+          "line": 117,
+          "end_line": 139
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.262Z",
+      "fingerprint": "2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef",
       "apis": [
         {
           "protocol": "rpc",
@@ -16498,13 +17201,13 @@
       "source": [
         {
           "path": "pyvdisk/vscript/runtime.py",
-          "line": 241,
-          "end_line": 307
+          "line": 323,
+          "end_line": 389
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.262Z",
+      "fingerprint": "2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef",
       "apis": [
         {
           "protocol": "rpc",
@@ -16568,13 +17271,13 @@
       "source": [
         {
           "path": "pyvdisk/vscript/runtime.py",
-          "line": 222,
-          "end_line": 240
+          "line": 304,
+          "end_line": 322
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.026Z",
-      "fingerprint": "1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.263Z",
+      "fingerprint": "2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef",
       "apis": [
         {
           "protocol": "rpc",
@@ -16624,13 +17327,13 @@
       "source": [
         {
           "path": "pyvdisk/vscript/runtime.py",
-          "line": 139,
-          "end_line": 221
+          "line": 224,
+          "end_line": 303
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.424Z",
-      "fingerprint": "1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.263Z",
+      "fingerprint": "2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef",
       "apis": [
         {
           "protocol": "rpc",
@@ -16674,53 +17377,44 @@
         "en": "Script Transaction"
       },
       "description": {
-        "zh": "脚本事务支持：撤销与操作记账，以及 transaction 语句使用的提交与回滚。\n",
-        "en": "Script transaction support: undo and operation journaling plus commit and rollback used by the transaction statement.\n"
+        "zh": "脚本事务支持：每个可撤销的 fs 变更在生效前落账，进程内回滚与崩溃恢复走同一个撤销解释器，超过 64 KiB 的快照正文落到事务目录。\n",
+        "en": "Script transaction support: every reversible fs change is journalled before it takes effect, in-process rollback and crash recovery run through the same undo interpreter, and snapshot bodies above 64 KiB spill to the transaction area.\n"
       },
       "source": [
         {
           "path": "pyvdisk/vscript/runtime.py",
-          "line": 9,
-          "end_line": 32
+          "line": 11,
+          "end_line": 116
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:20:48.310Z",
-      "fingerprint": "1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.264Z",
+      "fingerprint": "2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.vscript.runtime.TransactionContext",
           "description": {
-            "zh": "收集单次脚本事务的撤销回调与操作。\n",
-            "en": "Collects the undo callbacks and operations of one script transaction.\n"
+            "zh": "收集单次脚本事务的撤销记录与落盘槽位。\n",
+            "en": "Collects one script transaction's undo records and its spill slots.\n"
           },
           "key": "rpc:pyvdisk.vscript.runtime.TransactionContext"
         },
         {
           "protocol": "rpc",
-          "path": "pyvdisk.vscript.runtime.TransactionContext#add_operation",
+          "path": "pyvdisk.vscript.runtime.TransactionContext#journal",
           "description": {
-            "zh": "登记一个操作以供后续重放或审计。\n",
-            "en": "Register an operation for later replay or audit.\n"
+            "zh": "在效果生效**之前**记入一条可撤销账，大正文落盘而不驻留内存。\n",
+            "en": "Journals one reversible effect BEFORE it is applied, spilling large bodies out of memory.\n"
           },
-          "key": "rpc:pyvdisk.vscript.runtime.TransactionContext#add_operation"
-        },
-        {
-          "protocol": "rpc",
-          "path": "pyvdisk.vscript.runtime.TransactionContext#add",
-          "description": {
-            "zh": "登记一个撤销回调。\n",
-            "en": "Register an undo callback.\n"
-          },
-          "key": "rpc:pyvdisk.vscript.runtime.TransactionContext#add"
+          "key": "rpc:pyvdisk.vscript.runtime.TransactionContext#journal"
         },
         {
           "protocol": "rpc",
           "path": "pyvdisk.vscript.runtime.TransactionContext#commit",
           "description": {
-            "zh": "应用全部已记录效果并清空日志。\n",
-            "en": "Apply all recorded effects and clear the journal.\n"
+            "zh": "结算事务并清理其落盘快照。\n",
+            "en": "Settles the transaction and drops its spill files.\n"
           },
           "key": "rpc:pyvdisk.vscript.runtime.TransactionContext#commit"
         },
@@ -16728,21 +17422,39 @@
           "protocol": "rpc",
           "path": "pyvdisk.vscript.runtime.TransactionContext#rollback",
           "description": {
-            "zh": "按逆序撤销已记录效果。\n",
-            "en": "Undo recorded effects in reverse order.\n"
+            "zh": "按逆序通过共享撤销解释器回放账本。\n",
+            "en": "Replays the journal in reverse order through the shared undo interpreter.\n"
           },
           "key": "rpc:pyvdisk.vscript.runtime.TransactionContext#rollback"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.runtime.recover_wal",
+          "description": {
+            "zh": "崩溃恢复入口：用同一个撤销解释器回放持久化 WAL，并清理遗留快照。\n",
+            "en": "Crash-recovery entry point: replays a persisted WAL through the same undo interpreter and drops orphaned spills.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.runtime.recover_wal"
         }
       ],
       "deps": [
         {
           "kind": "call",
-          "to": "pyvdisk.storage.wal.undo",
+          "to": "pyvdisk.vscript.undo",
           "from_api": "rpc:pyvdisk.vscript.runtime.TransactionContext#rollback",
-          "to_api": "rpc:pyvdisk.vscript.wal.WriteAheadLog#recover",
           "label": {
-            "zh": "撤销宿主写入",
-            "en": "undoes host writes"
+            "zh": "重放撤销记录",
+            "en": "replays undo records"
+          },
+          "cross_tree": false
+        },
+        {
+          "kind": "call",
+          "to": "pyvdisk.storage.wal.undo",
+          "from_api": "rpc:pyvdisk.vscript.runtime.recover_wal",
+          "label": {
+            "zh": "消费事务 WAL",
+            "en": "consumes the tx WAL"
           },
           "cross_tree": false
         }
@@ -16751,7 +17463,7 @@
         "descendant_count": 0,
         "own_api_count": 5,
         "inherited_api_count": 0,
-        "dep_out": 1,
+        "dep_out": 2,
         "dep_in": 0
       }
     },
@@ -16774,9 +17486,9 @@
           "path": "pyvdisk/vscript/stdlib.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "4a46271b1688a7dd1e764a4281feb9875dc7c8f8b117cab916ca481882cc7e91",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.264Z",
+      "fingerprint": "c8f6852ff21b7b08e89e6c158274eeaef3d0a02376ac5600831b15124942de6e",
       "aggregate": {
         "descendant_count": 3,
         "own_api_count": 0,
@@ -16796,8 +17508,8 @@
         "en": "Stdlib Factory"
       },
       "description": {
-        "zh": "标准库工厂：文件系统、向量、日志与 json 原生函数，均受能力守卫与字节预算约束。\n",
-        "en": "The standard library factory: filesystem, vector, log and json natives, each confined by capability guards and byte budgets.\n"
+        "zh": "标准库工厂：文件系统、向量、日志与 json 原生函数，均受能力守卫与字节预算约束。每个会改动的 fs 动词在触碰存储之前先记入撤销账，事务失败时可回滚，而不留半成品写入。\n",
+        "en": "Stdlib factory: filesystem, vector, log and json native functions, all behind capability guards and byte budgets. Every mutating fs verb journals its undo record before it touches the store, so a failed transaction can be rolled back instead of leaving half-applied writes.\n"
       },
       "source": [
         {
@@ -16806,9 +17518,9 @@
           "end_line": 118
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:13.026Z",
-      "fingerprint": "4a46271b1688a7dd1e764a4281feb9875dc7c8f8b117cab916ca481882cc7e91",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.264Z",
+      "fingerprint": "c8f6852ff21b7b08e89e6c158274eeaef3d0a02376ac5600831b15124942de6e",
       "apis": [
         {
           "protocol": "rpc",
@@ -16873,9 +17585,9 @@
           "end_line": 44
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "4a46271b1688a7dd1e764a4281feb9875dc7c8f8b117cab916ca481882cc7e91",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.265Z",
+      "fingerprint": "c8f6852ff21b7b08e89e6c158274eeaef3d0a02376ac5600831b15124942de6e",
       "apis": [
         {
           "protocol": "rpc",
@@ -16925,9 +17637,9 @@
           "end_line": 26
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:19:48.424Z",
-      "fingerprint": "4a46271b1688a7dd1e764a4281feb9875dc7c8f8b117cab916ca481882cc7e91",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.265Z",
+      "fingerprint": "c8f6852ff21b7b08e89e6c158274eeaef3d0a02376ac5600831b15124942de6e",
       "apis": [
         {
           "protocol": "rpc",
@@ -17024,13 +17736,13 @@
           "path": "pyvdisk/vscript/triggers.py"
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "a148d13da73ae3dc4b768027bf6471b7ea1ec03669826741f4a3bf79cc35ba91",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.265Z",
+      "fingerprint": "531549cadc018163544e7928ca49da1cef4f71bd76c32347aeb01fadee9d949f",
       "aggregate": {
         "descendant_count": 2,
         "own_api_count": 0,
-        "inherited_api_count": 9,
+        "inherited_api_count": 7,
         "dep_out": 0,
         "dep_in": 1
       }
@@ -17046,19 +17758,19 @@
         "en": "Scheduler Daemon"
       },
       "description": {
-        "zh": "调度守护进程：文件与日志事件检测、经检查点的精确一次去重，以及轮询循环。\n",
-        "en": "The scheduling daemon: file and log event detection, exactly-once dedup through checkpoints, and the polling loop.\n"
+        "zh": "轮询守护进程：每轮评估到期的文件与日志触发器并分发动作，按单调水位线排序事件，不再静默跳过到期事件。\n",
+        "en": "The polling daemon: evaluates due file and log triggers once per tick and dispatches their actions, ordering events by the monotonic watermark so no due event is silently skipped.\n"
       },
       "source": [
         {
           "path": "pyvdisk/vscript/triggers.py",
-          "line": 46,
-          "end_line": 83
+          "line": 75,
+          "end_line": 108
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:22:04.609Z",
-      "fingerprint": "a148d13da73ae3dc4b768027bf6471b7ea1ec03669826741f4a3bf79cc35ba91",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.266Z",
+      "fingerprint": "531549cadc018163544e7928ca49da1cef4f71bd76c32347aeb01fadee9d949f",
       "apis": [
         {
           "protocol": "rpc",
@@ -17117,7 +17829,7 @@
         "own_api_count": 3,
         "inherited_api_count": 0,
         "dep_out": 2,
-        "dep_in": 0
+        "dep_in": 1
       }
     },
     "pyvdisk.vscript.triggers.registry": {
@@ -17131,26 +17843,26 @@
         "en": "Trigger Registry"
       },
       "description": {
-        "zh": "触发器声明及其持久注册表，是调度器轮询的依据。\n",
-        "en": "Trigger declarations and their durable registry, the source of what the scheduler polls for.\n"
+        "zh": "触发器的注册与列举。注册即校验输入（空文件 pattern 以前能注册成功、随后把轮询循环打挂），水位线比较改用单调事件序号，而不再拿随机 uuid 作文本比较。\n",
+        "en": "Trigger registration and listing. Registration validates its inputs immediately -- an empty file pattern used to register fine and then break the poll loop -- and the watermark comparison uses the monotonic event sequence instead of a random uuid compared as text.\n"
       },
       "source": [
         {
           "path": "pyvdisk/vscript/triggers.py",
           "line": 14,
-          "end_line": 44
+          "end_line": 73
         }
       ],
-      "revision": "6d203c0d5f54ce2e4293edd8054c10a109f8b83d",
-      "updated_at": "2026-09-23T07:00:00Z",
-      "fingerprint": "a148d13da73ae3dc4b768027bf6471b7ea1ec03669826741f4a3bf79cc35ba91",
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.266Z",
+      "fingerprint": "531549cadc018163544e7928ca49da1cef4f71bd76c32347aeb01fadee9d949f",
       "apis": [
         {
           "protocol": "rpc",
           "path": "pyvdisk.vscript.triggers.Trigger",
           "description": {
-            "zh": "一条已注册触发器：名称、类型、模式或流及级别过滤。\n",
-            "en": "One registered trigger: name, kind, pattern or stream and level filters.\n"
+            "zh": "一个已注册触发器：文件 glob 或日志流，加上其动作。\n",
+            "en": "One registered trigger: a file pattern or a log stream, plus its action.\n"
           },
           "key": "rpc:pyvdisk.vscript.triggers.Trigger"
         },
@@ -17158,64 +17870,169 @@
           "protocol": "rpc",
           "path": "pyvdisk.vscript.triggers.TriggerRegistry",
           "description": {
-            "zh": "以 JSON 文件为背衬的触发器注册表。\n",
-            "en": "JSON-file-backed registry of declared triggers.\n"
+            "zh": "注册与列举触发器；空 pattern 或 stream 在注册处就被拒绝。\n",
+            "en": "Registers and lists triggers, rejecting an empty pattern or stream up front.\n"
           },
           "key": "rpc:pyvdisk.vscript.triggers.TriggerRegistry"
         },
         {
           "protocol": "rpc",
-          "path": "pyvdisk.vscript.triggers.TriggerRegistry#save",
+          "path": "pyvdisk.vscript.triggers.event_position",
           "description": {
-            "zh": "持久化触发器映射。\n",
-            "en": "Persist the trigger map.\n"
+            "zh": "事件的单调位置，优先使用序号。\n",
+            "en": "Monotonic position of an event, preferring its sequence number.\n"
           },
-          "key": "rpc:pyvdisk.vscript.triggers.TriggerRegistry#save"
+          "key": "rpc:pyvdisk.vscript.triggers.event_position"
         },
         {
           "protocol": "rpc",
-          "path": "pyvdisk.vscript.triggers.TriggerRegistry#register",
+          "path": "pyvdisk.vscript.triggers.is_newer",
           "description": {
-            "zh": "注册触发器，同名时替换。\n",
-            "en": "Register a trigger, replacing any trigger of the same name.\n"
+            "zh": "判断位置是否新于水位线（两者可解析为数字时按数字比）。\n",
+            "en": "Whether a position is newer than a watermark (numeric when both parse).\n"
           },
-          "key": "rpc:pyvdisk.vscript.triggers.TriggerRegistry#register"
-        },
-        {
-          "protocol": "rpc",
-          "path": "pyvdisk.vscript.triggers.TriggerRegistry#register_file",
-          "description": {
-            "zh": "注册文件系统模式触发器。\n",
-            "en": "Register a filesystem-pattern trigger.\n"
-          },
-          "key": "rpc:pyvdisk.vscript.triggers.TriggerRegistry#register_file"
-        },
-        {
-          "protocol": "rpc",
-          "path": "pyvdisk.vscript.triggers.TriggerRegistry#register_log",
-          "description": {
-            "zh": "注册带级别与 logger 过滤的日志流触发器。\n",
-            "en": "Register a log-stream trigger with level and logger filters.\n"
-          },
-          "key": "rpc:pyvdisk.vscript.triggers.TriggerRegistry#register_log"
+          "key": "rpc:pyvdisk.vscript.triggers.is_newer"
         }
       ],
       "aggregate": {
         "descendant_count": 0,
-        "own_api_count": 6,
+        "own_api_count": 4,
         "inherited_api_count": 0,
         "dep_out": 0,
         "dep_in": 1
+      }
+    },
+    "pyvdisk.vscript.undo": {
+      "uid": "77079781",
+      "id": "pyvdisk.vscript.undo",
+      "parent": "pyvdisk.vscript",
+      "tree": "pyvdisk",
+      "depth": 3,
+      "tags": [
+        "vscript",
+        "transaction",
+        "undo",
+        "durability"
+      ],
+      "name": {
+        "zh": "事务撤销记账",
+        "en": "Transaction Undo Bookkeeping"
+      },
+      "description": {
+        "zh": "VScript 事务的撤销记账：每个可撤销的 fs 变更在生效之前就落账，进程内回滚与崩溃恢复共用同一个解释器；超过 64 KiB 的快照正文落到 /.system/tx，不再整份驻留内存。\n",
+        "en": "Undo bookkeeping for VScript transactions: every reversible fs change is journalled before it takes effect, the in-process rollback and the crash-recovery pass share one interpreter, and snapshot bodies above 64 KiB spill to /.system/tx instead of staying in memory.\n"
+      },
+      "source": [
+        {
+          "path": "pyvdisk/vscript/undo.py",
+          "line": 1,
+          "end_line": 210
+        }
+      ],
+      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
+      "updated_at": "2026-09-24T09:58:38.210Z",
+      "fingerprint": "45715e912e2168183a77a42b313761b2973190999957980141f83dfda88223e2",
+      "apis": [
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.undo.normalize",
+          "description": {
+            "zh": "把一条撤销记录规范化，使进程内回滚与崩溃恢复两个解释器不会漂移。\n",
+            "en": "Canonicalises one undo record so the in-process and the crash-recovery interpreters cannot drift apart.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.undo.normalize"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.undo.spill_path",
+          "description": {
+            "zh": "解析存放某个已落盘快照正文的磁盘槽位。\n",
+            "en": "Resolves the on-disk slot that holds one spilled snapshot body.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.undo.spill_path"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.undo.store_body",
+          "description": {
+            "zh": "保存快照正文，超过阈值时落到事务目录而不是留在内存。\n",
+            "en": "Stores a snapshot body, spilling to the transaction area once it exceeds the threshold.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.undo.store_body"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.undo.load_body",
+          "description": {
+            "zh": "读回快照正文，可能来自内存，也可能来自事务目录。\n",
+            "en": "Reads back a snapshot body, from memory or from the transaction area.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.undo.load_body"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.undo.snapshot_tree",
+          "description": {
+            "zh": "在递归删除登记逆操作之前，先为整棵子树拍快照。\n",
+            "en": "Captures a directory tree before a recursive removal journals reverse operations.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.undo.snapshot_tree"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.undo.spill_conflict",
+          "description": {
+            "zh": "当快照位置本身落在待撤销操作的删除范围内时拒绝记账。\n",
+            "en": "Refuses a snapshot whose location would itself be removed by the operation it must undo.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.undo.spill_conflict"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.undo.apply_undo",
+          "description": {
+            "zh": "针对某个存储重放一条撤销记录。\n",
+            "en": "Replays one undo record against a store.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.undo.apply_undo"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.undo.discard_spill_area",
+          "description": {
+            "zh": "事务结算后清理遗留的落盘快照文件。\n",
+            "en": "Drops orphaned spill files after a transaction settles.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.undo.discard_spill_area"
+        },
+        {
+          "protocol": "rpc",
+          "path": "pyvdisk.vscript.undo.KINDS",
+          "description": {
+            "zh": "撤销解释器认识的全部操作种类。\n",
+            "en": "Every operation kind the undo interpreter understands.\n"
+          },
+          "key": "rpc:pyvdisk.vscript.undo.KINDS"
+        }
+      ],
+      "aggregate": {
+        "descendant_count": 0,
+        "own_api_count": 9,
+        "inherited_api_count": 0,
+        "dep_out": 0,
+        "dep_in": 2
       }
     }
   },
   "api_index": {
     "file:.github/workflows/ci.yml": "pyvdisk.delivery.ci",
     "file:.github/workflows/pylint.yml": "pyvdisk.delivery.lint",
+    "file:CHANGELOG.md": "pyvdisk.docs.changelog",
     "file:docs/API_GOVERNANCE.md": "pyvdisk.docs.api-governance",
     "file:docs/ARCHITECTURE.md": "pyvdisk.docs.architecture",
     "file:docs/CONTRACTS.md": "pyvdisk.docs.contracts",
     "file:docs/VSCRIPT_SPEC.md": "pyvdisk.docs.vscript-spec",
+    "file:MANIFEST.in": "pyvdisk.delivery.packaging",
     "file:pyproject.toml": "pyvdisk.delivery.packaging",
     "file:pyvdisk/__main__.py": "pyvdisk.cli.entry",
     "file:pyvdisk/py.typed": "pyvdisk.delivery.packaging",
@@ -17519,13 +18336,14 @@
     "rpc:pyvdisk.infrastructure.disk.DataDisk": "pyvdisk.storage.datadisk.core",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#_append_metadata_wal": "pyvdisk.storage.datadisk.core",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#_atomic_json": "pyvdisk.storage.datadisk.core",
-    "rpc:pyvdisk.infrastructure.disk.DataDisk#_recover_metadata": "pyvdisk.storage.datadisk.core",
+    "rpc:pyvdisk.infrastructure.disk.DataDisk#_recover_transactions": "pyvdisk.storage.datadisk.core",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#close": "pyvdisk.storage.datadisk.api",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#create": "pyvdisk.storage.datadisk.core",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#get_metadata": "pyvdisk.storage.datadisk.api",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#manifest": "pyvdisk.storage.datadisk.api",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#mount": "pyvdisk.storage.datadisk.api",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#mounted": "pyvdisk.storage.datadisk.api",
+    "rpc:pyvdisk.infrastructure.disk.DataDisk#recovery_report": "pyvdisk.storage.datadisk.core",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#scoped": "pyvdisk.storage.datadisk.api",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#set_metadata": "pyvdisk.storage.datadisk.api",
     "rpc:pyvdisk.infrastructure.disk.DataDisk#transaction": "pyvdisk.storage.datadisk.api",
@@ -17609,10 +18427,11 @@
     "rpc:pyvdisk.infrastructure.wal.WriteAheadLog": "pyvdisk.storage.wal.journal",
     "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#__init__": "pyvdisk.storage.wal.journal",
     "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#_append": "pyvdisk.storage.wal.journal",
-    "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#_last_sequence": "pyvdisk.storage.wal.journal",
-    "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#_read": "pyvdisk.storage.wal.journal",
+    "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#_last_sequence": "pyvdisk.storage.wal.entries",
+    "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#_read": "pyvdisk.storage.wal.entries",
     "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#abort": "pyvdisk.storage.wal.entries",
     "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#append": "pyvdisk.storage.wal.entries",
+    "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#append_record": "pyvdisk.storage.wal.journal",
     "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#begin": "pyvdisk.storage.wal.entries",
     "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#commit": "pyvdisk.storage.wal.entries",
     "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#prepare": "pyvdisk.storage.wal.entries",
@@ -17791,15 +18610,29 @@
     "rpc:pyvdisk.vscript.ast.Transaction": "pyvdisk.vscript.frontend.ast",
     "rpc:pyvdisk.vscript.audit.AuditRecord": "pyvdisk.vscript.audit.record",
     "rpc:pyvdisk.vscript.audit.AuditRecord#to_dict": "pyvdisk.vscript.audit.record",
+    "rpc:pyvdisk.vscript.audit.chain_rows": "pyvdisk.vscript.audit.hashing",
     "rpc:pyvdisk.vscript.audit.CheckpointAuditSink": "pyvdisk.vscript.audit.sinks",
+    "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#adopt": "pyvdisk.vscript.audit.sinks",
     "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#emit": "pyvdisk.vscript.audit.sinks",
+    "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#head": "pyvdisk.vscript.audit.sinks",
+    "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#query": "pyvdisk.vscript.audit.sinks",
     "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#records": "pyvdisk.vscript.audit.sinks",
+    "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#retain": "pyvdisk.vscript.audit.sinks",
+    "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#verify": "pyvdisk.vscript.audit.sinks",
     "rpc:pyvdisk.vscript.audit.DataDiskAuditSink": "pyvdisk.vscript.audit.sinks",
     "rpc:pyvdisk.vscript.audit.DataDiskAuditSink#emit": "pyvdisk.vscript.audit.sinks",
+    "rpc:pyvdisk.vscript.audit.DataDiskAuditSink#query": "pyvdisk.vscript.audit.sinks",
+    "rpc:pyvdisk.vscript.audit.DataDiskAuditSink#retain": "pyvdisk.vscript.audit.sinks",
+    "rpc:pyvdisk.vscript.audit.DataDiskAuditSink#verify": "pyvdisk.vscript.audit.sinks",
     "rpc:pyvdisk.vscript.audit.monotonic_ms": "pyvdisk.vscript.audit.clock",
     "rpc:pyvdisk.vscript.audit.new_run_id": "pyvdisk.vscript.audit.clock",
     "rpc:pyvdisk.vscript.audit.policy_hash": "pyvdisk.vscript.audit.hashing",
+    "rpc:pyvdisk.vscript.audit.query_rows": "pyvdisk.vscript.audit.query",
+    "rpc:pyvdisk.vscript.audit.retain_rows": "pyvdisk.vscript.audit.query",
+    "rpc:pyvdisk.vscript.audit.row_hash": "pyvdisk.vscript.audit.hashing",
     "rpc:pyvdisk.vscript.audit.script_hash": "pyvdisk.vscript.audit.hashing",
+    "rpc:pyvdisk.vscript.audit.stamp_row": "pyvdisk.vscript.audit.hashing",
+    "rpc:pyvdisk.vscript.audit.verify_chain": "pyvdisk.vscript.audit.hashing",
     "rpc:pyvdisk.vscript.checkpoint.CheckpointStore": "pyvdisk.compat.vscript",
     "rpc:pyvdisk.vscript.cli._mounts": "pyvdisk.vscript.cli.commands",
     "rpc:pyvdisk.vscript.cli._pairs": "pyvdisk.vscript.cli.commands",
@@ -17863,6 +18696,7 @@
     "rpc:pyvdisk.vscript.runtime.Function": "pyvdisk.vscript.runtime.callables",
     "rpc:pyvdisk.vscript.runtime.Function#__call__": "pyvdisk.vscript.runtime.callables",
     "rpc:pyvdisk.vscript.runtime.LambdaFunction": "pyvdisk.vscript.runtime.callables",
+    "rpc:pyvdisk.vscript.runtime.recover_wal": "pyvdisk.vscript.runtime.tx",
     "rpc:pyvdisk.vscript.runtime.ReturnFlow": "pyvdisk.vscript.runtime.env",
     "rpc:pyvdisk.vscript.runtime.Runtime": "pyvdisk.vscript.runtime.core",
     "rpc:pyvdisk.vscript.runtime.Runtime#apply_assign": "pyvdisk.vscript.runtime.expressions",
@@ -17870,18 +18704,17 @@
     "rpc:pyvdisk.vscript.runtime.Runtime#eval": "pyvdisk.vscript.runtime.expressions",
     "rpc:pyvdisk.vscript.runtime.Runtime#exec_block": "pyvdisk.vscript.runtime.core",
     "rpc:pyvdisk.vscript.runtime.Runtime#execute": "pyvdisk.vscript.runtime.statements",
+    "rpc:pyvdisk.vscript.runtime.Runtime#journal": "pyvdisk.vscript.runtime.core",
     "rpc:pyvdisk.vscript.runtime.Runtime#load_module": "pyvdisk.vscript.runtime.modules",
     "rpc:pyvdisk.vscript.runtime.Runtime#member": "pyvdisk.vscript.runtime.expressions",
-    "rpc:pyvdisk.vscript.runtime.Runtime#record_operation": "pyvdisk.vscript.runtime.core",
-    "rpc:pyvdisk.vscript.runtime.Runtime#record_undo": "pyvdisk.vscript.runtime.core",
     "rpc:pyvdisk.vscript.runtime.Runtime#run": "pyvdisk.vscript.runtime.core",
     "rpc:pyvdisk.vscript.runtime.Runtime#stringify": "pyvdisk.vscript.runtime.core",
+    "rpc:pyvdisk.vscript.runtime.Runtime#transactions_open": "pyvdisk.vscript.runtime.core",
     "rpc:pyvdisk.vscript.runtime.Task": "pyvdisk.vscript.runtime.callables",
     "rpc:pyvdisk.vscript.runtime.Task#await_result": "pyvdisk.vscript.runtime.callables",
     "rpc:pyvdisk.vscript.runtime.TransactionContext": "pyvdisk.vscript.runtime.tx",
-    "rpc:pyvdisk.vscript.runtime.TransactionContext#add": "pyvdisk.vscript.runtime.tx",
-    "rpc:pyvdisk.vscript.runtime.TransactionContext#add_operation": "pyvdisk.vscript.runtime.tx",
     "rpc:pyvdisk.vscript.runtime.TransactionContext#commit": "pyvdisk.vscript.runtime.tx",
+    "rpc:pyvdisk.vscript.runtime.TransactionContext#journal": "pyvdisk.vscript.runtime.tx",
     "rpc:pyvdisk.vscript.runtime.TransactionContext#rollback": "pyvdisk.vscript.runtime.tx",
     "rpc:pyvdisk.vscript.stdlib._cap": "pyvdisk.vscript.stdlib.guards",
     "rpc:pyvdisk.vscript.stdlib._vpath": "pyvdisk.vscript.stdlib.guards",
@@ -17895,22 +18728,31 @@
     "rpc:pyvdisk.vscript.tokens.Token": "pyvdisk.vscript.frontend.tokens",
     "rpc:pyvdisk.vscript.tokens.Token#is_eof": "pyvdisk.vscript.frontend.tokens",
     "rpc:pyvdisk.vscript.tokens.TokenType": "pyvdisk.vscript.frontend.tokens",
+    "rpc:pyvdisk.vscript.triggers.event_position": "pyvdisk.vscript.triggers.registry",
+    "rpc:pyvdisk.vscript.triggers.is_newer": "pyvdisk.vscript.triggers.registry",
     "rpc:pyvdisk.vscript.triggers.SchedulerDaemon": "pyvdisk.vscript.triggers.daemon",
     "rpc:pyvdisk.vscript.triggers.SchedulerDaemon#poll_once": "pyvdisk.vscript.triggers.daemon",
     "rpc:pyvdisk.vscript.triggers.SchedulerDaemon#run": "pyvdisk.vscript.triggers.daemon",
     "rpc:pyvdisk.vscript.triggers.Trigger": "pyvdisk.vscript.triggers.registry",
     "rpc:pyvdisk.vscript.triggers.TriggerRegistry": "pyvdisk.vscript.triggers.registry",
-    "rpc:pyvdisk.vscript.triggers.TriggerRegistry#register": "pyvdisk.vscript.triggers.registry",
-    "rpc:pyvdisk.vscript.triggers.TriggerRegistry#register_file": "pyvdisk.vscript.triggers.registry",
-    "rpc:pyvdisk.vscript.triggers.TriggerRegistry#register_log": "pyvdisk.vscript.triggers.registry",
-    "rpc:pyvdisk.vscript.triggers.TriggerRegistry#save": "pyvdisk.vscript.triggers.registry",
+    "rpc:pyvdisk.vscript.undo.apply_undo": "pyvdisk.vscript.undo",
+    "rpc:pyvdisk.vscript.undo.discard_spill_area": "pyvdisk.vscript.undo",
+    "rpc:pyvdisk.vscript.undo.KINDS": "pyvdisk.vscript.undo",
+    "rpc:pyvdisk.vscript.undo.load_body": "pyvdisk.vscript.undo",
+    "rpc:pyvdisk.vscript.undo.normalize": "pyvdisk.vscript.undo",
+    "rpc:pyvdisk.vscript.undo.snapshot_tree": "pyvdisk.vscript.undo",
+    "rpc:pyvdisk.vscript.undo.spill_conflict": "pyvdisk.vscript.undo",
+    "rpc:pyvdisk.vscript.undo.spill_path": "pyvdisk.vscript.undo",
+    "rpc:pyvdisk.vscript.undo.store_body": "pyvdisk.vscript.undo",
+    "rpc:pyvdisk.vscript.wal.decode_records": "pyvdisk.storage.wal.undo",
+    "rpc:pyvdisk.vscript.wal.encode_record": "pyvdisk.storage.wal.undo",
+    "rpc:pyvdisk.vscript.wal.RECORD_KINDS": "pyvdisk.storage.wal.undo",
     "rpc:pyvdisk.vscript.wal.WriteAheadLog": "pyvdisk.storage.wal.undo",
-    "rpc:pyvdisk.vscript.wal.WriteAheadLog#_append": "pyvdisk.storage.wal.undo",
-    "rpc:pyvdisk.vscript.wal.WriteAheadLog#recover": "pyvdisk.storage.wal.undo",
     "rpc:tests/conftest.py": "pyvdisk.tests.fixtures",
     "rpc:tests/test_agentic_cli.py": "pyvdisk.tests.agentic-cli",
     "rpc:tests/test_api_governance.py": "pyvdisk.tests.api-governance",
     "rpc:tests/test_atomic_vfs_save.py": "pyvdisk.tests.atomic-save",
+    "rpc:tests/test_audit_trail.py": "pyvdisk.tests.audit-trail",
     "rpc:tests/test_checkpoint_store.py": "pyvdisk.tests.checkpoint",
     "rpc:tests/test_contracts.py": "pyvdisk.tests.contracts",
     "rpc:tests/test_cross_process_queue.py": "pyvdisk.tests.queue-crossprocess",
@@ -17919,10 +18761,12 @@
     "rpc:tests/test_exactly_once_operation.py": "pyvdisk.tests.exactly-once-operation",
     "rpc:tests/test_execution_queue.py": "pyvdisk.tests.execution-queue",
     "rpc:tests/test_execution.py": "pyvdisk.tests.execution",
+    "rpc:tests/test_fuse_mount.py": "pyvdisk.tests.fuse-mount",
     "rpc:tests/test_governance_regression.py": "pyvdisk.tests.governance",
     "rpc:tests/test_logdisk_compact_preserves_state.py": "pyvdisk.tests.logdisk-compact",
     "rpc:tests/test_logdisk_retention_event_ids.py": "pyvdisk.tests.logdisk-retention",
     "rpc:tests/test_packaging.py": "pyvdisk.tests.packaging",
+    "rpc:tests/test_participant_compensation.py": "pyvdisk.tests.participant-compensation",
     "rpc:tests/test_queue_backoff_and_lock.py": "pyvdisk.tests.queue-backoff",
     "rpc:tests/test_queue.py": "pyvdisk.tests.queue",
     "rpc:tests/test_submit_conflict_and_atomic_vfs.py": "pyvdisk.tests.submit-conflict",
@@ -17964,12 +18808,16 @@
     "rpc:tests/test_vdisk.py::TestVolumeStripe": "pyvdisk.tests.vdisk.volume",
     "rpc:tests/test_vdisk.py::VFSTestBase": "pyvdisk.tests.vdisk.base",
     "rpc:tests/test_vscript_audit.py": "pyvdisk.tests.vscript-audit",
+    "rpc:tests/test_vscript_cron.py": "pyvdisk.tests.vscript-cron",
     "rpc:tests/test_vscript_host.py": "pyvdisk.tests.vscript-host",
     "rpc:tests/test_vscript_optional_chain.py": "pyvdisk.tests.vscript-optional",
+    "rpc:tests/test_vscript_triggers.py": "pyvdisk.tests.vscript-triggers",
+    "rpc:tests/test_vscript_undo.py": "pyvdisk.tests.vscript-undo",
     "rpc:tests/test_vscript.py::FakeFS": "pyvdisk.tests.vscript",
     "rpc:tests/test_vscript.py::VScriptEndToEndTests": "pyvdisk.tests.vscript",
     "rpc:tests/test_vscript.py::VScriptTests": "pyvdisk.tests.vscript",
     "rpc:tests/test_wal_abort_recovery.py": "pyvdisk.tests.wal-recovery",
+    "rpc:tests/test_wal_checkpoint_and_recovery.py": "pyvdisk.tests.wal-checkpoint",
     "rpc:tests/test_worker_cancellation.py": "pyvdisk.tests.cancellation"
   },
   "edges": [
@@ -18779,8 +19627,8 @@
       "kind": "reference",
       "cross_tree": false,
       "label": {
-        "zh": "沿用 VFS WAL 的设计",
-        "en": "mirrors the VFS WAL design"
+        "zh": "复用共享 WAL 实现",
+        "en": "reuses the shared WAL"
       }
     },
     {
@@ -18814,6 +19662,18 @@
       "label": {
         "zh": "验证原子写入",
         "en": "verifies atomic write"
+      }
+    },
+    {
+      "from": "pyvdisk.tests.audit-trail",
+      "from_api": "rpc:tests/test_audit_trail.py",
+      "to": "pyvdisk.vscript.audit.sinks",
+      "to_api": "rpc:pyvdisk.vscript.audit.CheckpointAuditSink#verify",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "验证审计 Sink",
+        "en": "exercises audit sinks"
       }
     },
     {
@@ -18851,13 +19711,14 @@
     },
     {
       "from": "pyvdisk.tests.crash-matrix",
+      "from_api": "rpc:tests/test_datadisk_acid_crash_matrix.py",
       "to": "pyvdisk.storage.datadisk.core",
-      "to_api": "rpc:pyvdisk.infrastructure.disk.DataDisk#_recover_metadata",
+      "to_api": "rpc:pyvdisk.infrastructure.disk.DataDisk#_recover_transactions",
       "kind": "call",
       "cross_tree": false,
       "label": {
-        "zh": "验证恢复",
-        "en": "verifies recovery"
+        "zh": "验证事务重放",
+        "en": "verifies transaction replay"
       }
     },
     {
@@ -18916,6 +19777,18 @@
       }
     },
     {
+      "from": "pyvdisk.tests.fuse-mount",
+      "from_api": "rpc:tests/test_fuse_mount.py",
+      "to": "pyvdisk.storage.fuse.handlers",
+      "to_api": "rpc:pyvdisk.fuse_mount._VFuseOperations#_readlink",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "验证 FUSE 操作表",
+        "en": "exercises FUSE operations"
+      }
+    },
+    {
       "from": "pyvdisk.tests.governance",
       "to": "pyvdisk.governance.files",
       "to_api": "rpc:pyvdisk.infrastructure.capabilities.ScopedFileNamespace#_check_file",
@@ -18946,6 +19819,18 @@
       "label": {
         "zh": "验证保留策略",
         "en": "verifies retention"
+      }
+    },
+    {
+      "from": "pyvdisk.tests.participant-compensation",
+      "from_api": "rpc:tests/test_participant_compensation.py",
+      "to": "pyvdisk.storage.datadisk.tx-lifecycle",
+      "to_api": "rpc:pyvdisk.infrastructure.disk.MetadataTransaction#abort",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "验证事务补偿",
+        "en": "exercises tx compensation"
       }
     },
     {
@@ -19037,6 +19922,18 @@
       }
     },
     {
+      "from": "pyvdisk.tests.vscript-cron",
+      "from_api": "rpc:tests/test_vscript_cron.py",
+      "to": "pyvdisk.vscript.cron",
+      "to_api": "rpc:pyvdisk.vscript.cron.CronExpression#next_after",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "验证 cron 表达式",
+        "en": "exercises cron expressions"
+      }
+    },
+    {
       "from": "pyvdisk.tests.vscript-host",
       "to": "pyvdisk.vscript.host.guard",
       "to_api": "rpc:pyvdisk.vscript.host.HostProxy#_check",
@@ -19056,6 +19953,42 @@
       "label": {
         "zh": "验证求值",
         "en": "verifies evaluation"
+      }
+    },
+    {
+      "from": "pyvdisk.tests.vscript-triggers",
+      "from_api": "rpc:tests/test_vscript_triggers.py",
+      "to": "pyvdisk.vscript.triggers.daemon",
+      "to_api": "rpc:pyvdisk.vscript.triggers.SchedulerDaemon#poll_once",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "验证触发器守护进程",
+        "en": "exercises trigger daemon"
+      }
+    },
+    {
+      "from": "pyvdisk.tests.vscript-undo",
+      "from_api": "rpc:tests/test_vscript_undo.py",
+      "to": "pyvdisk.vscript.undo",
+      "to_api": "rpc:pyvdisk.vscript.undo.apply_undo",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "验证撤销解释器",
+        "en": "exercises undo interpreter"
+      }
+    },
+    {
+      "from": "pyvdisk.tests.wal-checkpoint",
+      "from_api": "rpc:tests/test_wal_checkpoint_and_recovery.py",
+      "to": "pyvdisk.storage.wal.entries",
+      "to_api": "rpc:pyvdisk.infrastructure.wal.WriteAheadLog#recover",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "验证 WAL 检查点",
+        "en": "verifies WAL checkpointing"
       }
     },
     {
@@ -19260,14 +20193,24 @@
     },
     {
       "from": "pyvdisk.vscript.runtime.tx",
-      "from_api": "rpc:pyvdisk.vscript.runtime.TransactionContext#rollback",
+      "from_api": "rpc:pyvdisk.vscript.runtime.recover_wal",
       "to": "pyvdisk.storage.wal.undo",
-      "to_api": "rpc:pyvdisk.vscript.wal.WriteAheadLog#recover",
       "kind": "call",
       "cross_tree": false,
       "label": {
-        "zh": "撤销宿主写入",
-        "en": "undoes host writes"
+        "zh": "消费事务 WAL",
+        "en": "consumes the tx WAL"
+      }
+    },
+    {
+      "from": "pyvdisk.vscript.runtime.tx",
+      "from_api": "rpc:pyvdisk.vscript.runtime.TransactionContext#rollback",
+      "to": "pyvdisk.vscript.undo",
+      "kind": "call",
+      "cross_tree": false,
+      "label": {
+        "zh": "重放撤销记录",
+        "en": "replays undo records"
       }
     },
     {
@@ -19560,17 +20503,18 @@
     "pyvdisk.docs": {
       "schema_version": 1,
       "id": "pyvdisk.docs",
-      "updated_at": "2026-09-23T07:24:04.612Z",
+      "updated_at": "2026-09-24T09:56:14.155Z",
       "reading": {
-        "zh": "先读 README 建立整体印象，再看架构总览、契约参考、能力治理设计说明与 VScript 语言规范。",
-        "en": "Start with the README for orientation, then the architecture overview, the contract reference, the capability-governance design note and the VScript language specification."
+        "zh": "先读 README 建立整体印象，再看架构总览、契约参考、能力治理设计说明与 VScript 语言规范；变更日志记录每个版本改了什么。",
+        "en": "Start with the README for orientation, then the architecture overview, the contract reference, the capability-governance design note and the VScript language specification; the changelog records what changed release by release."
       },
       "order": [
         "pyvdisk.docs.readme",
         "pyvdisk.docs.architecture",
         "pyvdisk.docs.contracts",
         "pyvdisk.docs.api-governance",
-        "pyvdisk.docs.vscript-spec"
+        "pyvdisk.docs.vscript-spec",
+        "pyvdisk.docs.changelog"
       ]
     },
     "pyvdisk.execution": {
@@ -20174,12 +21118,12 @@
     "pyvdisk.tests": {
       "schema_version": 1,
       "id": "pyvdisk.tests",
-      "updated_at": "2026-09-23T07:24:46.055Z",
+      "updated_at": "2026-09-24T09:56:06.550Z",
       "mode": "groups",
       "max_columns": 4,
       "reading": {
-        "zh": "按所验证的子系统分组：夹具与文件系统持久性、事务与崩溃矩阵、执行平面、队列与精确一次保证、VScript 语言、治理与契约，最后是日志盘、CLI 与打包检查。",
-        "en": "Grouped by the subsystem each module validates: fixtures and filesystem durability, transactions and crash matrices, the execution plane, queue and exactly-once guarantees, the VScript language, governance and contracts, and finally log-disk, CLI and packaging checks."
+        "zh": "按所验证的子系统分组：夹具与文件系统持久性（新增 FUSE 桥）、事务/参与者补偿/崩溃矩阵、执行平面、队列与精确一次保证、VScript 语言及其审计轨迹/撤销/cron/触发器、治理与契约，最后是日志盘、CLI 与打包检查。",
+        "en": "Grouped by the subsystem each module validates: fixtures and filesystem durability (now including the FUSE bridge), transactions, participant compensation and crash matrices, the execution plane, queue and exactly-once guarantees, the VScript language with its audit trail, undo, cron and triggers, governance and contracts, and finally log-disk, CLI and packaging checks."
       },
       "order": [
         "pyvdisk.tests.fixtures",
@@ -20187,10 +21131,13 @@
         "pyvdisk.tests.atomic-save",
         "pyvdisk.tests.submit-conflict",
         "pyvdisk.tests.wal-recovery",
+        "pyvdisk.tests.fuse-mount",
         "pyvdisk.tests.tx-rollback",
         "pyvdisk.tests.tx-idempotency",
         "pyvdisk.tests.crash-matrix",
         "pyvdisk.tests.checkpoint",
+        "pyvdisk.tests.participant-compensation",
+        "pyvdisk.tests.wal-checkpoint",
         "pyvdisk.tests.execution",
         "pyvdisk.tests.execution-queue",
         "pyvdisk.tests.cancellation",
@@ -20202,8 +21149,12 @@
         "pyvdisk.tests.exactly-once-operation",
         "pyvdisk.tests.vscript",
         "pyvdisk.tests.vscript-audit",
+        "pyvdisk.tests.audit-trail",
         "pyvdisk.tests.vscript-host",
         "pyvdisk.tests.vscript-optional",
+        "pyvdisk.tests.vscript-undo",
+        "pyvdisk.tests.vscript-cron",
+        "pyvdisk.tests.vscript-triggers",
         "pyvdisk.tests.governance",
         "pyvdisk.tests.api-governance",
         "pyvdisk.tests.contracts",
@@ -20224,7 +21175,8 @@
             "pyvdisk.tests.vdisk",
             "pyvdisk.tests.atomic-save",
             "pyvdisk.tests.submit-conflict",
-            "pyvdisk.tests.wal-recovery"
+            "pyvdisk.tests.wal-recovery",
+            "pyvdisk.tests.fuse-mount"
           ]
         },
         {
@@ -20237,7 +21189,9 @@
             "pyvdisk.tests.tx-rollback",
             "pyvdisk.tests.tx-idempotency",
             "pyvdisk.tests.crash-matrix",
-            "pyvdisk.tests.checkpoint"
+            "pyvdisk.tests.checkpoint",
+            "pyvdisk.tests.participant-compensation",
+            "pyvdisk.tests.wal-checkpoint"
           ]
         },
         {
@@ -20276,8 +21230,12 @@
           "children": [
             "pyvdisk.tests.vscript",
             "pyvdisk.tests.vscript-audit",
+            "pyvdisk.tests.audit-trail",
             "pyvdisk.tests.vscript-host",
-            "pyvdisk.tests.vscript-optional"
+            "pyvdisk.tests.vscript-optional",
+            "pyvdisk.tests.vscript-undo",
+            "pyvdisk.tests.vscript-cron",
+            "pyvdisk.tests.vscript-triggers"
           ]
         },
         {
@@ -20341,12 +21299,12 @@
     "pyvdisk.vscript": {
       "schema_version": 1,
       "id": "pyvdisk.vscript",
-      "updated_at": "2026-09-23T07:24:46.672Z",
+      "updated_at": "2026-09-24T09:55:44.889Z",
       "mode": "groups",
       "max_columns": 4,
       "reading": {
-        "zh": "跟随一个脚本穿过系统：前端完成词法与语法分析，策略与挂载/宿主层决定它能触及什么，标准库与运行时执行它，审计记录结果，触发器与 cron 安排后续运行，CLI 是用户的启动方式。",
-        "en": "Follow a script through the system: the front end lexes and parses, the policy and mount/host layers decide what it may touch, the stdlib and runtime execute it, audit records the outcome, triggers and cron schedule further runs, and the CLI is how a user starts one."
+        "zh": "跟随一个脚本穿过系统：前端完成词法与语法分析，策略与挂载/宿主层决定它能触及什么，标准库与运行时执行它，撤销记账让每处可撤销改动都能回滚，审计记录结果，触发器与 cron 安排后续运行，CLI 是用户的启动方式。",
+        "en": "Follow a script through the system: the front end lexes and parses, the policy and mount/host layers decide what it may touch, the stdlib and runtime execute it, the undo module keeps every reversible change rollback-able, audit records the outcome, triggers and cron schedule further runs, and the CLI is how a user starts one."
       },
       "order": [
         "pyvdisk.vscript.frontend",
@@ -20355,6 +21313,7 @@
         "pyvdisk.vscript.host",
         "pyvdisk.vscript.stdlib",
         "pyvdisk.vscript.runtime",
+        "pyvdisk.vscript.undo",
         "pyvdisk.vscript.audit",
         "pyvdisk.vscript.triggers",
         "pyvdisk.vscript.cron",
@@ -20392,6 +21351,7 @@
           "children": [
             "pyvdisk.vscript.stdlib",
             "pyvdisk.vscript.runtime",
+            "pyvdisk.vscript.undo",
             "pyvdisk.vscript.audit"
           ]
         },
@@ -20421,14 +21381,15 @@
     "pyvdisk.vscript.audit": {
       "schema_version": 1,
       "id": "pyvdisk.vscript.audit",
-      "updated_at": "2026-09-23T07:25:08.516Z",
+      "updated_at": "2026-09-24T09:55:53.156Z",
       "reading": {
-        "zh": "先是脚本与策略的内容哈希，再是由它们构成的记录形态、持久化记录的 sink，以及填充记录的 run id 与计时辅助。",
-        "en": "Content hashes of script and policy, then the record shape built from them, the sinks that persist records, and the run-id and timing helpers that fill them in."
+        "zh": "先是脚本与策略的内容哈希，再是由它们构成的记录形态、查询与保留辅助、负责持久化与校验的 sink，以及填充记录的 run id 与计时辅助。",
+        "en": "Content hashes of script and policy, then the record shape built from them, the query/retention helpers, the sinks that persist and verify records, and the run-id and timing helpers that fill them in."
       },
       "order": [
         "pyvdisk.vscript.audit.hashing",
         "pyvdisk.vscript.audit.record",
+        "pyvdisk.vscript.audit.query",
         "pyvdisk.vscript.audit.sinks",
         "pyvdisk.vscript.audit.clock"
       ]
@@ -20560,5 +21521,24 @@
       }
     ]
   },
-  "changes": []
+  "changes": [
+    {
+      "id": "2026-09-24-readme-counts",
+      "status": "verified",
+      "title": {
+        "en": "Align the README counts with the rebuilt tree",
+        "zh": "README 计数与重建后的结构库对齐"
+      },
+      "updated_at": "2026-09-24T10:00:54.385Z"
+    },
+    {
+      "id": "2026-09-24-resync-issue1-fixes",
+      "status": "verified",
+      "title": {
+        "en": "Resync the module tree with the issue #1 fixes",
+        "zh": "结构库同步 issue #1 的修复"
+      },
+      "updated_at": "2026-09-24T09:59:19.981Z"
+    }
+  ]
 }

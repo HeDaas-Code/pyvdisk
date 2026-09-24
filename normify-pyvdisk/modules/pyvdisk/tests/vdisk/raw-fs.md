@@ -6,11 +6,13 @@ name: {zh: "裸文件系统用例", en: "Raw Filesystem Tests"}
 description:
   zh: >
       直接操作块设备与磁盘布局、绕过 VFS 门面的用例。
+      
   en: >
       Tests that exercise the block device and on-disk layout directly, bypassing the VFS facade.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: 8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.249Z"
+fingerprint: 3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf
 source:
   - path: "tests/test_vdisk.py"
     line: 512
@@ -21,6 +23,8 @@ apis:
     description:
       zh: >
           绕过 VFS 的裸块设备级读写。
+          
       en: >
           Raw block-device level reads and writes outside the VFS.
+          
 ---

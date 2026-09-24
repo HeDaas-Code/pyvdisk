@@ -5,57 +5,53 @@ parent: pyvdisk.vscript.triggers
 name: {zh: "触发器注册表", en: "Trigger Registry"}
 description:
   zh: >
-      触发器声明及其持久注册表，是调度器轮询的依据。
+      触发器的注册与列举。注册即校验输入（空文件 pattern 以前能注册成功、随后把轮询循环打挂），水位线比较改用单调事件序号，而不再拿随机 uuid 作文本比较。
+      
   en: >
-      Trigger declarations and their durable registry, the source of what the scheduler polls for.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: a148d13da73ae3dc4b768027bf6471b7ea1ec03669826741f4a3bf79cc35ba91
+      Trigger registration and listing. Registration validates its inputs immediately -- an empty file pattern used to register fine and then break the poll loop -- and the watermark comparison uses the monotonic event sequence instead of a random uuid compared as text.
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.266Z"
+fingerprint: 531549cadc018163544e7928ca49da1cef4f71bd76c32347aeb01fadee9d949f
 source:
   - path: "pyvdisk/vscript/triggers.py"
     line: 14
-    end_line: 44
+    end_line: 73
 apis:
   - protocol: rpc
     path: "pyvdisk.vscript.triggers.Trigger"
     description:
       zh: >
-          一条已注册触发器：名称、类型、模式或流及级别过滤。
+          一个已注册触发器：文件 glob 或日志流，加上其动作。
+          
       en: >
-          One registered trigger: name, kind, pattern or stream and level filters.
+          One registered trigger: a file pattern or a log stream, plus its action.
+          
   - protocol: rpc
     path: "pyvdisk.vscript.triggers.TriggerRegistry"
     description:
       zh: >
-          以 JSON 文件为背衬的触发器注册表。
+          注册与列举触发器；空 pattern 或 stream 在注册处就被拒绝。
+          
       en: >
-          JSON-file-backed registry of declared triggers.
+          Registers and lists triggers, rejecting an empty pattern or stream up front.
+          
   - protocol: rpc
-    path: "pyvdisk.vscript.triggers.TriggerRegistry#save"
+    path: "pyvdisk.vscript.triggers.event_position"
     description:
       zh: >
-          持久化触发器映射。
+          事件的单调位置，优先使用序号。
+          
       en: >
-          Persist the trigger map.
+          Monotonic position of an event, preferring its sequence number.
+          
   - protocol: rpc
-    path: "pyvdisk.vscript.triggers.TriggerRegistry#register"
+    path: "pyvdisk.vscript.triggers.is_newer"
     description:
       zh: >
-          注册触发器，同名时替换。
+          判断位置是否新于水位线（两者可解析为数字时按数字比）。
+          
       en: >
-          Register a trigger, replacing any trigger of the same name.
-  - protocol: rpc
-    path: "pyvdisk.vscript.triggers.TriggerRegistry#register_file"
-    description:
-      zh: >
-          注册文件系统模式触发器。
-      en: >
-          Register a filesystem-pattern trigger.
-  - protocol: rpc
-    path: "pyvdisk.vscript.triggers.TriggerRegistry#register_log"
-    description:
-      zh: >
-          注册带级别与 logger 过滤的日志流触发器。
-      en: >
-          Register a log-stream trigger with level and logger filters.
+          Whether a position is newer than a watermark (numeric when both parse).
+          
 ---

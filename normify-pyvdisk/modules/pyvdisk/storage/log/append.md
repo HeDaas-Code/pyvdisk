@@ -10,13 +10,13 @@ description:
   en: >
       Event ingestion: single and batch append with automatic segmentation.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:13.025Z"
-fingerprint: 11add7318163863decd8c69563dc471bc6d5ad17eb43f77208f2520e3c4397df
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.233Z"
+fingerprint: 4b31d03456b1ae4db1ebceef13f447e5093e6459bdea0d2d648139d215bd89a4
 source:
   - path: "pyvdisk/log_disk.py"
     line: 104
-    end_line: 148
+    end_line: 149
 apis:
   - protocol: rpc
     path: "pyvdisk.log_disk.LogDisk#append"

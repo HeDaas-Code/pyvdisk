@@ -5,18 +5,18 @@ parent: pyvdisk.storage.datadisk
 name: {zh: "事务结局", en: "Transaction Outcome"}
 description:
   zh: >
-      事务的完整结局：进入、经 WAL 的持久提交、带撤销的回滚，以及异常驱动的自动回滚。
+      事务的完整结局：进入、经 WAL 的持久提交、带撤销的回滚，以及异常驱动的自动回滚。abort 现在先把 intent 落盘，再按逆序在进程内通知每个已登记的 participant，最后才展开文件系统回退。
       
   en: >
-      End-to-end transaction outcome: entry, durable commit through the WAL, abort with undo, and exception-driven rollback.
+      How a transaction ends: enter, durable commit through the WAL, rollback with undo, and exception-driven auto-abort. Abort now persists the intents first and then notifies every enlisted participant in reverse order, in-process, before unwinding the filesystem.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:48.423Z"
-fingerprint: 27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.228Z"
+fingerprint: 9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93
 source:
   - path: "pyvdisk/infrastructure/disk.py"
-    line: 101
-    end_line: 158
+    line: 181
+    end_line: 244
 apis:
   - protocol: rpc
     path: "pyvdisk.infrastructure.disk.MetadataTransaction#__enter__"

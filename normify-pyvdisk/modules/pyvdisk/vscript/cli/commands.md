@@ -5,14 +5,14 @@ parent: pyvdisk.vscript.cli
 name: {zh: "VScript 命令", en: "VScript Commands"}
 description:
   zh: >
-      VScript 命令接口：参数解析、挂载授权，以及 check 与 run 入口。
+      VScript 命令接口：参数解析、挂载授权与 check/run 入口，含使 host.* 可用的宿主读/写根目录选项。
       
   en: >
-      VScript command surface: argument parsing, mount authorization and the check and run entry points.
+      VScript command surface: argument parsing, mount authorisation and the check/run entry points, including the host read/write root options that make host.* usable.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:48.424Z"
-fingerprint: 8804f57427cc348f66a87e62a16cb43057e614c4d7ea12f01e4d8c384d5b716f
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.259Z"
+fingerprint: b93664d4ede6142b0a1f77adbe3592f0ee285c15f7e00e3627f7acae3a5a3431
 source:
   - path: "pyvdisk/vscript/cli.py"
     line: 7

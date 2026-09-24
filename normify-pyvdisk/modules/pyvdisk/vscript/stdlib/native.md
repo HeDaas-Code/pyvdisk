@@ -10,9 +10,9 @@ description:
   en: >
       Native module plumbing and the Handle wrapper that keeps native resources behind capability checks rather than raw Python objects.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:48.424Z"
-fingerprint: 4a46271b1688a7dd1e764a4281feb9875dc7c8f8b117cab916ca481882cc7e91
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.265Z"
+fingerprint: c8f6852ff21b7b08e89e6c158274eeaef3d0a02376ac5600831b15124942de6e
 source:
   - path: "pyvdisk/vscript/stdlib.py"
     line: 9

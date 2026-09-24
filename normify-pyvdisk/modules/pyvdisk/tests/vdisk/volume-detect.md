@@ -6,11 +6,13 @@ name: {zh: "卷检测用例", en: "Volume Detection Tests"}
 description:
   zh: >
       从设备内容而非配置自动检测卷成员关系。
+      
   en: >
       Automatic detection of volume membership from device contents, not configuration.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: 8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.252Z"
+fingerprint: 3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf
 source:
   - path: "tests/test_vdisk.py"
     line: 949
@@ -21,6 +23,8 @@ apis:
     description:
       zh: >
           基于扫描的卷自动检测与挂载。
+          
       en: >
           Scan-based automatic volume detection and mounting.
+          
 ---

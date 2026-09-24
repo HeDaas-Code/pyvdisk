@@ -10,9 +10,9 @@ description:
   en: >
       The host native module: script-facing read, write and transfer entry points that all funnel through the confinement proxy.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:13.026Z"
-fingerprint: 4bfbe1157d25b89c581f1b0dd4d4eb9d42fbe2c4b817c4371782f6bc007e4742
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.261Z"
+fingerprint: baf58ee2c4dbda56cd6c7afb131bba217cd12b97019cd89fbebb5a1a7edad7c2
 source:
   - path: "pyvdisk/vscript/host.py"
     line: 80

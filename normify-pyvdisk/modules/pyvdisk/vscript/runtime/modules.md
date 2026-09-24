@@ -10,13 +10,13 @@ description:
   en: >
       Module loading: resolves import names against built-in native modules and configured module roots.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:13.026Z"
-fingerprint: 1dda7ccf92f423de4bf6c96608977fd7dd9663e017104e9b8dd34066202d0dad
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.263Z"
+fingerprint: 2ddb2e01919be6c65aac4dd5d0babfa3f19bb115f24b6fa6da68c57b3b4756ef
 source:
   - path: "pyvdisk/vscript/runtime.py"
-    line: 222
-    end_line: 240
+    line: 304
+    end_line: 322
 apis:
   - protocol: rpc
     path: "pyvdisk.vscript.runtime.Runtime#load_module"

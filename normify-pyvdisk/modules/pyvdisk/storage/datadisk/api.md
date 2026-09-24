@@ -10,13 +10,13 @@ description:
   en: >
       Container lifecycle and the caller-facing surface: mount, manifest, transactions, metadata access and capability-scoped views.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:13.025Z"
-fingerprint: 27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.225Z"
+fingerprint: 9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93
 source:
   - path: "pyvdisk/infrastructure/disk.py"
-    line: 368
-    end_line: 405
+    line: 566
+    end_line: 609
 apis:
   - protocol: rpc
     path: "pyvdisk.infrastructure.disk.DataDisk#mount"

@@ -6,11 +6,13 @@ name: {zh: "链接与属性用例", en: "Link and Attribute Tests"}
 description:
   zh: >
       inode 层行为：硬链接、属性修改与稀疏分配。
+      
   en: >
       Inode-level behaviour: hard links, attribute mutations and sparse allocation.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: 8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.246Z"
+fingerprint: 3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf
 source:
   - path: "tests/test_vdisk.py"
     line: 320
@@ -21,20 +23,26 @@ apis:
     description:
       zh: >
           硬链接创建、引用计数与共享内容行为。
+          
       en: >
           Hard link creation, refcount and shared-content behaviour.
+          
   - protocol: rpc
     path: "tests/test_vdisk.py::TestAttributes"
     description:
       zh: >
           模式、uid、gid 与时间戳属性处理。
+          
       en: >
           Mode, uid, gid and timestamp attribute handling.
+          
   - protocol: rpc
     path: "tests/test_vdisk.py::TestSparseFile"
     description:
       zh: >
           稀疏文件空洞与表观大小对比实占大小。
+          
       en: >
           Sparse file holes and apparent versus allocated size.
+          
 ---

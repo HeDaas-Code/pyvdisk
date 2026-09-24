@@ -5,14 +5,14 @@ parent: pyvdisk.storage.log
 name: {zh: "保留与压缩", en: "Retention and Compaction"}
 description:
   zh: >
-      日志盘的存储治理：保留策略执行、压缩与统计。
+      日志盘的存储治理：保留策略执行、压缩与统计。保留如今同时清理被删事件的 event_ids 并校验消费者游标，不再留下指向已裁剪位置的游标。
       
   en: >
-      Storage hygiene on the log disk: retention enforcement, compaction and statistics.
+      Log-disk storage governance: retention enforcement, compaction and statistics. Retention also drops the event ids it removed and re-validates consumer cursors, so it can no longer leave a cursor pointing past the trimmed history.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:13.025Z"
-fingerprint: 11add7318163863decd8c69563dc471bc6d5ad17eb43f77208f2520e3c4397df
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.235Z"
+fingerprint: 4b31d03456b1ae4db1ebceef13f447e5093e6459bdea0d2d648139d215bd89a4
 source:
   - path: "pyvdisk/log_disk.py"
     line: 196

@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "id": "pyvdisk.tests",
-  "updated_at": "2026-09-23T07:24:46.055Z",
+  "updated_at": "2026-09-24T09:56:06.550Z",
   "mode": "groups",
   "max_columns": 4,
   "reading": {
-    "zh": "按所验证的子系统分组：夹具与文件系统持久性、事务与崩溃矩阵、执行平面、队列与精确一次保证、VScript 语言、治理与契约，最后是日志盘、CLI 与打包检查。",
-    "en": "Grouped by the subsystem each module validates: fixtures and filesystem durability, transactions and crash matrices, the execution plane, queue and exactly-once guarantees, the VScript language, governance and contracts, and finally log-disk, CLI and packaging checks."
+    "zh": "按所验证的子系统分组：夹具与文件系统持久性（新增 FUSE 桥）、事务/参与者补偿/崩溃矩阵、执行平面、队列与精确一次保证、VScript 语言及其审计轨迹/撤销/cron/触发器、治理与契约，最后是日志盘、CLI 与打包检查。",
+    "en": "Grouped by the subsystem each module validates: fixtures and filesystem durability (now including the FUSE bridge), transactions, participant compensation and crash matrices, the execution plane, queue and exactly-once guarantees, the VScript language with its audit trail, undo, cron and triggers, governance and contracts, and finally log-disk, CLI and packaging checks."
   },
   "order": [
     "pyvdisk.tests.fixtures",
@@ -14,10 +14,13 @@
     "pyvdisk.tests.atomic-save",
     "pyvdisk.tests.submit-conflict",
     "pyvdisk.tests.wal-recovery",
+    "pyvdisk.tests.fuse-mount",
     "pyvdisk.tests.tx-rollback",
     "pyvdisk.tests.tx-idempotency",
     "pyvdisk.tests.crash-matrix",
     "pyvdisk.tests.checkpoint",
+    "pyvdisk.tests.participant-compensation",
+    "pyvdisk.tests.wal-checkpoint",
     "pyvdisk.tests.execution",
     "pyvdisk.tests.execution-queue",
     "pyvdisk.tests.cancellation",
@@ -29,8 +32,12 @@
     "pyvdisk.tests.exactly-once-operation",
     "pyvdisk.tests.vscript",
     "pyvdisk.tests.vscript-audit",
+    "pyvdisk.tests.audit-trail",
     "pyvdisk.tests.vscript-host",
     "pyvdisk.tests.vscript-optional",
+    "pyvdisk.tests.vscript-undo",
+    "pyvdisk.tests.vscript-cron",
+    "pyvdisk.tests.vscript-triggers",
     "pyvdisk.tests.governance",
     "pyvdisk.tests.api-governance",
     "pyvdisk.tests.contracts",
@@ -51,7 +58,8 @@
         "pyvdisk.tests.vdisk",
         "pyvdisk.tests.atomic-save",
         "pyvdisk.tests.submit-conflict",
-        "pyvdisk.tests.wal-recovery"
+        "pyvdisk.tests.wal-recovery",
+        "pyvdisk.tests.fuse-mount"
       ]
     },
     {
@@ -64,7 +72,9 @@
         "pyvdisk.tests.tx-rollback",
         "pyvdisk.tests.tx-idempotency",
         "pyvdisk.tests.crash-matrix",
-        "pyvdisk.tests.checkpoint"
+        "pyvdisk.tests.checkpoint",
+        "pyvdisk.tests.participant-compensation",
+        "pyvdisk.tests.wal-checkpoint"
       ]
     },
     {
@@ -103,8 +113,12 @@
       "children": [
         "pyvdisk.tests.vscript",
         "pyvdisk.tests.vscript-audit",
+        "pyvdisk.tests.audit-trail",
         "pyvdisk.tests.vscript-host",
-        "pyvdisk.tests.vscript-optional"
+        "pyvdisk.tests.vscript-optional",
+        "pyvdisk.tests.vscript-undo",
+        "pyvdisk.tests.vscript-cron",
+        "pyvdisk.tests.vscript-triggers"
       ]
     },
     {

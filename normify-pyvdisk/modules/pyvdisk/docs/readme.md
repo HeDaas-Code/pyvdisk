@@ -5,14 +5,14 @@ parent: pyvdisk.docs
 name: {zh: "项目总览", en: "Project Overview"}
 description:
   zh: >
-      README 总览：项目定位、快速开始、核心能力、CLI 用法与验证方式。
+      README 总览：项目定位、快速开始、核心能力、CLI 用法与验证方式；徽章与声明的 Python 下限及当前用例数一致。
       
   en: >
-      README overview: positioning, quick start, core capabilities, CLI usage and the verification recipe.
+      README overview: positioning, quick start, core capabilities, CLI usage and how it is verified, with badges that match the declared Python floor and the current suite size.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:22:04.609Z"
-fingerprint: 3d011b3cdc6a887e3884b77a55e5c39ca8a3f5b0657c0d2c1aca8aeee11c487d
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T10:00:52.068Z"
+fingerprint: fd96eaab9b9f839e266b3f990012c5cc034178b7e0a534eb15be4c397a525f55
 source:
   - path: "README.md"
 apis:

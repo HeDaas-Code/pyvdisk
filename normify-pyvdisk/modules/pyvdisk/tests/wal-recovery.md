@@ -10,9 +10,9 @@ description:
   en: >
       Focused test of journal replay: an aborted transaction must be invisible after recovery.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:20:48.309Z"
-fingerprint: 91f015f9a69c470bcd7c73dd7f5e312415bb1bf2a939050ee144cf3503ae8b06
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.253Z"
+fingerprint: 460baab1c07bd01c140b0540d8220942e6c883f3296de958426ed0a0d999e514
 source:
   - path: "tests/test_wal_abort_recovery.py"
 apis:

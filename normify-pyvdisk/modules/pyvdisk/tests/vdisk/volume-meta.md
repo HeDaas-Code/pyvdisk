@@ -6,11 +6,13 @@ name: {zh: "卷元数据用例", en: "Volume Metadata Tests"}
 description:
   zh: >
       卷元数据与错误处理，以及卷 CLI 接口。
+      
   en: >
       Volume metadata and error handling plus the volume CLI surface.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: 8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.252Z"
+fingerprint: 3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf
 source:
   - path: "tests/test_vdisk.py"
     line: 851
@@ -21,20 +23,26 @@ apis:
     description:
       zh: >
           卷元数据、成员记录与几何持久化。
+          
       en: >
           Volume metadata, member records and geometry persistence.
+          
   - protocol: rpc
     path: "tests/test_vdisk.py::TestVolumeErrors"
     description:
       zh: >
           成员缺失、重复或不匹配的错误用例。
+          
       en: >
           Error cases for missing, duplicated or mismatched members.
+          
   - protocol: rpc
     path: "tests/test_vdisk.py::TestVolumeCLI"
     description:
       zh: >
           卷 CLI 子命令接口。
+          
       en: >
           Volume CLI subcommand surface.
+          
 ---

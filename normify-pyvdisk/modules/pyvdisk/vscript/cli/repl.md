@@ -10,9 +10,9 @@ description:
   en: >
       The interactive VScript REPL: line wrapping, value formatting, help and the loop that keeps state across inputs.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:20:48.310Z"
-fingerprint: 8804f57427cc348f66a87e62a16cb43057e614c4d7ea12f01e4d8c384d5b716f
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.260Z"
+fingerprint: b93664d4ede6142b0a1f77adbe3592f0ee285c15f7e00e3627f7acae3a5a3431
 source:
   - path: "pyvdisk/vscript/cli.py"
     line: 47

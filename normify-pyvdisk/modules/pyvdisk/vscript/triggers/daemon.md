@@ -5,18 +5,18 @@ parent: pyvdisk.vscript.triggers
 name: {zh: "调度守护进程", en: "Scheduler Daemon"}
 description:
   zh: >
-      调度守护进程：文件与日志事件检测、经检查点的精确一次去重，以及轮询循环。
+      轮询守护进程：每轮评估到期的文件与日志触发器并分发动作，按单调水位线排序事件，不再静默跳过到期事件。
       
   en: >
-      The scheduling daemon: file and log event detection, exactly-once dedup through checkpoints, and the polling loop.
+      The polling daemon: evaluates due file and log triggers once per tick and dispatches their actions, ordering events by the monotonic watermark so no due event is silently skipped.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:22:04.609Z"
-fingerprint: a148d13da73ae3dc4b768027bf6471b7ea1ec03669826741f4a3bf79cc35ba91
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.266Z"
+fingerprint: 531549cadc018163544e7928ca49da1cef4f71bd76c32347aeb01fadee9d949f
 source:
   - path: "pyvdisk/vscript/triggers.py"
-    line: 46
-    end_line: 83
+    line: 75
+    end_line: 108
 apis:
   - protocol: rpc
     path: "pyvdisk.vscript.triggers.SchedulerDaemon"

@@ -6,11 +6,13 @@ name: {zh: "日志流", en: "Log Streams"}
 description:
   zh: >
       流目录：带保留策略的创建、列举与删除。
+      
   en: >
       Stream catalogue: creation with retention policy, listing and removal.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: 11add7318163863decd8c69563dc471bc6d5ad17eb43f77208f2520e3c4397df
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.235Z"
+fingerprint: 4b31d03456b1ae4db1ebceef13f447e5093e6459bdea0d2d648139d215bd89a4
 source:
   - path: "pyvdisk/log_disk.py"
     line: 81
@@ -21,20 +23,26 @@ apis:
     description:
       zh: >
           创建流：段大小、保留窗口与最大事件数。
+          
       en: >
           Create a stream with segment size, retention window and max event count.
+          
   - protocol: rpc
     path: "pyvdisk.log_disk.LogDisk#list_streams"
     description:
       zh: >
           列出流名称及其配置与计数。
+          
       en: >
           List stream names with their configuration and counters.
+          
   - protocol: rpc
     path: "pyvdisk.log_disk.LogDisk#drop_stream"
     description:
       zh: >
           删除流及其分段。
+          
       en: >
           Drop a stream and its segments.
+          
 ---

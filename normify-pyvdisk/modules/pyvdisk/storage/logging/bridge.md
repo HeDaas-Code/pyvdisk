@@ -10,9 +10,9 @@ description:
   en: >
       Bridge to the standard library logging module plus the module-level logger factory.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:48.423Z"
-fingerprint: fefd7a882d4b70ff980d0e54e1cafe1b91a0123ff526fca44181377d3f5cdd3f
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.236Z"
+fingerprint: b09c0a892a4245c749b1b656f75fea42c069ef41438429402f0b180223f5b281
 source:
   - path: "pyvdisk/logging_core.py"
     line: 112

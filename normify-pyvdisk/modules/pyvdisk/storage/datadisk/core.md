@@ -5,63 +5,72 @@ parent: pyvdisk.storage.datadisk
 name: {zh: "DataDisk 核心", en: "DataDisk Core"}
 description:
   zh: >
-      DataDisk 构造、元数据原子持久化与挂载时 WAL 恢复。
+      DataDisk 构造、元数据原子持久化，以及挂载时的 WAL 重放与恢复报告。
       
   en: >
-      DataDisk construction, atomic metadata persistence and mount-time WAL recovery.
+      DataDisk construction, atomic metadata persistence, and the WAL replay performed on mount together with its recovery report.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:19:48.423Z"
-fingerprint: 27417279d86cf988527d80c6805f9060b482885af9ee1fc92092576c1d5490fc
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.226Z"
+fingerprint: 9e43dcc0192ae7fcb043dfd6e12b09e42ba36fa2b8b01c445b2e84a45d351d93
 source:
   - path: "pyvdisk/infrastructure/disk.py"
-    line: 300
-    end_line: 367
+    line: 407
+    end_line: 565
 apis:
   - protocol: rpc
     path: "pyvdisk.infrastructure.disk.DataDisk"
     description:
       zh: >
-          把一个 VFS 绑定到文件系统、向量与日志命名空间的统一容器。
+          磁盘容器本体。
           
       en: >
-          The unified container binding one VFS to filesystem, vector and log namespaces.
+          The disk container itself.
           
   - protocol: rpc
     path: "pyvdisk.infrastructure.disk.DataDisk#create"
     description:
       zh: >
-          创建并格式化 DataDisk 镜像。
+          按容量、块大小与标签创建磁盘镜像。
           
       en: >
-          Create and format a DataDisk image.
+          Creates a disk image with a size, block size and label.
           
   - protocol: rpc
     path: "pyvdisk.infrastructure.disk.DataDisk#_atomic_json"
     description:
       zh: >
-          经临时文件加 rename 原子写入元数据值。
+          原子写入 JSON 元数据。
           
       en: >
-          Write a metadata value atomically through a temp file and rename.
+          Writes JSON metadata atomically.
           
   - protocol: rpc
     path: "pyvdisk.infrastructure.disk.DataDisk#_append_metadata_wal"
     description:
       zh: >
-          向元数据 WAL 追加一条记录。
+          向事务 WAL 追加一条元数据记录。
           
       en: >
-          Append one record to the metadata WAL.
+          Appends one metadata record to the transaction WAL.
           
   - protocol: rpc
-    path: "pyvdisk.infrastructure.disk.DataDisk#_recover_metadata"
+    path: "pyvdisk.infrastructure.disk.DataDisk#_recover_transactions"
     description:
       zh: >
-          挂载时重放 WAL，处理未完成事务并清理临时文件。
+          挂载时重放 WAL：已提交事务重做，未提交事务回滚。
           
       en: >
-          Replay the WAL on mount, resolving unfinished transactions and cleaning temp files.
+          Replays the WAL on mount: committed transactions redo, uncommitted roll back.
+          
+  - protocol: rpc
+    path: "pyvdisk.infrastructure.disk.DataDisk#recovery_report"
+    description:
+      zh: >
+          最近一次恢复对每个事务做了什么。
+          
+      en: >
+          What the last recovery did, per transaction.
           
 deps:
   - kind: call

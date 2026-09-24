@@ -6,11 +6,13 @@ name: {zh: "空间耗尽用例", en: "Space Exhaustion Tests"}
 description:
   zh: >
       空间耗尽行为：分配失败必须上报，不得静默损坏。
+      
   en: >
       Space exhaustion behaviour, where allocation failure must be reported rather than silently corrupting.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: 8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.244Z"
+fingerprint: 3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf
 source:
   - path: "tests/test_vdisk.py"
     line: 671
@@ -21,6 +23,8 @@ apis:
     description:
       zh: >
           镜像写满时的行为：暴露 ENOSPC 而不损坏元数据。
+          
       en: >
           Behaviour when the image is full: ENOSPC surfaces instead of corrupting metadata.
+          
 ---

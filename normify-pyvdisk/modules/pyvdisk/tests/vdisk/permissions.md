@@ -6,11 +6,13 @@ name: {zh: "权限用例", en: "Permission Tests"}
 description:
   zh: >
       权限用例：跨 uid 与 gid 组合遵守读、写、执行位。
+      
   en: >
       Permission tests: read, write and execute bits honoured across uid and gid combinations.
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:00:00Z"
-fingerprint: 8c9616395f1cb1647444cd364eeb44d4c9f2a723f3162a8421918c81c6cd4556
+      
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.249Z"
+fingerprint: 3855e965b1d64d49d91e1f55344fdf67a6ec626f3493b5cb3a5fd8c83bc6e9cf
 source:
   - path: "tests/test_vdisk.py"
     line: 1419
@@ -21,6 +23,8 @@ apis:
     description:
       zh: >
           模式、属主与 root 旁路的权限强制。
+          
       en: >
           Permission enforcement for mode, owner and root bypass.
+          
 ---

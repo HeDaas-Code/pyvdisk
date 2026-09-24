@@ -5,50 +5,59 @@ parent: pyvdisk.storage.wal
 name: {zh: "宿主撤销 WAL", en: "Host Undo WAL"}
 description:
   zh: >
-      预写日志的宿主文件系统变体：生命周期动词一致，但记录旧文件内容以便事务失败时撤销。
+      VScript 侧的 WAL 入口：独立的宿主路径实现已取消——本模块直接复用同一套 WriteAheadLog，并给出撤销记录使用的 kind 集与编解码。
       
   en: >
-      Host-filesystem variant of the write-ahead log: same lifetime verbs but records the previous file body so a failed transaction can be undone.
+      VScript-side WAL entry point: the separate host-path implementation is gone -- this module re-exports the shared WriteAheadLog together with the record kinds and codecs the undo records use.
       
-revision: 6d203c0d5f54ce2e4293edd8054c10a109f8b83d
-updated_at: "2026-09-23T07:22:04.609Z"
-fingerprint: db40c61d0287aa74638316dbb877367db4fda76f270bdefb13e13f200b0a991c
+revision: c3881eee5dced2b180cd3b383e5d848026224154
+updated_at: "2026-09-24T09:58:38.239Z"
+fingerprint: 52cf7418ca7ca365477273fa2f1cb4ad9c418bddbdc6413489ec12b2689d9015
 source:
   - path: "pyvdisk/vscript/wal.py"
     line: 1
-    end_line: 61
+    end_line: 11
 apis:
   - protocol: rpc
     path: "pyvdisk.vscript.wal.WriteAheadLog"
     description:
       zh: >
-          用于 VScript 事务撤销的宿主路径预写日志。
+          复用同一套 WAL 类，供 VScript 侧使用。
           
       en: >
-          Host-path write-ahead log used for VScript transaction undo.
+          The shared WAL class, re-exported for VScript.
           
   - protocol: rpc
-    path: "pyvdisk.vscript.wal.WriteAheadLog#_append"
+    path: "pyvdisk.vscript.wal.RECORD_KINDS"
     description:
       zh: >
-          追加一条携带旧文件内容的二进制帧记录。
+          两个平面现在共用的记录种类集合。
           
       en: >
-          Append one binary-framed record carrying the previous file body.
+          Record kinds both planes now agree on.
           
   - protocol: rpc
-    path: "pyvdisk.vscript.wal.WriteAheadLog#recover"
+    path: "pyvdisk.vscript.wal.encode_record"
     description:
       zh: >
-          重放日志，通过 undo 回调恢复旧内容。
+          与 DataDisk 共用的记录编解码。
           
       en: >
-          Replay the log, restoring previous bodies through the undo callback.
+          Record codec shared with DataDisk.
+          
+  - protocol: rpc
+    path: "pyvdisk.vscript.wal.decode_records"
+    description:
+      zh: >
+          与 DataDisk 共用的批量解码。
+          
+      en: >
+          Batch decoder shared with DataDisk.
           
 deps:
   - kind: reference
     to: pyvdisk.storage.wal.journal
     from_api: "rpc:pyvdisk.vscript.wal.WriteAheadLog"
     to_api: "rpc:pyvdisk.infrastructure.wal.WriteAheadLog"
-    label: {zh: "沿用 VFS WAL 的设计", en: "mirrors the VFS WAL design"}
+    label: {zh: "复用共享 WAL 实现", en: "reuses the shared WAL"}
 ---

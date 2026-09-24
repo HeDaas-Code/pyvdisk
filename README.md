@@ -6,7 +6,7 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-PyVDisk-181717?logo=github)](https://github.com/HeDaas-Code/pyvdisk)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-389%20passed-2ea44f)](#验证)
+[![Tests](https://img.shields.io/badge/Tests-391%20passed-2ea44f)](#验证)
 
 PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行基础设施项目：DataDisk 负责统一数据与执行基础设施，VScript 负责安全工作流语言、CLI、REPL 与运行时。
 
@@ -26,7 +26,7 @@ PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行
 
 ```mermaid
 graph TD
-  R["pyvdisk · 262 模块 / 761 API / 116 依赖箭头"]
+  R["pyvdisk · 272 模块 / 794 API / 124 依赖箭头"]
   R --> pyvdisk_storage["storage · 14"]
   R --> pyvdisk_execution["execution · 4"]
   R --> pyvdisk_governance["governance · 4"]
@@ -70,11 +70,11 @@ graph TD
 
 | 产物 | 说明 |
 |---|---|
-| [`normify-pyvdisk/normify.html`](normify-pyvdisk/normify.html) | 单文件可交互图谱（262 模块 / 761 API / 116 依赖箭头） |
+| [`normify-pyvdisk/normify.html`](normify-pyvdisk/normify.html) | 单文件可交互图谱（272 模块 / 794 API / 124 依赖箭头） |
 | [`normify-pyvdisk/outline.md`](normify-pyvdisk/outline.md) | 缩进式模块大纲，适合逐层通读 |
 | [`normify-pyvdisk/api-index.json`](normify-pyvdisk/api-index.json) | 全量 API 索引 |
 | [`normify-pyvdisk/tree.json`](normify-pyvdisk/tree.json) | 编译产物：模块、每层布局、依赖边、内容指纹 |
-| [`normify-pyvdisk/modules/`](normify-pyvdisk/modules) | 262 个模块 Markdown，frontmatter 为机器可读契约（含源码路径与行号证据） |
+| [`normify-pyvdisk/modules/`](normify-pyvdisk/modules) | 272 个模块 Markdown，frontmatter 为机器可读契约（含源码路径与行号证据） |
 
 图谱由 Normify 从仓库源码生成，每个叶子模块都带**仓库内真实文件路径 + 行号区间**的 `source` 证据与 SHA-256 指纹，冻结于 commit `6d203c0`；`normify_validate` 结果为 0 error。
 
@@ -149,4 +149,5 @@ pyvdisk info image.vdisk
 .venv/bin/python -m pytest -q
 ```
 
-当前回归：193 passed
+当前回归：391 passed（本地 3.12；CI 覆盖 3.9 / 3.10 / 3.11 / 3.12 四个版本的同一套用例）
+其中 3.11 本地缺 hnswlib 时有 5 例跳过（该版本无法编译 hnswlib），CI 环境正常。
