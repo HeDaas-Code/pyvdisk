@@ -20,6 +20,31 @@ class Trigger:
     levels: tuple = ()
     logger: str = ''
 
+def event_position(event):
+    """The cursor an event is ordered by.
+
+    ``LogEvent.event_id`` defaults to a random uuid4 hex string, so ordering ids as
+    text says nothing about what came later -- it silently dropped about half of the
+    events that should have been delivered. ``sequence`` is the monotonic cursor the
+    log actually assigns, so that is the position; the id is only a fallback for
+    sources that have nothing better.
+    """
+    sequence = getattr(event, 'sequence', None)
+    if sequence is not None:
+        return int(sequence)
+    return str(getattr(event, 'event_id', getattr(event, 'id', '')))
+
+
+def is_newer(position, watermark):
+    """True when ``position`` is past ``watermark``."""
+    try:
+        return int(position) > int(watermark)
+    except (TypeError, ValueError):
+        # Without a sequence the id is all there is, and an id can only be
+        # recognised as already delivered when it repeats exactly.
+        return str(position) != str(watermark)
+
+
 class TriggerRegistry:
     def __init__(self, path): self.path=Path(path); self.triggers={}; self._load()
     def _load(self):
@@ -36,6 +61,10 @@ class TriggerRegistry:
         tmp.write_text(json.dumps({'version':1,'triggers':[asdict(t) for t in self.triggers.values()]},sort_keys=True),encoding='utf-8'); tmp.replace(self.path)
     def register(self, trigger):
         if not isinstance(trigger,Trigger) or not trigger.name or trigger.kind not in ('file','log'): raise ValueError('invalid trigger')
+        # Reject a trigger that could never fire here, where the caller can fix it:
+        # an empty file pattern otherwise raises out of the polling loop instead.
+        if trigger.kind=='file' and not trigger.pattern: raise ValueError('file trigger requires a pattern')
+        if trigger.kind=='log' and not trigger.stream: raise ValueError('log trigger requires a stream')
         self.triggers[trigger.name]=trigger; self.save(); return trigger
     def register_file(self,name,pattern,events=('create','modify','delete')): return self.register(Trigger(name,'file',pattern=pattern,events=tuple(events)))
     def register_log(self,name,stream,levels=(),logger=''): return self.register(Trigger(name,'log',stream=stream,levels=tuple(levels),logger=logger))
@@ -61,9 +90,9 @@ class SchedulerDaemon:
         events=source.query(t.stream, levels=list(t.levels) or None, loggers=[t.logger] if t.logger else None) if hasattr(source,'query') else source(t)
         out=[]
         for e in events:
-            eid=str(getattr(e,'event_id',getattr(e,'id','')))
-            if after is not None and eid<=str(after): continue
-            out.append((eid,e))
+            position=event_position(e)
+            if after is not None and not is_newer(position,after): continue
+            out.append((position,e))
         return out
     def poll_once(self, handlers):
         delivered=0

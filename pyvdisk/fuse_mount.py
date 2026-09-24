@@ -138,7 +138,10 @@ class _VFuseOperations:
 
         fs = self.vfs._fs_or_raise()
         try:
-            ino = fs.resolve(path)
+            # lstat semantics: the link's own inode. Following it here resolved to the
+            # target -- a regular file -- and readlink then raised, so every symlink
+            # read through FUSE reported EINVAL.
+            ino = fs.resolve(path, follow=False)
             return fs.readlink(ino)
         except FSError:
             raise FuseOSError(EINVAL)

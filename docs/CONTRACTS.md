@@ -34,6 +34,12 @@ ExecutionService 支持 inline 与可选 worker。DurableQueue 支持 lease、he
 - **大 body 不留在内存**：旧内容 ≥ `SPILL_THRESHOLD`（64 KiB）时写入挂载内的 `/.system/tx/<token>-<序号>`（`/.system` 对脚本不可达，受能力保护），条目只记路径；阈值以下仍内联，避免常见小文件额外 I/O。`commit` 与 `rollback` 都会回收 spill；spill 槽位名按事务随机短 token 生成，符合单目录项 27 字节上限。整段 spill 区在日志结算后一并清理。
 - **边界**：`vector.*` 与 `log.*` 的变更仍然不入 undo 记账（回滚不会撤销 `upsert`/`drop_collection`/`emit`/`compact` 等），这是当前明确的未覆盖面。
 
+### 本地触发器（triggers / cron）
+- **水位线是序号，不是事件 id**：`LogEvent.event_id` 是随机 uuid4，拿它做"我处理到哪了"的比较会大约丢掉一半该投递的事件；投递位置取日志单调分配的 `sequence`，没有 sequence 的源才退回 id（此时只有完全相同才视为已投递）。
+- **至少一次**：checkpoint 在 handler 成功返回之后才标记，所以 handler 抛错的事件下一轮会被重新投递，而不是被静默跳过；日志触发器因此不能假设 handler 只被调用一次。
+- **注册即校验**：`register_file` 必须有 pattern、`register_log` 必须有 stream——否则轮询循环会抛出 `ValueError: Unacceptable pattern`，把守护进程打挂。文件触发器的事件靠内存快照差分（`create`/`modify`/`delete`），进程重启后现有文件会重新按 `create` 上报一次。
+- **cron**：五字段（分 时 日 月 周），周字段同时接受 `0` 与 `7` 表示周日；`next_after` 逐分钟前进，超出搜索窗口直接报错而不是返回一个猜测值。
+
 ### 宿主文件桥（host.*）
 - **默认关闭**：`Policy.host_read_roots / host_write_roots` 默认为空，此时 `host.*` 一律拒绝——空列表表示"没有授权任何根目录"，而不是"路径不合法"，报错会直接给出打开方式。
 - **入口**：`pyvdisk vscript run|run-disk|repl --host-read-root DIR --host-write-root DIR`（可重复），或 Python API 里 `Runtime(policy=Policy(host_read_roots=[...], host_write_roots=[...]))`。读写根相互独立：读根只能 `host.read/import_file`，写根才能 `host.write/export_file`。
