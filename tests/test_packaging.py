@@ -6,6 +6,7 @@ exactly the way it declares: ``pip install -e .[dev]`` on every version listed i
 """
 import ast
 import re
+import sys
 import tarfile
 import tempfile
 import unittest
@@ -29,6 +30,11 @@ def _same_quote_nesting(source):
 
     Only the fields are inspected, not the whole literal, because a JoinedStr spanning
     implicitly concatenated literals reports all of them as one source segment.
+
+    Replacement-field positions are only reliable from 3.12 on (older ASTs report the
+    whole literal), so this is called there only. That is not a gap: on 3.9-3.11 a
+    PEP 701 construct makes ``import pyvdisk`` raise SyntaxError, so test collection
+    fails outright and there is nothing left for a detector to add.
     """
     for node in ast.walk(ast.parse(source)):
         if not isinstance(node, ast.JoinedStr):
@@ -87,7 +93,8 @@ class PackagingTests(unittest.TestCase):
         for source in SOURCES:
             body = source.read_text(encoding="utf-8")
             ast.parse(body, filename=str(source), feature_version=version)
-            offenders += [(str(source.relative_to(ROOT)), line) for line in _same_quote_nesting(body)]
+            if sys.version_info >= (3, 12):
+                offenders += [(str(source.relative_to(ROOT)), line) for line in _same_quote_nesting(body)]
         self.assertEqual(offenders, [], f"这些 f-string 需要比 {version[0]}.{version[1]} 更新的 Python: {offenders}")
 
 
