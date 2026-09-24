@@ -20,6 +20,10 @@ def _pyproject_text():
     return (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
 
+def _readme_text():
+    return (ROOT / "README.md").read_text(encoding="utf-8")
+
+
 def _same_quote_nesting(source):
     """Yield the line numbers of f-strings that reuse their own quote inside a field.
 
@@ -72,6 +76,25 @@ class PackagingTests(unittest.TestCase):
 
     def test_py_typed_marker_ships(self):
         self.assertTrue((Path(__file__).resolve().parents[1] / "pyvdisk" / "py.typed").exists())
+
+    def test_sdist_carries_the_license_and_the_changelog(self):
+        """E asked for both files; a distribution that omits them is not compliant."""
+        names = self._sdist_names()
+        top = set()
+        for name in names:
+            parts = name.split("/", 1)
+            if len(parts) == 2 and "/" not in parts[1]:   # files directly under pyvdisk-<version>/
+                top.add(parts[1])
+        self.assertIn("LICENSE", top, top)
+        self.assertIn("CHANGELOG.md", top, f"MANIFEST.in 没把变更日志带进 sdist: {top}")
+
+    def test_readme_badge_matches_the_declared_python_floor(self):
+        """The badge claimed 3.12+ while the metadata claimed 3.9+."""
+        floor = re.search(r'requires-python\s*=\s*">=\s*(\d+\.\d+)"', _pyproject_text())
+        self.assertIsNotNone(floor, "pyproject.toml 缺少 requires-python")
+        badge = re.search(r"badge/Python-(\d+\.\d+)%2B", _readme_text())
+        self.assertIsNotNone(badge, "README 缺少 Python 版本徽章")
+        self.assertEqual(badge.group(1), floor.group(1), "README 徽章与 requires-python 不一致")
 
     def test_dev_extra_declares_what_the_suite_imports(self):
         """CI sets the suite up with ``pip install -e .[dev]``, so dev must be complete.

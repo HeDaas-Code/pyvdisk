@@ -1,0 +1,4 @@
+# 许可与变更日志随 sdist 一起分发；setuptools 只会自动带上 LICENSE / README。
+include LICENSE
+include CHANGELOG.md
+include README.md
