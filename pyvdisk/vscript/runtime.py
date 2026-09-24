@@ -102,7 +102,7 @@ class Task:
     """Deterministic task value; execution is eager within a parallel block."""
     name: str
     result: object = None
-    error: object = None
+    error: "BaseException | None" = None
     done: bool = False
 
     def await_result(self):
@@ -110,7 +110,7 @@ class Task:
         return self.result
 @dataclass
 class Function:
-    params:list; body:object; closure:Env; runtime:object
+    params:list; body:object; closure:Env; runtime:"Runtime"
     def __call__(self,*args,**kwargs):
         if kwargs or len(args)!=len(self.params): raise RuntimeError("函数参数数量不匹配")
         if self.runtime.depth>=self.runtime.policy.max_call_depth: raise ResourceLimitError("函数调用深度超限")

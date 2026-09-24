@@ -682,7 +682,7 @@ class TestSpaceExhaustion(unittest.TestCase):
 class TestVolumeBase(unittest.TestCase):
     """多盘卷测试基类。"""
     MODE = None
-    NDIST = 2
+    NDISTS = 2
 
     def setUp(self):
         self.tmp = tempfile.mkdtemp()

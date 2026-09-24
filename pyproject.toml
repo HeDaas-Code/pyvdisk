@@ -15,7 +15,7 @@ dependencies = ["hnswlib>=0.8.0"]
 
 [project.optional-dependencies]
 fuse = ["fusepy"]
-dev = ["pytest"]
+dev = ["pytest", "setuptools>=61.0"]
 
 [project.scripts]
 pyvdisk = "pyvdisk.cli:main"

@@ -115,7 +115,7 @@ class StandardLoggingHandler(logging.Handler):
         try:
             fields={k:v for k,v in record.__dict__.items() if k not in _STANDARD_RECORD_FIELDS}
             event=LogEvent(int(record.created*1_000_000_000),record.levelname,record.name,record.getMessage(),fields,
-                           exception=self.formatException(record.exc_info) if record.exc_info else None,
+                           exception=self.formatException(record.exc_info) if record.exc_info else None,  # pylint: disable=no-member  # logging.Handler 的标准方法
                            thread=record.threadName)
             self.sink.emit(event)
         except Exception: self.handleError(record)

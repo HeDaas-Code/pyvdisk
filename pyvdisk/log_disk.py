@@ -132,7 +132,8 @@ class LogDisk:
             previous = self.vfs.read_file(segment_path) if self.vfs.exists(segment_path) else b""
             payload = previous + (_json(event.to_dict())+"\n").encode()
             # Directory entries are limited to 27 bytes; use a short temp name.
-            temp_path = base + "/segments/" + f"tmp{seg["id"]:016d}"
+            # No PEP 701 same-quote nesting, so the package still parses on 3.9-3.11.
+            temp_path = base + "/segments/" + f"tmp{seg['id']:016d}"
             self.vfs.write_file(temp_path, payload)
             self.vfs.rename(temp_path, segment_path)
             seg["count"]+=1;seg["min_ns"]=min(seg["min_ns"],event.timestamp_ns);seg["max_ns"]=max(seg["max_ns"],event.timestamp_ns);seg["checksum"]=hashlib.sha256(payload).hexdigest()

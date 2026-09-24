@@ -5,9 +5,13 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    # hnswlib builds from source here; without a cap a stuck build burns the runner.
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
+        # Every version requires-python promises. The 3.9 job is the floor: it is what
+        # fails if a change starts using newer syntax (it caught PEP 701 nesting).
         python-version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
