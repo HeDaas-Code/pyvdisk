@@ -114,6 +114,7 @@ pyvdisk vscript run-disk tools.vdisk:/.vscript/scripts/job.vds
 
 - Storage Plane：FS、Vector、Log、Checkpoint、Metadata、WAL、VirtualDisk、Volume。
 - Execution Plane：ExecutionService、DurableQueue、worker、lease、heartbeat、retry、idempotency、dead-letter、RunState、Audit。
+- WAL 检查点：日志结算后整段截断（`wal.ckpt.json` 记录明细），重挂载只重放检查点之后的尾巴；DataDisk 与 VScript 共用同一份 WAL 实现，`vscript run --wal` 是它的真实恢复入口。
 - 单 DataDisk ACID：统一 txid、intent、prepare、apply、commit、abort；FS/Vector/Log 副作用走**写前补偿日志**，未提交事务在 mount 时被幂等补偿，不再出现"元数据回滚、副作用残留"的部分提交。
 - 内部 exactly-once：operation_id、结果持久化、任务去重、Log event_id 去重。
 - 安全：ScopedDataDisk、路径/collection/stream scope、Host allowlist、atomic write。

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from .parser import parse
-from .runtime import Runtime
+from .runtime import Runtime, recover_wal
 from .policy import Policy, Capability
 from .host import HostCapability, HostProxy
 from .mounts import MountRegistry

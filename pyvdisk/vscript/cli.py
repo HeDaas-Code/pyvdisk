@@ -2,6 +2,8 @@
 from __future__ import annotations
 import sys
 from . import Compiler, Runtime, MountRegistry
+from .runtime import recover_wal
+from .wal import WriteAheadLog
 from .errors import VScriptError, CapabilityError, ResourceLimitError, LexError, ParseError, CompileError
 
 def _pairs(values):
@@ -21,6 +23,14 @@ def _mounts(values,registry):
         name,path,raw=parts;perms=set(raw.split(","));bindings[name]=registry.open(name,path,permissions=perms);allowed[path]=perms
     return bindings,allowed
 
+def _recovery_mounts(bindings):
+    """Map a pre-bound mount name to the capability its operations were recorded against."""
+    out={}
+    for name,handle in (bindings or {}).items():
+        cap=getattr(handle,"cap",None)
+        if cap is not None and cap.kind=="fs": out[name]=cap.target
+    return out
+
 def command(args):
     try:
         if args.action=="check":Compiler().compile_file(args.script);print(f"OK: {args.script}");return 0
@@ -36,7 +46,22 @@ def command(args):
         else:program=Compiler().compile_file(args.script)
         with MountRegistry() as mounts:
             bindings,allowed=_mounts(args.mount,mounts)
-            Runtime(stdout=sys.stdout,mount_registry=mounts,allowed_mounts=allowed).run(program.ast,args=_pairs(args.arg),bindings=bindings)
+            # A transaction log is recovered before the script runs and settled after it,
+            # so a killed process cannot leave a half-applied transaction behind.
+            wal=WriteAheadLog(args.wal) if getattr(args,"wal",None) else None
+            unresolved=0
+            if wal is not None:
+                report=recover_wal(wal,_recovery_mounts(bindings))
+                unresolved=len(report["unresolved"])
+                if report["pending"]: print(f"恢复: 回滚 {len(report['pending'])} 个未完成事务（{report['rolled_back']} 次写入被撤销）",file=sys.stderr)
+                if report["deferred"]: print(f"恢复: {len(report['deferred'])} 个未完成事务因挂载缺失未能回滚，日志保留",file=sys.stderr)
+            runtime=Runtime(stdout=sys.stdout,mount_registry=mounts,allowed_mounts=allowed,wal=wal)
+            try:
+                runtime.run(program.ast,args=_pairs(args.arg),bindings=bindings)
+            finally:
+                if wal is not None and not unresolved and not runtime.transactions_open():
+                    _,pending=wal.recover()
+                    if not pending: wal.truncate()
         return 0
     except (LexError,ParseError,CompileError) as e:print(e,file=sys.stderr);return 2
     except CapabilityError as e:print(e,file=sys.stderr);return 3
@@ -153,7 +178,7 @@ def add_parser(sub):
     root=sub.add_parser("vscript",help="运行安全 VScript 批处理脚本")
     actions=root.add_subparsers(dest="action",required=True)
     check=actions.add_parser("check",help="检查 .vds 语法");check.add_argument("script");check.set_defaults(func=command)
-    run=actions.add_parser("run",help="执行 .vds 脚本");run.add_argument("script");run.add_argument("--arg",action="append",default=[]);run.add_argument("--mount",action="append",default=[],help="PATH:PERMS（授权）或 NAME:PATH:PERMS（预挂载）");run.set_defaults(func=command)
-    disk=actions.add_parser("run-disk",help="执行普通 .vdisk 内的脚本");disk.add_argument("location");disk.add_argument("--arg",action="append",default=[]);disk.add_argument("--mount",action="append",default=[]);disk.set_defaults(func=command)
+    run=actions.add_parser("run",help="执行 .vds 脚本");run.add_argument("script");run.add_argument("--arg",action="append",default=[]);run.add_argument("--mount",action="append",default=[],help="PATH:PERMS（授权）或 NAME:PATH:PERMS（预挂载）");run.add_argument("--wal",default=None,help="事务日志路径；启动时先恢复未完成事务，结束时结算并截断");run.set_defaults(func=command)
+    disk=actions.add_parser("run-disk",help="执行普通 .vdisk 内的脚本");disk.add_argument("location");disk.add_argument("--arg",action="append",default=[]);disk.add_argument("--mount",action="append",default=[]);disk.add_argument("--wal",default=None,help="事务日志路径；启动时先恢复未完成事务，结束时结算并截断");disk.set_defaults(func=command)
     replp=actions.add_parser("repl",help="交互式 VScript");replp.set_defaults(func=command)
     return root

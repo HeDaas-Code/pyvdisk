@@ -8,7 +8,7 @@ from ..vfs import VFS
 from ..vector_disk import VectorDisk
 from ..log_disk import LogDisk
 from .checkpoint import CheckpointStore
-from .wal import WriteAheadLog
+from .wal import WriteAheadLog, decode_records
 
 class DataDiskError(RuntimeError):
     """Raised for invalid or unmounted data disks."""
@@ -155,6 +155,11 @@ class MetadataTransaction(AbstractContextManager):
         if vfs is not None and getattr(vfs, "_tx_stack", None) and vfs._tx_stack and vfs._tx_stack[-1] is self:
             vfs._tx_stack.pop()
         self._pushed=False
+    def _maybe_checkpoint(self):
+        checkpointer=getattr(self.owner,"_maybe_checkpoint_wal",None)
+        if checkpointer is not None:
+            try: checkpointer()
+            except Exception: pass
     def __enter__(self):
         self.owner._append_metadata_wal({"kind":"begin","txid":self.txid})
         vfs=getattr(self.owner, "vfs", None)
@@ -186,7 +191,7 @@ class MetadataTransaction(AbstractContextManager):
             self.owner._append_metadata_wal({"kind":"commit","txid":self.txid})
             self.owner._transaction_state(self.txid, "committed")
             self.owner._atomic_json(self.owner.CHECKPOINT,{"last_txid":self.txid,"time_ns":time.time_ns(),"status":"committed"})
-            self._fs_journal.clear(); self._detach()
+            self._fs_journal.clear(); self._detach(); self._maybe_checkpoint()
             self.closed=True; return self
         except Exception:
             self.owner._atomic_json(self.owner.METADATA, old)
@@ -197,7 +202,7 @@ class MetadataTransaction(AbstractContextManager):
             self.owner._append_metadata_wal({"kind":"abort","txid":self.txid})
             self.owner._transaction_state(self.txid, "aborted")
             self._unwind_fs()
-            self._fs_journal.clear(); self._detach()
+            self._fs_journal.clear(); self._detach(); self._maybe_checkpoint()
             self.closed=True
             raise
     def abort(self):
@@ -206,7 +211,7 @@ class MetadataTransaction(AbstractContextManager):
                 self.owner._append_metadata_wal({"kind":"abort","txid":self.txid})
                 self.owner._transaction_state(self.txid, "aborted")
             self._unwind_fs()
-            self._fs_journal.clear(); self._detach()
+            self._fs_journal.clear(); self._detach(); self._maybe_checkpoint()
             self.closed=True
         return self
     def __exit__(self,exc_type,exc,tb):
@@ -377,7 +382,8 @@ def _attach(cls,vfs,lock):
 
 class DataDisk:
     """One image containing VFS, vectors, logs, checkpoints, WAL and metadata."""
-    MANIFEST="/.system/manifest.json"; METADATA="/.system/metadata.json"; WAL="/.system/wal.jsonl"; CHECKPOINT="/.system/checkpoint.json"; TRANSACTIONS="/.system/transactions.json"; FORMAT="pyvdisk-data"
+    MANIFEST="/.system/manifest.json"; METADATA="/.system/metadata.json"; WAL="/.system/wal.jsonl"; CHECKPOINT="/.system/checkpoint.json"; TRANSACTIONS="/.system/transactions.json"; WAL_CHECKPOINT="/.system/wal.ckpt.json"; FORMAT="pyvdisk-data"
+    WAL_CHECKPOINT_BYTES=256*1024
     def __init__(self,path,block_size=4096, *, legacy=False):
         if legacy:
             warnings.warn(
@@ -386,6 +392,7 @@ class DataDisk:
             )
         self.path=os.fspath(path); self.block_size=block_size; self.vfs=VFS(self.path,block_size); self._lock=threading.RLock(); self._mounted=False; self._metadata={}
         self._recovery_participants={}; self._recovery_report=None
+        self._checkpointing=False; self._wal_checkpoint=None
     @classmethod
     def create(cls,path,size_bytes,block_size=4096,label=""):
         VFS.create(os.fspath(path),size_bytes,block_size,label=label)
@@ -404,6 +411,9 @@ class DataDisk:
         self.vfs.disk.flush(); h=getattr(self.vfs.disk,"_f",None)
         if h is not None: os.fsync(h.fileno())
     def _append_metadata_wal(self,record):
+        wal=getattr(self,"wal",None)
+        if wal is not None:
+            wal.append_record(record); return
         body=dict(record); body["checksum"]=hashlib.sha256(_json(record)).hexdigest()
         data=_json(body)+b"\n"
         self.vfs.append_file(self.WAL,data) if self.vfs.exists(self.WAL) else self.vfs.write_file(self.WAL,data); self._sync()
@@ -426,15 +436,11 @@ class DataDisk:
         builtin={"FileNamespace":"fs","VectorNamespace":"vector","LogNamespace":"log"}
         return getattr(self,builtin[name],None) if name in builtin else None
     def _wal_records(self):
+        """Every readable record in the log, decoded by the shared WAL reader."""
+        wal=getattr(self,"wal",None)
+        if wal is not None: return list(wal.records())
         if not self.vfs.exists(self.WAL): return []
-        out=[]
-        for line in self.vfs.read_file(self.WAL).splitlines():
-            try:
-                item=json.loads(line); checksum=item.pop("checksum")
-                if hashlib.sha256(_json(item)).hexdigest()!=checksum: break
-                out.append(item)
-            except (ValueError,KeyError,TypeError): break
-        return out
+        return list(decode_records(self.vfs.read_file(self.WAL)))
     def _transaction_state(self, txid, status):
         states=self._read_json(self.TRANSACTIONS,{})
         states.setdefault(txid,{})["status"]=status
@@ -450,25 +456,20 @@ class DataDisk:
         """
         order,ops,done,aborted={}, {}, set(), set()
         undo,intents,compensated={}, {}, set()
-        if self.vfs.exists(self.WAL):
-            for line in self.vfs.read_file(self.WAL).splitlines():
-                try:
-                    item=json.loads(line); checksum=item.pop("checksum")
-                    if hashlib.sha256(_json(item)).hexdigest()!=checksum:break
-                except (ValueError,KeyError,TypeError):break
-                kind=item.get("kind"); tid=item.get("txid")
-                if tid is not None and tid not in order: order[tid]=len(order)
-                try:
-                    if kind=="begin":ops.setdefault(tid,[])
-                    elif kind=="operation":ops.setdefault(tid,[]).append(item["operation"])
-                    elif kind=="undo":undo.setdefault(tid,[]).append(_dec_entry(item.get("entry")))
-                    elif kind=="intent":
-                        payload=_dec_entry(item.get("intents") or [])
-                        intents.setdefault(tid,[]).append(((item.get("operation") or {}).get("participant"),payload))
-                    elif kind=="commit":done.add(tid)
-                    elif kind=="abort":aborted.add(tid)
-                    elif kind=="compensated":compensated.add(tid)
-                except (ValueError,KeyError,TypeError):break
+        for item in self._wal_records():
+            kind=item.get("kind"); tid=item.get("txid")
+            if tid is not None and tid not in order: order[tid]=len(order)
+            try:
+                if kind=="begin":ops.setdefault(tid,[])
+                elif kind=="operation":ops.setdefault(tid,[]).append(item["operation"])
+                elif kind=="undo":undo.setdefault(tid,[]).append(_dec_entry(item.get("entry")))
+                elif kind=="intent":
+                    payload=_dec_entry(item.get("intents") or [])
+                    intents.setdefault(tid,[]).append(((item.get("operation") or {}).get("participant"),payload))
+                elif kind=="commit":done.add(tid)
+                elif kind=="abort":aborted.add(tid)
+                elif kind=="compensated":compensated.add(tid)
+            except (ValueError,KeyError,TypeError):break
         state=self._read_json(self.METADATA,{})
         for tid,entries in ops.items():
             if tid in aborted: continue
@@ -501,6 +502,43 @@ class DataDisk:
     def recovery_report(self):
         """Result of the last mount-time recovery (None before the first mount)."""
         return self._recovery_report
+    def checkpoint_wal(self):
+        """Settle every recorded transaction and truncate the log.
+
+        A checkpoint is only legal with no open transaction. At that point every
+        transaction in the log is either committed -- its effects are already
+        published to METADATA and to the namespaces -- or unfinished, and unfinished
+        work is compensated before its log records may be dropped. Committed work
+        therefore needs no redo after a checkpoint, and recovery no longer replays
+        the whole history on every mount.
+        """
+        with self._lock:
+            if not self._mounted: raise DataDiskError("data disk not mounted")
+            if self._checkpointing: return self._wal_checkpoint
+            if getattr(self.vfs,"_tx_stack",None): return self._wal_checkpoint
+            self._checkpointing=True
+            try:
+                records=len(self._wal_records())
+                if not records: return self._wal_checkpoint
+                self._recover_transactions()
+                self.wal.truncate()
+                info={"truncated_records":records,"truncated_at_ns":time.time_ns(),"remaining_bytes":self.wal.size(),"truncated":self._recovery_report}
+                self._atomic_json(self.WAL_CHECKPOINT,info); self._sync()
+                self._wal_checkpoint=info
+                return info
+            finally:
+                self._checkpointing=False
+    def _maybe_checkpoint_wal(self,force=False):
+        """Truncate once the log is large enough, or unconditionally on shutdown."""
+        if not self._mounted or self._checkpointing: return None
+        if getattr(self.vfs,"_tx_stack",None): return None
+        if not force and self.wal.size()<self.WAL_CHECKPOINT_BYTES: return None
+        try: return self.checkpoint_wal()
+        except Exception: return None
+    def wal_stats(self):
+        """Current log occupancy plus the last truncation boundary, if any."""
+        wal=getattr(self,"wal",None)
+        return {"bytes":wal.size() if wal is not None else 0,"records":len(self._wal_records()),"checkpoint":self._wal_checkpoint}
     def mount(self):
         with self._lock:
             if self._mounted:return self
@@ -514,13 +552,17 @@ class DataDisk:
                 self.vector=self.vectors=VectorNamespace(self._vector_disk); self.vector_disk=self.vector
                 self.log=self.logs=LogNamespace(self._log_disk); self.log_disk=self.log
                 self.checkpoints=CheckpointStore(self.vfs); self.wal=WriteAheadLog(self.vfs); self._metadata=self._read_json(self.METADATA,{})
-                if self.vfs.exists(self.WAL):self._recover_transactions()
+                self._wal_checkpoint=self._read_json(self.WAL_CHECKPOINT,self._wal_checkpoint)
+                if self.vfs.exists(self.WAL) and self._wal_records():self._recover_transactions()
+                elif self._recovery_report is None:self._recovery_report={"compensated":[],"committed":[],"aborted":[],"participants":[]}
                 self._mounted=True; return self
             except Exception:self.vfs.close(); raise
     open=mount
     def close(self):
         with self._lock:
-            if self._mounted:self._sync(); self.vfs.close(); self._mounted=False; self.vector._mounted=self.log._mounted=False
+            if self._mounted:
+                self._maybe_checkpoint_wal(force=True)
+                self._sync(); self.vfs.close(); self._mounted=False; self.vector._mounted=self.log._mounted=False
     def __enter__(self):return self.mount()
     def __exit__(self,*exc):self.close()
     @property

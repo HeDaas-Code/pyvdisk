@@ -48,7 +48,7 @@ class CapabilityNamespace:
 
 
 class ScopedFileNamespace(CapabilityNamespace):
-    _PROTECTED = ("/.vectors", "/.logs", "/.system/wal.jsonl", "/.system/checkpoint.json")
+    _PROTECTED = ("/.vectors", "/.logs", "/.system/wal.jsonl", "/.system/wal.ckpt.json", "/.system/checkpoint.json")
 
     def _check_file(self, permission, path):
         normalized = _path(path)

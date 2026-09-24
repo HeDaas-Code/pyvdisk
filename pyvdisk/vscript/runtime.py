@@ -7,7 +7,13 @@ from .parser import parse
 from .audit import AuditRecord, new_run_id, policy_hash, script_hash, monotonic_ms
 
 class TransactionContext:
-    """In-process undo log; not crash-safe and has no WAL."""
+    """In-process undo log, mirrored into a WAL when the runtime has one.
+
+    The in-memory undo closures are what a rollback uses; the WAL carries the
+    recorded operations so a *later* process can settle a transaction whose owner
+    died. Neither is a substitute for the other: undos need live handles, the log
+    survives the process.
+    """
     def __init__(self, runtime):
         self.runtime=runtime; self.undos=[]; self.operations=[]; self.rolling_back=False
         self.txid = runtime.wal.begin() if runtime.wal is not None else None
@@ -25,7 +31,45 @@ class TransactionContext:
         for undo in reversed(self.undos):
             try: undo()
             except Exception as exc: errors.append(exc)
+        if self.runtime.wal is not None and self.txid is not None:
+            self.runtime.wal.abort(self.txid)
         if errors: raise RuntimeError(f"事务回滚失败: {errors[0]}")
+def recover_wal(wal, mounts=None):
+    """Consume a VScript transaction log: roll back work that never committed.
+
+    Committed operations are not replayed. A write is applied before its commit is
+    recorded, so a durable ``commit`` already implies the data reached the store --
+    and re-applying an ``append`` would duplicate it. The direction the log is
+    actually needed for is the other one: undoing a transaction whose process died.
+
+    ``mounts`` maps a mount name to the capability its operations were recorded
+    against. A transaction with an operation whose mount was not supplied is left in
+    flight and reported as ``deferred`` instead of being marked aborted, because
+    aborting it would silently keep a half-applied change; the log is kept so a later
+    recovery can finish the job.
+    """
+    mounts=dict(mounts or {})
+    committed,pending=wal.recover()
+    report={"committed":[txid for txid,_ in committed],"pending":[],"deferred":[],"rolled_back":0,"unresolved":[]}
+    def undo(operation):
+        target=mounts.get(operation.get("mount"))
+        if target is None: report["unresolved"].append(operation); return False
+        old=operation.get("old")
+        if old is None:
+            if target.exists(operation["path"]): target.remove(operation["path"])
+        else: target.write_file(operation["path"], old.encode("latin1"))
+        report["rolled_back"]+=1
+        return True
+    for txid,operations in pending:
+        blocked=False
+        for operation in reversed(operations):
+            if not undo(operation): blocked=True
+        if blocked: report["deferred"].append(txid)
+        else:
+            wal.abort(txid); report["pending"].append(txid)
+    if not report["unresolved"]: wal.truncate()
+    return report
+
 from dataclasses import dataclass
 from . import ast as A
 from .errors import RuntimeError, ScriptThrown, ResourceLimitError, CapabilityError
@@ -128,6 +172,9 @@ class Runtime:
                 record = AuditRecord(record_id, script_hash(source if source is not None else program), policy_hash(self.policy), status, {"steps": self.budget.steps, "read_bytes": self.budget.read_bytes, "write_bytes": self.budget.write_bytes, "output_bytes": self.budget.output_bytes, "duration_ms": monotonic_ms(started)}, error=error, started_at=time.time() - (time.monotonic() - started), finished_at=time.time(), **self.audit_context)
                 sink = self.audit_sink.emit if hasattr(self.audit_sink, "emit") else self.audit_sink
                 sink(record)
+    def transactions_open(self):
+        """True while a ``tx`` block is still running, so the log cannot be settled."""
+        return bool(self._transactions)
     def record_undo(self, undo):
         if self._transactions: self._transactions[-1].add(undo)
     def record_operation(self, operation):

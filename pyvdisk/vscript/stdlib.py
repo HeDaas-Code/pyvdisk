@@ -50,11 +50,11 @@ def create_stdlib(runtime):
     def fs_read_text(h,p,encoding="utf-8"):return fs_read(h,p).decode(encoding)
     def fs_write(h,p,data,overwrite=True):
         c=_cap(h,"fs","write");target=_vpath(c,p);raw=data.encode() if isinstance(data,str) else bytes(data);existed=c.target.exists(target);old=c.target.read_file(target) if existed and c.target.isfile(target) else None;b.charge_write(len(raw));c.target.write_file(target,raw)
-        runtime.record_operation({"kind":"write","path":target,"old":old.decode("latin1") if old is not None else None,"new":raw.decode("latin1")})
+        runtime.record_operation({"kind":"write","mount":c.name,"path":target,"old":old.decode("latin1") if old is not None else None,"new":raw.decode("latin1")})
         runtime.record_undo(lambda: c.target.write_file(target,old) if existed and old is not None else (c.target.remove(target) if c.target.exists(target) else None));return len(raw)
     def fs_append(h,p,data):
         c=_cap(h,"fs","write");target=_vpath(c,p);raw=data.encode() if isinstance(data,str) else bytes(data);existed=c.target.exists(target);old=c.target.read_file(target) if existed else None;b.charge_write(len(raw));c.target.append_file(target,raw)
-        runtime.record_operation({"kind":"append","path":target,"old":old.decode("latin1") if old is not None else None,"new":raw.decode("latin1")})
+        runtime.record_operation({"kind":"append","mount":c.name,"path":target,"old":old.decode("latin1") if old is not None else None,"new":raw.decode("latin1")})
         runtime.record_undo(lambda: c.target.write_file(target,old) if existed else c.target.remove(target));return len(raw)
     def fs_copy(sh,sp,dh,dp,overwrite=False):
         data=fs_read(sh,sp);c=_cap(dh,"fs","write");target=_vpath(c,dp)

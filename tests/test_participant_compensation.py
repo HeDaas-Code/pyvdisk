@@ -18,6 +18,15 @@ class Crash(BaseException):
     """Process-loss simulation: deliberately bypasses transaction exception cleanup."""
 
 
+def _kill(disk):
+    """Simulate process death by releasing the image without DataDisk shutdown.
+
+    ``DataDisk.close()`` settles and truncates the log, so using it after a simulated
+    crash would perform the recovery this module exists to test.
+    """
+    disk.vfs.close()
+
+
 def _new(path):
     return DataDisk.create(path, 32 * 1024 * 1024).mount()
 
@@ -84,7 +93,7 @@ def test_filesystem_effects_are_compensated_after_crash(tmp_path):
     assert participant.committed == 1
     assert disk.fs.read_file("/keep.txt") == b"changed"
     assert disk.fs.exists("/new.txt") is True
-    disk.close()
+    _kill(disk)
 
     reopened = DataDisk(path).mount()
     try:
@@ -118,7 +127,7 @@ def test_directory_and_removal_effects_are_undone_from_the_log(tmp_path):
             disk.fs.makedirs("/fresh/deep")
             disk.fs.write_file("/fresh/deep/new.txt", b"new")
     assert disk.fs.exists("/dir/sub/gone.txt") is False
-    disk.close()
+    _kill(disk)
 
     reopened = DataDisk(path).mount()
     try:
@@ -138,7 +147,7 @@ def test_committed_transaction_effects_survive_recovery(tmp_path):
         disk.fs.write_file("/keep.txt", b"committed")
         disk.fs.write_file("/new.txt", b"new")
     txid = tx.txid
-    disk.close()
+    _kill(disk)
 
     reopened = DataDisk(path).mount()
     try:
@@ -163,7 +172,7 @@ def test_vector_namespace_effects_are_compensated_after_crash(tmp_path):
             tx.set("answer", 42)
             disk.vector.upsert("items", "added", [1.0, 0.0], {"v": 1})
     assert disk.vector.get("items", "added") is not None
-    disk.close()
+    _kill(disk)
 
     reopened = DataDisk(path).mount()
     try:
@@ -186,7 +195,7 @@ def test_log_namespace_effects_are_compensated_after_crash(tmp_path):
             tx.set("answer", 42)
             disk.log.append("events", LogEvent(2, "INFO", "test", "transient"))
     assert [e.message for e in disk.log.query("events")] == ["baseline", "transient"]
-    disk.close()
+    _kill(disk)
 
     reopened = DataDisk(path).mount()
     try:
@@ -206,7 +215,7 @@ def test_registered_participant_is_compensated_with_its_persisted_intent(tmp_pat
         tx.commit()
     txid = tx.txid
     assert participant.committed == 1
-    disk.close()
+    _kill(disk)
 
     reopened = DataDisk(path)
     replayed = []
@@ -232,7 +241,7 @@ def test_recovery_reports_unknown_participants_without_failing(tmp_path):
     _crash_after_participant_commit(participant)
     with pytest.raises(Crash):
         tx.commit()
-    disk.close()
+    _kill(disk)
 
     # No factory registered: recovery still compensates what it owns and stays healthy.
     reopened = DataDisk(path).mount()

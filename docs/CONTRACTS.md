@@ -17,7 +17,14 @@ ExecutionService 支持 inline 与可选 worker。DurableQueue 支持 lease、he
 - **已提交事务**：存在 `commit` 记录的事务只做元数据 redo，命名空间副作用被保留，绝不被补偿。
 - **第三方 participant**：`enlist` 的 intent 随事务持久化（含载荷）。要在恢复期被补偿，participant 需用 `DataDisk.register_recovery_participant(name, factory)` 注册重建方式，恢复时对其调用 `abort(txid, intents)`；未注册的 participant 只被记录、不被调用，且不会影响恢复本身。
 - **可观测**：`DataDisk.recovery_report()` 返回本次 mount 的 `compensated / committed / aborted / participants` 明细。
-- **边界**：补偿只覆盖容器内状态；participant 在容器外的副作用（外部 API、支付、邮件）必须由其自身 `abort` 负责。当前 WAL 尚无截断/检查点（见 issue #1 B2），补偿日志会随事务累积。
+- **边界**：补偿只覆盖容器内状态；participant 在容器外的副作用（外部 API、支付、邮件）必须由其自身 `abort` 负责。
+
+### 日志检查点与恢复入口
+- **一份实现**：DataDisk 与 VScript 共用同一份 WAL——同一记录编解码、同一 kind 词表、同一 `recover()`，只是后端不同（镜像内 VFS / 宿主文件）。读取端遇到不认识的 kind 只截断可读前缀，不会假装后面没有 `commit`。
+- **结算即截断**：`DataDisk.checkpoint_wal()` 在没有打开事务时结算全部记录——已提交事务的元数据早已发布，未完成事务先被补偿——然后整段丢弃日志；`close()` 与日志超过 `WAL_CHECKPOINT_BYTES`（默认 256 KiB）时自动触发。截断明细写入 `/.system/wal.ckpt.json`（受能力保护）。
+- **为什么可以丢弃**：写入永远先于 `commit` 记录落盘，所以 `commit` 一旦持久化，效果就已经在数据里；日志真正要用的是反方向——撤销没提交完的事务。
+- **VScript 恢复入口**：`pyvdisk vscript run --wal PATH` 在脚本运行前消费日志、回滚未提交事务，运行结束再结算并截断。挂载没提供时，该事务保持 in-flight（报告为 `deferred`）而不是被标记 aborted——标记 aborted 会静默保留半应用的写入。
+- **已知限制**：嵌套 `transaction` 的子事务把操作记录在子事务自己的 txid 下，父事务回滚不会覆盖它们（与 issue #1 C8 的 undo 记账一并处理）。
 
 ## 永久边界
 不实现分布式调度平台、不做多租户、不做旧格式迁移。不自动恢复任意 Python 执行栈；VScript parallel/task/await 为确定性顺序语义。
