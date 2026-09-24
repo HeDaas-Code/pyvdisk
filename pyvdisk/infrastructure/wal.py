@@ -2,6 +2,11 @@
 from __future__ import annotations
 import hashlib,json,uuid
 
+# Every record kind DataDisk and MetadataTransaction write to the shared log.
+# Readers must tolerate all of them: stopping at an unknown kind would silently
+# truncate the log and hide later commit records.
+RECORD_KINDS={"begin","intent","prepare","apply","operation","commit","abort","undo","compensated"}
+
 class WriteAheadLog:
     def __init__(self,vfs,path="/.system/wal.jsonl"):
         self.vfs=vfs; self.path=path; self._sequence=self._last_sequence()
@@ -16,7 +21,7 @@ class WriteAheadLog:
         for line in self.vfs.read_file(self.path).splitlines():
             try:
                 item=json.loads(line); checksum=item.pop("checksum"); raw=json.dumps(item,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()
-                if hashlib.sha256(raw).hexdigest()!=checksum or item["kind"] not in {"begin","intent","prepare","operation","commit","abort"}:break
+                if hashlib.sha256(raw).hexdigest()!=checksum or item["kind"] not in RECORD_KINDS:break
                 out.append(item)
             except (ValueError,KeyError,TypeError):break
         return out

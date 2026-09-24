@@ -18,6 +18,88 @@ def _json(v): return json.dumps(v, ensure_ascii=False, sort_keys=True, separator
 def _enc(v): return base64.b64encode(_json(v)).decode("ascii")
 def _dec(v): return json.loads(base64.b64decode(v).decode())
 
+def _enc_entry(value):
+    """JSON-safe encoding for compensation entries (bytes become base64 wrappers)."""
+    if isinstance(value, bytes): return {"__bytes__": base64.b64encode(value).decode("ascii")}
+    if isinstance(value, dict): return {str(k): _enc_entry(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)): return [_enc_entry(v) for v in value]
+    return value
+
+def _dec_entry(value):
+    if isinstance(value, dict):
+        if len(value) == 1 and "__bytes__" in value: return base64.b64decode(value["__bytes__"])
+        return {k: _dec_entry(v) for k, v in value.items()}
+    if isinstance(value, list): return [_dec_entry(v) for v in value]
+    return value
+
+def _tree_paths(vfs, root):
+    """Every path under ``root``, deepest first so removals never precede children."""
+    out=[]
+    if not vfs.exists(root): return out
+    stack=[root]
+    while stack:
+        cur=stack.pop()
+        try: names=vfs.listdir(cur)
+        except Exception: continue
+        for name in names:
+            full=f"{cur.rstrip('/')}/{name}" if cur!="/" else f"/{name}"
+            out.append(full)
+            if vfs.isdir(full): stack.append(full)
+    out.sort(key=lambda p: p.count("/"), reverse=True)
+    return out
+
+def _apply_undo(vfs, entry):
+    """Compensate one recorded mutation. Must stay idempotent: recovery replays it."""
+    kind=entry[0]
+    if kind=="write":
+        _, path, before=entry
+        if before is None:
+            if vfs.exists(path): vfs.remove(path)
+        else:
+            vfs.write_file(path, before)
+    elif kind=="remove":
+        _, path=entry
+        if vfs.exists(path): vfs.remove(path)
+    elif kind=="rmdir":
+        _, path=entry
+        if vfs.exists(path) and vfs.isdir(path): vfs.rmdir(path)
+    elif kind=="mkdirs":
+        _, path=entry
+        if vfs.exists(path) and vfs.isdir(path): vfs.rmdir(path)
+    elif kind=="rename":
+        _, src, dst, src_b, dst_b=entry
+        if vfs.exists(dst): vfs.remove(dst)
+        if src_b is None:
+            if vfs.exists(src): vfs.remove(src)
+        else:
+            vfs.write_file(src, src_b)
+        if dst_b is not None:
+            vfs.write_file(dst, dst_b)
+    elif kind=="restore_many":
+        _, snap=entry
+        for rel, data in snap.items():
+            full="/"+rel.lstrip("/")
+            if isinstance(data, dict) and data.get("__dir__"):
+                if not vfs.exists(full): vfs.mkdir(full)
+            elif data is None:
+                if vfs.exists(full): vfs.remove(full)
+            else:
+                vfs.write_file(full, data)
+    elif kind=="restore_tree":
+        _, root, snap=entry
+        for full in _tree_paths(vfs, root):
+            if full.lstrip("/") not in snap:
+                try: vfs.remove(full)
+                except Exception: pass
+        for rel in sorted(snap, key=lambda p: (p.count("/"), p)):
+            data=snap[rel]; full="/"+rel.lstrip("/")
+            if isinstance(data, dict) and data.get("__dir__"):
+                if not vfs.exists(full): vfs.makedirs(full)
+            elif data is None:
+                if vfs.exists(full): vfs.remove(full)
+            else:
+                vfs.write_file(full, data)
+
 class TransactionParticipant:
     """Small participant contract: prepare/commit/abort, with saga fallback."""
     def prepare(self, txid, intents): return None
@@ -28,6 +110,7 @@ class MetadataTransaction(AbstractContextManager):
     def __init__(self, owner, txid=None):
         self.owner=owner; self.txid=txid or uuid.uuid4().hex; self.changes={}; self.closed=False
         self._participants=[]; self._intents=[]; self._fs_journal=[]; self._pushed=False
+        self._compensated=False
     def set(self,key,value):
         if not isinstance(key,str) or not key: raise TypeError("metadata key must be a non-empty string")
         self.changes[key]=value; return self
@@ -48,51 +131,25 @@ class MetadataTransaction(AbstractContextManager):
         if vfs is None or not getattr(vfs, "_tx_stack", None): return None
         return vfs._tx_stack[-1]
     def _record_fs(self, kind, *args):
-        if self._active_tx() is self:
-            self._fs_journal.append((kind,) + args)
+        if self._active_tx() is not self: return
+        entry=(kind,)+args
+        self._fs_journal.append(entry)
+        # Write-ahead: the compensation entry is durable before the mutation is applied,
+        # so a crash before commit can still be undone from the log alone.
+        self.owner._append_compensation(self.txid, entry)
+    def _mark_compensated(self):
+        if not self._compensated:
+            self._compensated=True
+            self.owner._append_metadata_wal({"kind":"compensated","txid":self.txid})
     def _unwind_fs(self):
         vfs=getattr(self.owner, "vfs", None)
         if vfs is None: return
         for entry in reversed(self._fs_journal):
-            kind=entry[0]
-            try:
-                if kind=="write":
-                    _, path, before=entry
-                    if before is None:
-                        if vfs.exists(path): vfs.remove(path)
-                    else:
-                        vfs.write_file(path, before)
-                elif kind=="remove":
-                    _, path=entry
-                    if vfs.exists(path): vfs.remove(path)
-                elif kind=="rmdir":
-                    _, path=entry
-                    if vfs.exists(path) and vfs.isdir(path): vfs.rmdir(path)
-                elif kind=="mkdirs":
-                    _, path=entry
-                    if vfs.exists(path) and vfs.isdir(path): vfs.rmdir(path)
-                elif kind=="rename":
-                    _, src, dst, src_b, dst_b=entry
-                    if vfs.exists(dst): vfs.remove(dst)
-                    if src_b is None:
-                        if vfs.exists(src): vfs.remove(src)
-                    else:
-                        vfs.write_file(src, src_b)
-                    if dst_b is not None:
-                        vfs.write_file(dst, dst_b)
-                elif kind=="restore_many":
-                    _, snap=entry
-                    for rel, data in snap.items():
-                        full="/"+rel.lstrip("/")
-                        if isinstance(data, dict) and data.get("__dir__"):
-                            if not vfs.exists(full): vfs.mkdir(full)
-                        elif data is None:
-                            if vfs.exists(full): vfs.remove(full)
-                        else:
-                            vfs.write_file(full, data)
+            try: _apply_undo(vfs, entry)
             except Exception:
-                # best-effort; partial unwind is acceptable for crash recovery
+                # best-effort; recovery replays the durable log and retries
                 pass
+        self._mark_compensated()
     def _detach(self):
         vfs=getattr(self.owner, "vfs", None)
         if vfs is not None and getattr(vfs, "_tx_stack", None) and vfs._tx_stack and vfs._tx_stack[-1] is self:
@@ -117,7 +174,7 @@ class MetadataTransaction(AbstractContextManager):
         grouped={p: [op for q,op in self._intents if q is p] for p in self._participants}
         try:
             for p,ops in grouped.items():
-                self.owner._append_metadata_wal({"kind":"intent","txid":self.txid,"operation":{"participant":type(p).__name__,"count":len(ops)}})
+                self.owner._append_metadata_wal({"kind":"intent","txid":self.txid,"operation":{"participant":type(p).__name__,"count":len(ops)},"intents":_enc_entry(list(ops))})
                 p.prepare(self.txid, tuple(ops)); self.owner._append_metadata_wal({"kind":"prepare","txid":self.txid,"operation":{"participant":type(p).__name__}})
             new=dict(old)
             for key,value in self.changes.items():
@@ -208,44 +265,37 @@ class FileNamespace(TransactionParticipant):
     def df(self): return self.vfs.df()
     def du(self, path="/"): return self.vfs.du(path)
     def fsck(self, repair=False): return self.vfs.fsck(repair)
-    # mutating: journal before-state, then delegate
+    # mutating: journal before-state first (write-ahead), then delegate
     def write_file(self, path, data, mode=0o644):
-        before=None
-        if self.vfs.exists(path) and self.vfs.isfile(path):
-            before=self.vfs.read_file(path)
-        self.vfs.write_file(path, data, mode)
+        before=self.vfs.read_file(path) if (self.vfs.exists(path) and self.vfs.isfile(path)) else None
         if before is None: self._record("remove", path)
         else: self._record("write", path, before)
+        self.vfs.write_file(path, data, mode)
     def append_file(self, path, data):
-        before=None
-        if self.vfs.exists(path) and self.vfs.isfile(path):
-            before=self.vfs.read_file(path)
-        self.vfs.append_file(path, data)
+        before=self.vfs.read_file(path) if (self.vfs.exists(path) and self.vfs.isfile(path)) else None
         if before is not None: self._record("write", path, before)
+        self.vfs.append_file(path, data)
     def remove(self, path):
-        snap=None
-        if self.vfs.exists(path) and self.vfs.isdir(path):
-            snap=_snapshot_dir(self.vfs, path)
-        before=None
-        if self.vfs.exists(path) and self.vfs.isfile(path):
-            before=self.vfs.read_file(path)
-        self.vfs.remove(path)
+        existed=self.vfs.exists(path)
+        snap=_snapshot_dir(self.vfs, path) if (existed and self.vfs.isdir(path)) else None
+        before=self.vfs.read_file(path) if (existed and self.vfs.isfile(path)) else None
         if snap is not None: self._record("restore_many", snap)
         elif before is not None: self._record("write", path, before)
         # if missing, nothing to undo
+        self.vfs.remove(path)
     def rmtree(self, path):
         snap=_snapshot_dir(self.vfs, path) if self.vfs.exists(path) else {}
-        self.vfs.rmtree(path)
         if snap: self._record("restore_many", snap)
+        self.vfs.rmtree(path)
     def rename(self, src, dst):
         src_b=self.vfs.read_file(src) if (self.vfs.exists(src) and self.vfs.isfile(src)) else None
         dst_b=self.vfs.read_file(dst) if (self.vfs.exists(dst) and self.vfs.isfile(dst)) else None
-        self.vfs.rename(src, dst)
         self._record("rename", src, dst, src_b, dst_b)
+        self.vfs.rename(src, dst)
     def mkdir(self, path, mode=0o755):
         existed=self.vfs.exists(path)
-        self.vfs.mkdir(path, mode)
         if not existed: self._record("rmdir", path)
+        self.vfs.mkdir(path, mode)
     def makedirs(self, path, mode=0o755):
         # Record each missing ancestor shallow→deep so undo removes deepest first
         missing=[]
@@ -258,39 +308,64 @@ class FileNamespace(TransactionParticipant):
             cur=parent
         # missing is deepest→shallowest; record shallow→deep so reverse undo
         # removes deepest first.
-        self.vfs.makedirs(path, mode)
         for p in reversed(missing): self._record("rmdir", p)
+        self.vfs.makedirs(path, mode)
 
 
 class VectorNamespace(TransactionParticipant):
-    """Explicit vector collection adapter (saga participant boundary)."""
+    """Explicit vector collection adapter (saga participant boundary).
+
+    Mutations snapshot the collection directory into the active transaction so a
+    crash before the commit record can be compensated at mount time.
+    """
     def __init__(self, disk): self.disk = disk
     def prepare(self, txid, intents): return None
     def commit(self, txid, intents): return None
     def abort(self, txid, intents): return None
     def __getattr__(self, name): return getattr(self.disk, name)
-    create_collection = lambda self, *a, **k: self.disk.create_collection(*a, **k)
+    def _journal(self, name):
+        vfs=self.disk.vfs; stack=getattr(vfs, "_tx_stack", None)
+        if stack: stack[-1]._record_fs("restore_tree", self.disk._dir(name), _snapshot_dir(vfs, self.disk._dir(name)))
+    def create_collection(self, name, *a, **k):
+        self._journal(name); return self.disk.create_collection(name, *a, **k)
+    def drop_collection(self, name, *a, **k):
+        self._journal(name); return self.disk.drop_collection(name, *a, **k)
+    def upsert(self, name, *a, **k):
+        self._journal(name); return self.disk.upsert(name, *a, **k)
+    def upsert_many(self, name, *a, **k):
+        self._journal(name); return self.disk.upsert_many(name, *a, **k)
+    def delete(self, name, *a, **k):
+        self._journal(name); return self.disk.delete(name, *a, **k)
     list_collections = lambda self: self.disk.list_collections()
-    drop_collection = lambda self, *a, **k: self.disk.drop_collection(*a, **k)
-    upsert = lambda self, *a, **k: self.disk.upsert(*a, **k)
-    upsert_many = lambda self, *a, **k: self.disk.upsert_many(*a, **k)
     get = lambda self, *a, **k: self.disk.get(*a, **k)
-    delete = lambda self, *a, **k: self.disk.delete(*a, **k)
     count = lambda self, *a, **k: self.disk.count(*a, **k)
     search = lambda self, *a, **k: self.disk.search(*a, **k)
 
 class LogNamespace(TransactionParticipant):
-    """Explicit structured-log adapter (saga participant boundary)."""
+    """Explicit structured-log adapter (saga participant boundary).
+
+    Mutations snapshot the stream directory into the active transaction so a
+    crash before the commit record can be compensated at mount time.
+    """
     def __init__(self, disk): self.disk = disk
     def prepare(self, txid, intents): return None
     def commit(self, txid, intents): return None
     def abort(self, txid, intents): return None
     def __getattr__(self, name): return getattr(self.disk, name)
-    create_stream = lambda self, *a, **k: self.disk.create_stream(*a, **k)
+    def _journal(self, name):
+        vfs=self.disk.vfs; stack=getattr(vfs, "_tx_stack", None)
+        if stack: stack[-1]._record_fs("restore_tree", self.disk._dir(name), _snapshot_dir(vfs, self.disk._dir(name)))
+    def create_stream(self, name, *a, **k):
+        self._journal(name); return self.disk.create_stream(name, *a, **k)
+    def drop_stream(self, name, *a, **k):
+        self._journal(name); return self.disk.drop_stream(name, *a, **k)
+    def append(self, stream, *a, **k):
+        self._journal(stream); return self.disk.append(stream, *a, **k)
+    def append_many(self, stream, *a, **k):
+        self._journal(stream); return self.disk.append_many(stream, *a, **k)
+    def ack(self, stream, *a, **k):
+        self._journal(stream); return self.disk.ack(stream, *a, **k)
     list_streams = lambda self: self.disk.list_streams()
-    drop_stream = lambda self, *a, **k: self.disk.drop_stream(*a, **k)
-    append = lambda self, *a, **k: self.disk.append(*a, **k)
-    append_many = lambda self, *a, **k: self.disk.append_many(*a, **k)
     query = lambda self, *a, **k: self.disk.query(*a, **k)
     count = lambda self, *a, **k: self.disk.count(*a, **k)
     tail = lambda self, *a, **k: self.disk.tail(*a, **k)
@@ -310,6 +385,7 @@ class DataDisk:
                 DeprecationWarning, stacklevel=2,
             )
         self.path=os.fspath(path); self.block_size=block_size; self.vfs=VFS(self.path,block_size); self._lock=threading.RLock(); self._mounted=False; self._metadata={}
+        self._recovery_participants={}; self._recovery_report=None
     @classmethod
     def create(cls,path,size_bytes,block_size=4096,label=""):
         VFS.create(os.fspath(path),size_bytes,block_size,label=label)
@@ -331,6 +407,24 @@ class DataDisk:
         body=dict(record); body["checksum"]=hashlib.sha256(_json(record)).hexdigest()
         data=_json(body)+b"\n"
         self.vfs.append_file(self.WAL,data) if self.vfs.exists(self.WAL) else self.vfs.write_file(self.WAL,data); self._sync()
+    def _append_compensation(self,txid,entry):
+        """Durably record how to undo one participant mutation (write-ahead undo log)."""
+        self._append_metadata_wal({"kind":"undo","txid":txid,"entry":_enc_entry(list(entry))})
+    def register_recovery_participant(self,name,factory):
+        """Register how to rebuild a participant so mount recovery can compensate it.
+
+        ``factory`` is called with the disk and must return an object exposing
+        ``abort(txid, intents)`` (or None when the participant is unavailable).
+        """
+        self._recovery_participants[name]=factory
+        return self
+    def _resolve_recovery_participant(self,name):
+        factory=self._recovery_participants.get(name)
+        if factory is not None:
+            try: return factory(self) if callable(factory) else factory
+            except Exception: return None
+        builtin={"FileNamespace":"fs","VectorNamespace":"vector","LogNamespace":"log"}
+        return getattr(self,builtin[name],None) if name in builtin else None
     def _wal_records(self):
         if not self.vfs.exists(self.WAL): return []
         out=[]
@@ -345,26 +439,68 @@ class DataDisk:
         states=self._read_json(self.TRANSACTIONS,{})
         states.setdefault(txid,{})["status"]=status
         self._atomic_json(self.TRANSACTIONS,states); self._sync()
-    def _recover_metadata(self):
-        tx,done,aborted={},set(),set()
+    def _recover_transactions(self):
+        """Replay the WAL: roll metadata forward/back, then compensate unfinished work.
+
+        Metadata is redone when the transaction durably committed and rolled back
+        otherwise. Every transaction without a ``commit`` record additionally has its
+        durable write-ahead undo entries replayed in reverse, so participant side
+        effects (filesystem, vector and log namespaces) cannot survive a crash that
+        happened after the participant acted but before the commit record.
+        """
+        order,ops,done,aborted={}, {}, set(), set()
+        undo,intents,compensated={}, {}, set()
         if self.vfs.exists(self.WAL):
             for line in self.vfs.read_file(self.WAL).splitlines():
                 try:
                     item=json.loads(line); checksum=item.pop("checksum")
                     if hashlib.sha256(_json(item)).hexdigest()!=checksum:break
-                    if item.get("kind")=="begin":tx.setdefault(item["txid"],[])
-                    elif item.get("kind")=="operation":tx.setdefault(item["txid"],[]).append(item["operation"])
-                    elif item.get("kind")=="commit":done.add(item["txid"])
-                    elif item.get("kind")=="abort":aborted.add(item["txid"])
+                except (ValueError,KeyError,TypeError):break
+                kind=item.get("kind"); tid=item.get("txid")
+                if tid is not None and tid not in order: order[tid]=len(order)
+                try:
+                    if kind=="begin":ops.setdefault(tid,[])
+                    elif kind=="operation":ops.setdefault(tid,[]).append(item["operation"])
+                    elif kind=="undo":undo.setdefault(tid,[]).append(_dec_entry(item.get("entry")))
+                    elif kind=="intent":
+                        payload=_dec_entry(item.get("intents") or [])
+                        intents.setdefault(tid,[]).append(((item.get("operation") or {}).get("participant"),payload))
+                    elif kind=="commit":done.add(tid)
+                    elif kind=="abort":aborted.add(tid)
+                    elif kind=="compensated":compensated.add(tid)
                 except (ValueError,KeyError,TypeError):break
         state=self._read_json(self.METADATA,{})
-        for tid,ops in tx.items():
+        for tid,entries in ops.items():
             if tid in aborted: continue
-            for op in (ops if tid in done else reversed(ops)):
+            for op in (entries if tid in done else reversed(entries)):
                 committed=tid in done; missing=op["after_missing"] if committed else op["before_missing"]; value=_dec(op["after"] if committed else op["before"])
                 if missing:state.pop(op["key"],None)
                 else:state[op["key"]]=value
         self._atomic_json(self.METADATA,state); self._metadata=state
+        report={"compensated":[],"committed":[],"aborted":[],"participants":[]}
+        for tid in sorted(order,key=order.get):
+            if tid in done:
+                report["committed"].append(tid); continue
+            if tid in aborted: report["aborted"].append(tid)
+            if tid not in compensated:
+                for entry in reversed(undo.get(tid,[])):
+                    try: _apply_undo(self.vfs,entry)
+                    except Exception: pass
+                # Written last so a crash during compensation simply replays it.
+                self._append_metadata_wal({"kind":"compensated","txid":tid})
+                compensated.add(tid); report["compensated"].append(tid)
+            for name,payload in intents.get(tid,()):
+                participant=self._resolve_recovery_participant(name)
+                if participant is None: continue
+                try:
+                    participant.abort(tid,tuple(payload))
+                    report["participants"].append({"txid":tid,"participant":name})
+                except Exception: pass
+        self._recovery_report=report
+        return report
+    def recovery_report(self):
+        """Result of the last mount-time recovery (None before the first mount)."""
+        return self._recovery_report
     def mount(self):
         with self._lock:
             if self._mounted:return self
@@ -378,7 +514,7 @@ class DataDisk:
                 self.vector=self.vectors=VectorNamespace(self._vector_disk); self.vector_disk=self.vector
                 self.log=self.logs=LogNamespace(self._log_disk); self.log_disk=self.log
                 self.checkpoints=CheckpointStore(self.vfs); self.wal=WriteAheadLog(self.vfs); self._metadata=self._read_json(self.METADATA,{})
-                if self.vfs.exists(self.WAL):self._recover_metadata()
+                if self.vfs.exists(self.WAL):self._recover_transactions()
                 self._mounted=True; return self
             except Exception:self.vfs.close(); raise
     open=mount
