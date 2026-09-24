@@ -110,7 +110,7 @@ class MetadataTransaction(AbstractContextManager):
     def __init__(self, owner, txid=None):
         self.owner=owner; self.txid=txid or uuid.uuid4().hex; self.changes={}; self.closed=False
         self._participants=[]; self._intents=[]; self._fs_journal=[]; self._pushed=False
-        self._compensated=False
+        self._compensated=False; self._intents_persisted=False
     def set(self,key,value):
         if not isinstance(key,str) or not key: raise TypeError("metadata key must be a non-empty string")
         self.changes[key]=value; return self
@@ -126,6 +126,24 @@ class MetadataTransaction(AbstractContextManager):
         if participant not in self._participants: self.enlist(participant)
         if not isinstance(operation, dict): raise TypeError("operation intent must be a dict")
         self._intents.append((participant, dict(operation))); return self
+    def _grouped_intents(self):
+        """每个 participant 的 intent，保持 enlist 顺序。"""
+        return {p: [op for q, op in self._intents if q is p] for p in self._participants}
+    def _persist_intents(self):
+        """把 intent 落盘（幂等）。
+
+        ``commit()`` 在 prepare 之前逐条写入；而 abort 可能在任何 prepare 发生前就到来，
+        恢复端只有能从日志读回 intent 才能补偿，所以这条路径也要写。
+        """
+        if self._intents_persisted: return
+        for p, ops in self._grouped_intents().items():
+            self.owner._append_metadata_wal({"kind":"intent","txid":self.txid,"operation":{"participant":type(p).__name__,"count":len(ops)},"intents":_enc_entry(list(ops))})
+        self._intents_persisted=True
+    def _dispatch_participant_abort(self):
+        """按 enlist 的逆序通知 participant 补偿，容忍单个失败。"""
+        for p, ops in reversed(list(self._grouped_intents().items())):
+            try: p.abort(self.txid, tuple(ops))
+            except Exception: pass
     def _active_tx(self):
         vfs=getattr(self.owner, "vfs", None)
         if vfs is None or not getattr(vfs, "_tx_stack", None): return None
@@ -176,11 +194,12 @@ class MetadataTransaction(AbstractContextManager):
             before=old.get(key,MISSING)
             op={"key":key,"before":_enc(None if before is MISSING else before),"before_missing":before is MISSING,"after":_enc(None if after is MISSING else after),"after_missing":after is MISSING}
             self.owner._append_metadata_wal({"kind":"operation","txid":self.txid,"operation":op})
-        grouped={p: [op for q,op in self._intents if q is p] for p in self._participants}
+        grouped=self._grouped_intents()
         try:
             for p,ops in grouped.items():
                 self.owner._append_metadata_wal({"kind":"intent","txid":self.txid,"operation":{"participant":type(p).__name__,"count":len(ops)},"intents":_enc_entry(list(ops))})
                 p.prepare(self.txid, tuple(ops)); self.owner._append_metadata_wal({"kind":"prepare","txid":self.txid,"operation":{"participant":type(p).__name__}})
+            self._intents_persisted=True
             new=dict(old)
             for key,value in self.changes.items():
                 if value is MISSING:new.pop(key,None)
@@ -210,6 +229,11 @@ class MetadataTransaction(AbstractContextManager):
             if not any(r.get("txid")==self.txid and r.get("kind") in ("commit", "abort") for r in self.owner._wal_records()):
                 self.owner._append_metadata_wal({"kind":"abort","txid":self.txid})
                 self.owner._transaction_state(self.txid, "aborted")
+            if self._participants:
+                # §8.6：已注册的 participant 在这里就收到 abort(txid, intents)，而不是
+                # 只等挂载恢复重放日志——否则进程内 abort 后它的事务性副作用会留下来。
+                self._persist_intents()
+                self._dispatch_participant_abort()
             self._unwind_fs()
             self._fs_journal.clear(); self._detach(); self._maybe_checkpoint()
             self.closed=True

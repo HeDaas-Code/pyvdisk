@@ -250,3 +250,109 @@ def test_recovery_reports_unknown_participants_without_failing(tmp_path):
         assert reopened.get_metadata("answer") is None
     finally:
         reopened.close()
+
+
+# ---------------------------------------------------------------- A3: live abort
+# ARCHITECTURE §8.6 promises participants are told to compensate via
+# abort(txid, intents). Mount recovery did that; aborting a live transaction did not,
+# so an in-process abort left participant side effects behind.
+def test_abort_notifies_enlisted_participants_in_process(tmp_path):
+    disk = _new(tmp_path / "abort.vdisk")
+    try:
+        participant = RecordingParticipant()
+        tx = disk.transaction().set("answer", 42).enlist(participant, {"op": "upsert", "id": "a"})
+        tx.abort()
+        assert participant.aborted == 1
+        assert participant.ledger == [("abort", tx.txid, ({"op": "upsert", "id": "a"},))]
+        assert disk.get_metadata("answer") is None
+    finally:
+        disk.close()
+
+
+def test_an_exception_in_the_transaction_block_compensates_participants(tmp_path):
+    disk = _new(tmp_path / "context.vdisk")
+    try:
+        participant = RecordingParticipant()
+        with pytest.raises(RuntimeError):
+            with disk.transaction() as tx:
+                tx.set("answer", 42).enlist(participant, {"op": "set"})
+                raise RuntimeError("caller failed")
+        assert participant.aborted == 1
+        assert disk.get_metadata("answer") is None
+    finally:
+        disk.close()
+
+
+def test_a_participant_enlisted_without_an_intent_is_still_told(tmp_path):
+    disk = _new(tmp_path / "no-intent.vdisk")
+    try:
+        participant = RecordingParticipant()
+        tx = disk.transaction().enlist(participant)
+        tx.abort()
+        assert participant.ledger == [("abort", tx.txid, ())]
+    finally:
+        disk.close()
+
+
+def test_abort_persists_intents_so_recovery_can_compensate_too(tmp_path):
+    """A crash right after a live abort must not lose the participant's intent."""
+    path = tmp_path / "abort-crash.vdisk"
+    disk = _new(path)
+    participant = RecordingParticipant()
+    tx = disk.transaction().set("answer", 42).enlist(participant, {"op": "set"})
+    tx.abort()
+    assert participant.aborted == 1
+    txid = tx.txid
+    _kill(disk)
+
+    replayed = []
+    reopened = DataDisk(path)
+    reopened.register_recovery_participant("RecordingParticipant", lambda d: RecordingParticipant(replayed))
+    reopened.mount()
+    try:
+        assert replayed == [("abort", txid, ({"op": "set"},))]
+        assert reopened.get_metadata("answer") is None
+    finally:
+        reopened.close()
+
+
+def test_abort_dispatches_in_reverse_order_and_survives_a_failure(tmp_path):
+    disk = _new(tmp_path / "reverse.vdisk")
+    order = []
+
+    class Marked(RecordingParticipant):
+        def __init__(self, name, ledger, fail=False):
+            super().__init__(ledger)
+            self.name, self.fail = name, fail
+
+        def abort(self, txid, intents):
+            order.append(self.name)
+            super().abort(txid, intents)
+            if self.fail:
+                raise RuntimeError(f"{self.name} cannot compensate")
+
+    try:
+        ledger = []
+        first = Marked("first", ledger)
+        second = Marked("second", ledger, fail=True)
+        third = Marked("third", ledger)
+        tx = (disk.transaction().enlist(first, {"n": 1}).enlist(second, {"n": 2})
+              .enlist(third, {"n": 3}))
+        tx.abort()                       # a failing participant must not abort the abort
+        assert order == ["third", "second", "first"]
+        assert [entry[0] for entry in ledger] == ["abort", "abort", "abort"]
+        assert ({"n": 1},) in [entry[2] for entry in ledger]
+    finally:
+        disk.close()
+
+
+def test_abort_notifies_participants_only_once(tmp_path):
+    disk = _new(tmp_path / "twice.vdisk")
+    try:
+        participant = RecordingParticipant()
+        tx = disk.transaction().enlist(participant, {"op": "set"})
+        tx.abort()
+        tx.abort()
+        assert participant.aborted == 1
+    finally:
+        disk.close()

@@ -16,6 +16,7 @@ ExecutionService 支持 inline 与可选 worker。DurableQueue 支持 lease、he
 - **恢复期补偿**：mount 时，WAL 中没有 `commit` 记录的事务，其 undo 记录按**逆序**重放，并写入 `kind=compensated` 标记。补偿幂等且可重复——重复 mount 结果一致，第二次 mount 不再重复补偿。
 - **已提交事务**：存在 `commit` 记录的事务只做元数据 redo，命名空间副作用被保留，绝不被补偿。
 - **第三方 participant**：`enlist` 的 intent 随事务持久化（含载荷）。要在恢复期被补偿，participant 需用 `DataDisk.register_recovery_participant(name, factory)` 注册重建方式，恢复时对其调用 `abort(txid, intents)`；未注册的 participant 只被记录、不被调用，且不会影响恢复本身。
+- **进程内 abort 同样通知 participant**：`abort()`（含 `with` 块里抛异常触发的隐式 abort）先持久化 intent，再按 enlist 的**逆序**调用 `abort(txid, intents)`，单个 participant 抛错不影响其余——不等同于"只等下次 mount 恢复"。因此 `abort` 可能被重复调用（崩溃后恢复会再来一次），participant 必须按幂等实现。
 - **可观测**：`DataDisk.recovery_report()` 返回本次 mount 的 `compensated / committed / aborted / participants` 明细。
 - **边界**：补偿只覆盖容器内状态；participant 在容器外的副作用（外部 API、支付、邮件）必须由其自身 `abort` 负责。
 
