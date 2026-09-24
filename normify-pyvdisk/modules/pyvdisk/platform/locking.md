@@ -10,9 +10,9 @@ description:
   en: >
       Whole-file write serialisation across threads and processes: fcntl.flock on POSIX, an msvcrt byte range on Windows. The Windows path polls with LK_NBLCK on purpose: LK_LOCK errors out after about ten seconds where flock keeps waiting.
       
-revision: 2c9009ba74afb515d301cc96e1946087268479a2
-updated_at: "2026-09-24T11:41:06.398Z"
-fingerprint: 079a5edb2e3962afd8293877a634189cbdef72a96e9d5881983523ef5a531fb1
+revision: 3cb47877135592bd8565726610c54ebd1ecd9fba
+updated_at: "2026-09-24T14:30:00Z"
+fingerprint: 00f27482df9157d059e546cd531a5773775112816081092a7b689393b4e6197b
 source:
   - path: "pyvdisk/compat.py"
     line: 128
@@ -27,13 +27,17 @@ apis:
     description:
       zh: >
           取得整文件锁。blocking=True 等待，timeout=N 秒后放弃并返回 False，blocking=False 只试一次。返回是否拿到锁。
+          
       en: >
           Take the whole-file lock. blocking=True waits, timeout=N seconds gives up and returns False, blocking=False tries once. Returns whether the lock is held.
+          
   - protocol: rpc
     path: "pyvdisk.compat.unlock"
     description:
       zh: >
           释放锁。句柄已关闭也能调用，因为卸载路径与出错路径都会走到它。
+          
       en: >
           Release the lock. Tolerates an already-closed handle, because unmount and error paths both call it.
+          
 ---

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "ok": true,
   "project": "normify-pyvdisk",
-  "compiled_at": "2026-09-24T11:48:42.836Z",
+  "compiled_at": "2026-09-24T11:51:44.100Z",
   "stats": {
     "tree_count": 1,
     "module_count": 290,
@@ -15,7 +15,7 @@
     "planned_count": 0,
     "deprecated_count": 0,
     "policy_rule_count": 2,
-    "change_count": 4,
+    "change_count": 5,
     "open_change_count": 0
   },
   "warnings": {
@@ -24,11 +24,11 @@
   },
   "artifacts": {
     "tree.json": {
-      "sha256": "2ec85812c633a314f985ff843562e9feb5c1a9ba78e267d26b4115da786284e3",
-      "bytes": 832176
+      "sha256": "c166989dfb7459ed702458b273fde1a4135ad707f7ab1ad8743c64705f920dab",
+      "bytes": 832638
     },
     "outline.md": {
-      "sha256": "84959e68fcfce9320bdd3bae70d18973d87fa558d0a0bea716ef5d51a0e1d30e",
+      "sha256": "fea33e8c6e8b1b7b98c7684729802b8639ca72d16a47c8adae7a20011a8f98cd",
       "bytes": 58995
     },
     "api-index.json": {
@@ -36,7 +36,7 @@
       "bytes": 62999
     },
     "receipt.json": {
-      "sha256": "6517e4cb20e1a6adde78aa6a5b9983240e72bad078a1a8914ff38c94acec7e44",
+      "sha256": "9f630c60ed6c4ff788b9e10259671ad79cc9b42b8f2e116127e206cc347048e6",
       "bytes": 964
     }
   }

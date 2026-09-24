@@ -10,9 +10,9 @@ description:
   en: >
       README overview: positioning, zero-dependency quick start, a ten-line agent-framework demo, core capabilities, CLI usage and how it is verified, with badges that match the declared Python floor and the current suite size.
       
-revision: f163400c098f68cbdfb0393a9bf488037d012aaf
-updated_at: "2026-09-24T11:48:38.684Z"
-fingerprint: 21502068301a8671d1fae8491b59e2a56e5e63d4a6f43a8250b4f127abba4f40
+revision: 3cb47877135592bd8565726610c54ebd1ecd9fba
+updated_at: "2026-09-24T11:51:39.625Z"
+fingerprint: 342ea9fe45178aeef55db55a465024bd6b8b64e68bf3f3fb0441947f7c90aaa4
 source:
   - path: "README.md"
 apis:

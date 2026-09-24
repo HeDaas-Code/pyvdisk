@@ -9,7 +9,7 @@
         "repository": "https://github.com/HeDaas-Code/pyvdisk"
       }
     ],
-    "compiled_at": "2026-09-24T11:48:42.836Z",
+    "compiled_at": "2026-09-24T11:51:44.100Z",
     "stats": {
       "tree_count": 1,
       "module_count": 290,
@@ -22,7 +22,7 @@
       "planned_count": 0,
       "deprecated_count": 0,
       "policy_rule_count": 2,
-      "change_count": 4,
+      "change_count": 5,
       "open_change_count": 0
     }
   },
@@ -2557,9 +2557,9 @@
           "path": "docs/VSCRIPT_SPEC.md"
         }
       ],
-      "revision": "f163400c098f68cbdfb0393a9bf488037d012aaf",
-      "updated_at": "2026-09-24T11:48:38.686Z",
-      "fingerprint": "eb6fa907e54689d8347e966774b0ad07fba9f382d04fba10dacc8c03953c1644",
+      "revision": "3cb47877135592bd8565726610c54ebd1ecd9fba",
+      "updated_at": "2026-09-24T11:51:39.626Z",
+      "fingerprint": "8d769f91ff4b5ef98a97e401560ea0b464b62e52d7f0300183d14660d5a10460",
       "aggregate": {
         "descendant_count": 6,
         "own_api_count": 0,
@@ -2757,9 +2757,9 @@
           "path": "README.md"
         }
       ],
-      "revision": "f163400c098f68cbdfb0393a9bf488037d012aaf",
-      "updated_at": "2026-09-24T11:48:38.684Z",
-      "fingerprint": "21502068301a8671d1fae8491b59e2a56e5e63d4a6f43a8250b4f127abba4f40",
+      "revision": "3cb47877135592bd8565726610c54ebd1ecd9fba",
+      "updated_at": "2026-09-24T11:51:39.625Z",
+      "fingerprint": "342ea9fe45178aeef55db55a465024bd6b8b64e68bf3f3fb0441947f7c90aaa4",
       "apis": [
         {
           "protocol": "file",
@@ -4944,9 +4944,9 @@
           "path": "pyvdisk/fuse_mount.py"
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T13:40:00Z",
-      "fingerprint": "184149afe73afbc06aac483b2bfd4c3def5db0e514b75c6e3b4c2835102d728f",
+      "revision": "3cb47877135592bd8565726610c54ebd1ecd9fba",
+      "updated_at": "2026-09-24T11:51:39.623Z",
+      "fingerprint": "a36d0bc58d4a6da6854f4c155bbc8fca838d7a7ff82d379b18b17490bdb29657",
       "aggregate": {
         "descendant_count": 4,
         "own_api_count": 0,
@@ -4966,8 +4966,8 @@
         "en": "Implementation Dispatch"
       },
       "description": {
-        "zh": "决定当前生效的实现并对外描述它。Windows 判定基于 sys.platform；use_implementation() 是测试缝，让模拟分支能在 Linux 上真正被执行；describe() 如实报告当前实现，调用方不必猜。\n",
-        "en": "Chooses the implementation in force and describes it. Windows detection is sys.platform based; use_implementation() is the seam that lets the emulated branches be exercised on Linux, and describe() reports what is actually live so a caller never has to guess.\n"
+        "zh": "决定当前生效的实现并对外描述它。Windows 判定基于 sys.platform；use_implementation() 是测试缝，让模拟分支能在 Linux 上真正被执行；describe() 如实报告当前生效的实现（包括模拟），调用方不会拿到一份\"在说另一个平台\"的报告。\n",
+        "en": "Chooses the implementation in force and describes it. Windows detection is sys.platform based; use_implementation() is the seam that lets the emulated branches be exercised on Linux, and describe() reports what is actually live -- the emulation included -- so a caller never gets a report about a platform that is not the one running.\n"
       },
       "source": [
         {
@@ -4976,9 +4976,9 @@
           "end_line": 100
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T11:40:54.220Z",
-      "fingerprint": "079a5edb2e3962afd8293877a634189cbdef72a96e9d5881983523ef5a531fb1",
+      "revision": "3cb47877135592bd8565726610c54ebd1ecd9fba",
+      "updated_at": "2026-09-24T11:51:39.621Z",
+      "fingerprint": "00f27482df9157d059e546cd531a5773775112816081092a7b689393b4e6197b",
       "apis": [
         {
           "protocol": "rpc",
@@ -5002,8 +5002,8 @@
           "protocol": "rpc",
           "path": "pyvdisk.compat.describe",
           "description": {
-            "zh": "当前实现的可读说明：定位读写、文件锁、目录 fsync、身份与符号链接各由什么原语支撑。\n",
-            "en": "Human-readable description of the live implementation: which primitive backs positional IO, locking, directory fsync, identity and symlinks.\n"
+            "zh": "当前生效的实现实际会做什么：定位读写、文件锁、目录 fsync、身份与符号链接各由什么原语支撑。描述的是 implementation()，而不是宿主平台。\n",
+            "en": "What the implementation in force actually does: which primitive backs positional IO, locking, directory fsync, identity and symlinks. Follows implementation(), not the host platform.\n"
           },
           "key": "rpc:pyvdisk.compat.describe"
         }
@@ -5042,9 +5042,9 @@
           "end_line": 100
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T11:40:47.981Z",
-      "fingerprint": "079a5edb2e3962afd8293877a634189cbdef72a96e9d5881983523ef5a531fb1",
+      "revision": "3cb47877135592bd8565726610c54ebd1ecd9fba",
+      "updated_at": "2026-09-24T14:30:00Z",
+      "fingerprint": "00f27482df9157d059e546cd531a5773775112816081092a7b689393b4e6197b",
       "apis": [
         {
           "protocol": "rpc",
@@ -5138,9 +5138,9 @@
           "line": 58
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T11:41:06.398Z",
-      "fingerprint": "079a5edb2e3962afd8293877a634189cbdef72a96e9d5881983523ef5a531fb1",
+      "revision": "3cb47877135592bd8565726610c54ebd1ecd9fba",
+      "updated_at": "2026-09-24T14:30:00Z",
+      "fingerprint": "00f27482df9157d059e546cd531a5773775112816081092a7b689393b4e6197b",
       "apis": [
         {
           "protocol": "rpc",
@@ -5190,9 +5190,9 @@
           "end_line": 127
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T11:41:00.670Z",
-      "fingerprint": "079a5edb2e3962afd8293877a634189cbdef72a96e9d5881983523ef5a531fb1",
+      "revision": "3cb47877135592bd8565726610c54ebd1ecd9fba",
+      "updated_at": "2026-09-24T14:30:00Z",
+      "fingerprint": "00f27482df9157d059e546cd531a5773775112816081092a7b689393b4e6197b",
       "apis": [
         {
           "protocol": "rpc",
@@ -13124,8 +13124,8 @@
         "en": "Test Suite"
       },
       "description": {
-        "zh": "测试套件：446 项可执行校验，覆盖文件系统、卷、身份、锁、队列、事务、VScript、审计轨迹、FUSE 桥、平台适配层、沙箱与打包。缺 hnswlib 时有 4 项对照用例跳过。\n",
-        "en": "Test suite: 446 executable checks covering the filesystem, volumes, identity, locking, the queue, transactions, VScript, the audit trail, the FUSE bridge, the platform layer, the sandbox and packaging. Four comparison cases skip when hnswlib is absent.\n"
+        "zh": "测试套件：447 项可执行校验，覆盖文件系统、卷、身份、锁、队列、事务、VScript、审计轨迹、FUSE 桥、平台适配层、沙箱与打包。缺 hnswlib 时有 4 项对照用例跳过。\n",
+        "en": "Test suite: 447 executable checks covering the filesystem, volumes, identity, locking, the queue, transactions, VScript, the audit trail, the FUSE bridge, the platform layer, the sandbox and packaging. Four comparison cases skip when hnswlib is absent.\n"
       },
       "source": [
         {
@@ -13138,8 +13138,8 @@
           "path": "tests/test_vscript.py"
         }
       ],
-      "revision": "c3881eee5dced2b180cd3b383e5d848026224154",
-      "updated_at": "2026-09-24T14:10:00Z",
+      "revision": "3cb47877135592bd8565726610c54ebd1ecd9fba",
+      "updated_at": "2026-09-24T11:51:39.627Z",
       "fingerprint": "b6440af3d48834c687f05de99c57cf0e3582d53a09d2ffb04b28579e901b64b1",
       "aggregate": {
         "descendant_count": 58,
@@ -13526,17 +13526,17 @@
         "en": "Platform Compat Tests"
       },
       "description": {
-        "zh": "在 Linux 上执行 Windows 模拟：用 msvcrt 替身加 use_implementation() 让模拟分支在真实文件上运行，覆盖锁竞争与超时分支，并与原生实现逐字节对照一整套操作。替身锁是进程内的，因此无法证明两个进程之间互斥——这仍然需要 Windows runner，文件里写明了这一点。守卫测试会在 compat.py 之外任何模块直接使用 fcntl、msvcrt、os.pread、os.pwrite 时失败。\n",
-        "en": "Exercises the Windows emulation from Linux: a stand-in for msvcrt plus use_implementation() runs the emulated branches against real files, including lock contention and the timeout path, and compares a whole workload against the native implementation byte for byte. The stand-in's lock is in-process, so it cannot show two processes contending -- that needs a Windows runner, and the file says so. A guard test fails if any module outside compat.py reaches for fcntl, msvcrt, os.pread or os.pwrite.\n"
+        "zh": "在 Linux 上执行 Windows 模拟：用 msvcrt 替身加 use_implementation() 让模拟分支在真实文件上运行，覆盖锁竞争与超时分支，并与原生实现逐字节对照一整套操作；同时固定 describe() 描述的是生效实现而不是宿主。替身锁是进程内的，因此无法证明两个进程之间互斥——这仍然需要 Windows runner，文件里写明了这一点。\n",
+        "en": "Exercises the Windows emulation from Linux: a stand-in for msvcrt plus use_implementation() runs the emulated branches against real files, including lock contention and the timeout path, and compares a whole workload against the native implementation byte for byte. It also pins describe() to the implementation in force rather than the host. The stand-in's lock is in-process, so it cannot show two processes contending -- that needs a Windows runner, and the file says so.\n"
       },
       "source": [
         {
           "path": "tests/test_compat.py"
         }
       ],
-      "revision": "2c9009ba74afb515d301cc96e1946087268479a2",
-      "updated_at": "2026-09-24T13:40:00Z",
-      "fingerprint": "27901dc78ca371a0a4fb38f74f89616e6b40b5cf776510c92021ff8155f5970c",
+      "revision": "3cb47877135592bd8565726610c54ebd1ecd9fba",
+      "updated_at": "2026-09-24T11:51:39.624Z",
+      "fingerprint": "49ec4bf92e42b64486091b5f313fcab34567167b3fdbe9d85ad538e501c2122d",
       "apis": [
         {
           "protocol": "file",
@@ -22957,6 +22957,15 @@
     ]
   },
   "changes": [
+    {
+      "id": "2026-09-24-compat-describe-live-impl",
+      "status": "verified",
+      "title": {
+        "en": "describe() reports the live implementation",
+        "zh": "describe() 报告生效的实现"
+      },
+      "updated_at": "2026-09-24T11:51:43.517Z"
+    },
     {
       "id": "2026-09-24-readme-agent-demo-fix",
       "status": "verified",

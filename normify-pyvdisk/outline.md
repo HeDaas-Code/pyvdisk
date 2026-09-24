@@ -193,7 +193,7 @@
       - pyvdisk.storage.wal.entries — WAL 记录 / WAL Entries — 事务日志动词与崩溃恢复重放：begin/append/prepare/commit/abort，以及重放所依赖的读取入口。 — [模块 1 · API 8]
       - pyvdisk.storage.wal.journal — 元数据 WAL / Metadata WAL — DataDisk 事务使用的元数据预写日志：存储后端、行编解码，以及分配序号的追加写入。 — [模块 1 · API 4]
       - pyvdisk.storage.wal.undo — 宿主撤销 WAL / Host Undo WAL — VScript 侧的 WAL 入口：独立的宿主路径实现已取消——本模块直接复用同一套 WriteAheadLog，并给出撤销记录使用的 kind 集与编解码。 — [模块 1 · API 4]
-  - pyvdisk.tests — 测试套件 / Test Suite — 测试套件：446 项可执行校验，覆盖文件系统、卷、身份、锁、队列、事务、VScript、审计轨迹、FUSE 桥、平台适配层、沙箱与打包。缺 hnswlib 时有… — [模块 59 · API 74]
+  - pyvdisk.tests — 测试套件 / Test Suite — 测试套件：447 项可执行校验，覆盖文件系统、卷、身份、锁、队列、事务、VScript、审计轨迹、FUSE 桥、平台适配层、沙箱与打包。缺 hnswlib 时有… — [模块 59 · API 74]
     - pyvdisk.tests.agent-sandbox — 沙箱测试 / Sandbox Tests — 把 AgentSandbox 当作一组承诺来测，而不是按实现来测：越权路径、Windows 样式路径、被隐藏的容器簿记、只读与禁删模式、含伪造行的审计链、脚本的… — [模块 1 · API 1]
     - pyvdisk.tests.agentic-cli — 智能体 CLI 用例 / Agentic CLI Tests — 面向智能体使用编写的 CLI 用例：可发现的输出与稳定的退出码。 — [模块 1 · API 1]
     - pyvdisk.tests.api-governance — API 治理用例 / API Governance Tests — 检查公开能力 API 是否拒绝应当拒绝的调用，而不只验证正常路径。 — [模块 1 · API 1]
