@@ -26,5 +26,10 @@ ExecutionService 支持 inline 与可选 worker。DurableQueue 支持 lease、he
 - **VScript 恢复入口**：`pyvdisk vscript run --wal PATH` 在脚本运行前消费日志、回滚未提交事务，运行结束再结算并截断。挂载没提供时，该事务保持 in-flight（报告为 `deferred`）而不是被标记 aborted——标记 aborted 会静默保留半应用的写入。
 - **已知限制**：嵌套 `transaction` 的子事务把操作记录在子事务自己的 txid 下，父事务回滚不会覆盖它们（与 issue #1 C8 的 undo 记账一并处理）。
 
+### 宿主文件桥（host.*）
+- **默认关闭**：`Policy.host_read_roots / host_write_roots` 默认为空，此时 `host.*` 一律拒绝——空列表表示"没有授权任何根目录"，而不是"路径不合法"，报错会直接给出打开方式。
+- **入口**：`pyvdisk vscript run|run-disk|repl --host-read-root DIR --host-write-root DIR`（可重复），或 Python API 里 `Runtime(policy=Policy(host_read_roots=[...], host_write_roots=[...]))`。读写根相互独立：读根只能 `host.read/import_file`，写根才能 `host.write/export_file`。
+- **约束**：根目录必须存在；解析后必须落在根内（`realpath` + `commonpath`）；路径中任何一段是符号链接、或目标是特殊文件（fifo/设备）都被拒绝；写入走同目录临时文件 + `fsync` + `os.replace`。
+
 ## 永久边界
 不实现分布式调度平台、不做多租户、不做旧格式迁移。不自动恢复任意 Python 执行栈；VScript parallel/task/await 为确定性顺序语义。
