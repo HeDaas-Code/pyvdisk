@@ -20,6 +20,12 @@ ExecutionService 支持 inline 与可选 worker。DurableQueue 支持 lease、he
 - **可观测**：`DataDisk.recovery_report()` 返回本次 mount 的 `compensated / committed / aborted / participants` 明细。
 - **边界**：补偿只覆盖容器内状态；participant 在容器外的副作用（外部 API、支付、邮件）必须由其自身 `abort` 负责。
 
+### 审计轨迹（audit）
+- **读得到**：`CheckpointAuditSink` 与 `DataDiskAuditSink` 都提供 `records()` / `query(run_id=, task_id=, status=, since=, until=, limit=, newest_first=)`，按记录字段精确过滤；`limit` 默认取最旧的 N 条，`newest_first=True` 取最新的 N 条。
+- **可检测篡改**：每行带 `prev_hash` / `hash` 组成哈希链（默认开启），`verify()` 逐行报告首个断链点与原因（`row content changed` / `prev_hash does not link` / `row is not chained`）。链只能发现"改了却没重算整条链"的修改——有写权限的人可以重算整条链，这正是 `head()` 的用途：把它锚定在存储之外，重写就会露出来。旧版写下的无链日志用 `adopt()` 重新落链。
+- **保留**：两个后端的语义不同，故意不统一——`CheckpointAuditSink.retain(max_records=, max_age_seconds=)` 真的删除最旧的行，并把链锚点推进到"最后一个被丢掉的行"，所以删除后 `verify()` 依然成立；`DataDiskAuditSink.retain()` 不重写历史，它请日志层按流自身的 `retention_seconds` / `max_events` 立即执行段级保留（段是只追加的），锚点同样记录被丢掉的链头。保留都是显式调用，不会后台自动清理。
+- **哈希链不加密**：`hash` 不防止读取，也不替代权限；它只让"事后修改"可被发现。
+
 ### 日志检查点与恢复入口
 - **一份实现**：DataDisk 与 VScript 共用同一份 WAL——同一记录编解码、同一 kind 词表、同一 `recover()`，只是后端不同（镜像内 VFS / 宿主文件）。读取端遇到不认识的 kind 只截断可读前缀，不会假装后面没有 `commit`。
 - **结算即截断**：`DataDisk.checkpoint_wal()` 在没有打开事务时结算全部记录——已提交事务的元数据早已发布，未完成事务先被补偿——然后整段丢弃日志；`close()` 与日志超过 `WAL_CHECKPOINT_BYTES`（默认 256 KiB）时自动触发。截断明细写入 `/.system/wal.ckpt.json`（受能力保护）。
