@@ -87,14 +87,21 @@ def use_implementation(name: str):
 
 
 def describe() -> dict:
-    """What this platform gives us, for diagnostics and test assertions."""
+    """What the implementation in force actually does, for diagnostics.
+
+    This reports the *live* implementation, not the host platform: when the
+    Windows emulation is forced on Linux, callers must see the emulated
+    primitives, otherwise ``describe()`` would confirm exactly the wrong thing.
+    """
+    windows = implementation() == "windows"
     return {
         "platform": sys.platform,
         "implementation": implementation(),
-        "positional_io": "os.pread/os.pwrite" if _HAS_POSITIONAL else "lseek+read/write",
-        "locking": "fcntl.flock" if _fcntl is not None else ("msvcrt.locking" if _msvcrt is not None else "none"),
-        "directory_fsync": IS_POSIX,
-        "uid_gid": hasattr(os, "getuid") and hasattr(os, "getgid"),
+        "positional_io": ("lseek+read/write" if windows or not _HAS_POSITIONAL
+                          else "os.pread/os.pwrite"),
+        "locking": ("msvcrt.locking" if windows else ("fcntl.flock" if _fcntl is not None else "none")),
+        "directory_fsync": IS_POSIX and not windows,
+        "uid_gid": hasattr(os, "getuid") and hasattr(os, "getgid") and not windows,
         "symlinks": hasattr(os, "symlink"),
     }
 

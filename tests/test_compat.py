@@ -80,6 +80,20 @@ def test_describe_reports_the_live_implementation():
         assert info["directory_fsync"] is True
 
 
+def test_describe_follows_the_implementation_not_the_host(windows_emulation):
+    """A forced implementation must be described as itself.
+
+    Reporting the host's primitives while the emulation is live would confirm
+    exactly the wrong thing to anyone using describe() for diagnostics.
+    """
+    info = compat.describe()
+    assert info["implementation"] == "windows"
+    assert info["positional_io"] == "lseek+read/write"
+    assert info["locking"] == "msvcrt.locking"
+    assert info["directory_fsync"] is False, "Windows cannot fsync a directory"
+    assert info["uid_gid"] is False
+
+
 def test_uid_and_gid_are_integers():
     assert isinstance(compat.uid(), int)
     assert isinstance(compat.gid(), int)

@@ -6,7 +6,7 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-PyVDisk-181717?logo=github)](https://github.com/HeDaas-Code/pyvdisk)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-446%20passed-2ea44f)](#验证)
+[![Tests](https://img.shields.io/badge/Tests-447%20passed-2ea44f)](#验证)
 
 PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行基础设施项目：DataDisk 负责统一数据与执行基础设施，VScript 负责安全工作流语言、CLI、REPL 与运行时。
 
@@ -187,6 +187,6 @@ pyvdisk info image.vdisk
 .venv/bin/python -m pytest -q
 ```
 
-当前回归：446 passed（本地 3.12；CI 覆盖 3.9 / 3.10 / 3.11 / 3.12 四个版本的同一套用例）
+当前回归：447 passed（本地 3.12；CI 覆盖 3.9 / 3.10 / 3.11 / 3.12 四个版本的同一套用例）
 
-不装 hnswlib 时同一套用例为 442 passed / 4 skipped —— 核心路径不再依赖任何第三方包，跳过的是"两种索引后端结果一致"这类对照用例。
+不装 hnswlib 时同一套用例为 443 passed / 4 skipped —— 核心路径不再依赖任何第三方包，跳过的是"两种索引后端结果一致"这类对照用例。
