@@ -116,6 +116,7 @@ pyvdisk vscript run-disk tools.vdisk:/.vscript/scripts/job.vds
 - Execution Plane：ExecutionService、DurableQueue、worker、lease、heartbeat、retry、idempotency、dead-letter、RunState、Audit。
 - WAL 检查点：日志结算后整段截断（`wal.ckpt.json` 记录明细），重挂载只重放检查点之后的尾巴；DataDisk 与 VScript 共用同一份 WAL 实现，`vscript run --wal` 是它的真实恢复入口。
 - 单 DataDisk ACID：统一 txid、intent、prepare、apply、commit、abort；FS/Vector/Log 副作用走**写前补偿日志**，未提交事务在 mount 时被幂等补偿，不再出现"元数据回滚、副作用残留"的部分提交。
+- VScript 事务撤销：每次可撤销的 `fs.*` 变更都在生效前记账（`write/remove/mkdir/rename/symlink/meta/truncate/restore_tree`），进程内回滚与崩溃恢复共用同一份 undo 解释器；旧内容 ≥64 KiB 落到挂载内 `/.system/tx`，不再整份留在内存。
 - 内部 exactly-once：operation_id、结果持久化、任务去重、Log event_id 去重。
 - 安全：ScopedDataDisk、路径/collection/stream scope、Host allowlist、atomic write。
 - 可靠性：generation、checksum、fsync、mirror degraded fallback、remount recovery。

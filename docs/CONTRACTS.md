@@ -24,7 +24,15 @@ ExecutionService 支持 inline 与可选 worker。DurableQueue 支持 lease、he
 - **结算即截断**：`DataDisk.checkpoint_wal()` 在没有打开事务时结算全部记录——已提交事务的元数据早已发布，未完成事务先被补偿——然后整段丢弃日志；`close()` 与日志超过 `WAL_CHECKPOINT_BYTES`（默认 256 KiB）时自动触发。截断明细写入 `/.system/wal.ckpt.json`（受能力保护）。
 - **为什么可以丢弃**：写入永远先于 `commit` 记录落盘，所以 `commit` 一旦持久化，效果就已经在数据里；日志真正要用的是反方向——撤销没提交完的事务。
 - **VScript 恢复入口**：`pyvdisk vscript run --wal PATH` 在脚本运行前消费日志、回滚未提交事务，运行结束再结算并截断。挂载没提供时，该事务保持 in-flight（报告为 `deferred`）而不是被标记 aborted——标记 aborted 会静默保留半应用的写入。
-- **已知限制**：嵌套 `transaction` 的子事务把操作记录在子事务自己的 txid 下，父事务回滚不会覆盖它们（与 issue #1 C8 的 undo 记账一并处理）。
+- **已知限制**：嵌套 `transaction` 的子事务把操作记录在子事务自己的 txid 下，自己 `commit` 后 WAL 里已是已提交事务。父事务回滚在进程内仍会覆盖它们（undo 会合并给父事务），但若进程在父事务回滚的中途崩溃，恢复只会撤销父事务的条目。
+
+### VScript 事务的撤销记账
+- **写前记账**：每条可撤销的变更都在**生效之前**记账（先写 WAL 记录与 in-memory 条目，再改数据），所以"改完但没记上"的窗口不存在。此前只有 `fs.write`/`fs.append` 记账，`remove/mkdir/move/link` 回滚后依然是改过的。
+- **一份词表，一个解释器**：`vscript/undo.py` 定义全部 undo 动词——`write`（恢复内容，`body=None` 表示原本不存在）、`remove`、`mkdir`、`rename`、`symlink`、`meta`（mode/uid/gid/atime/mtime）、`truncate`、`restore_tree`（撤销 `remove --recursive`）。进程内回滚与崩溃后的 `recover_wal` 都调用同一个 `apply_undo`，不再各写一套。
+- **覆盖范围**：`fs.write / append / copy / mkdir / makedirs / remove（文件、目录、符号链接、递归目录树）/ move / link / symlink / truncate / chmod / chown / utime`。`move` 覆盖了已存在的目标（先记目标旧内容，再记反向 rename）；`truncate` 记旧全文，因为截断丢掉的内容无法用"截回去"找回。
+- **旧日志可读**：上一版写下的 `kind=write|append` + `old` 记录会被 `normalize()` 翻译成 `write` 条目，恢复不需要日志迁移。
+- **大 body 不留在内存**：旧内容 ≥ `SPILL_THRESHOLD`（64 KiB）时写入挂载内的 `/.system/tx/<token>-<序号>`（`/.system` 对脚本不可达，受能力保护），条目只记路径；阈值以下仍内联，避免常见小文件额外 I/O。`commit` 与 `rollback` 都会回收 spill；spill 槽位名按事务随机短 token 生成，符合单目录项 27 字节上限。整段 spill 区在日志结算后一并清理。
+- **边界**：`vector.*` 与 `log.*` 的变更仍然不入 undo 记账（回滚不会撤销 `upsert`/`drop_collection`/`emit`/`compact` 等），这是当前明确的未覆盖面。
 
 ### 宿主文件桥（host.*）
 - **默认关闭**：`Policy.host_read_roots / host_write_roots` 默认为空，此时 `host.*` 一律拒绝——空列表表示"没有授权任何根目录"，而不是"路径不合法"，报错会直接给出打开方式。

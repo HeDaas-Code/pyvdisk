@@ -1,6 +1,8 @@
 """Safe tree-walking VScript interpreter."""
 from __future__ import annotations
-import io, operator, time
+import io, operator, time, uuid
+from .undo import (apply_undo, discard_body, discard_spill_area, normalize,
+                   snapshot_tree, spill_conflict, store_body)
 from .wal import WriteAheadLog
 from pathlib import Path
 from .parser import parse
@@ -9,28 +11,61 @@ from .audit import AuditRecord, new_run_id, policy_hash, script_hash, monotonic_
 class TransactionContext:
     """In-process undo log, mirrored into a WAL when the runtime has one.
 
-    The in-memory undo closures are what a rollback uses; the WAL carries the
-    recorded operations so a *later* process can settle a transaction whose owner
-    died. Neither is a substitute for the other: undos need live handles, the log
-    survives the process.
+    Every entry is recorded *before* the change it undoes (write-ahead, see
+    `docs/CONTRACTS.md`). The in-memory list is what a rollback uses -- entries plus
+    the store they belong to, since handles are live -- and the WAL carries the same
+    entries so a *later* process can settle a transaction whose owner died. Neither
+    is a substitute for the other: one needs live handles, the other survives the
+    process.
     """
     def __init__(self, runtime):
-        self.runtime=runtime; self.undos=[]; self.operations=[]; self.rolling_back=False
+        self.runtime=runtime
+        #: (store, entry) pairs, undone in reverse order.
+        self.undos=[]
+        #: entries as recorded, for introspection.
+        self.operations=[]
+        self.rolling_back=False
         self.txid = runtime.wal.begin() if runtime.wal is not None else None
-    def add_operation(self, operation):
-        if not self.rolling_back:
-            self.operations.append(operation)
-            if self.runtime.wal is not None: self.runtime.wal.append(self.txid, operation)
-    def add(self, undo):
-        if not self.rolling_back: self.undos.append(undo)
-    def commit(self):
+        # Spill slots are named per transaction, and short: a directory entry is
+        # limited to 27 bytes, so a uuid4 hex txid does not fit in a file name.
+        self.spill_token = uuid.uuid4().hex[:12]
+        self._spill_index = 0
+    def _spill_slot(self):
+        self._spill_index += 1
+        return self._spill_index
+    def journal(self, capability, undo, path=None, body=None, tree=False, **fields):
+        """Record one reversible change before it is applied.
+
+        ``body`` is the file's previous content, or None when it did not exist; a
+        large body goes to the store rather than into memory (`undo.store_body`).
+        """
+        if self.rolling_back: return
+        entry={"undo":undo,"path":path,**fields}
+        if undo=="write":
+            entry.update(store_body(capability.target,self.spill_token,self._spill_slot(),body))
+        elif undo=="restore_tree":
+            if spill_conflict(path):
+                raise RuntimeError(f"无法在事务内递归删除 {path}：撤销快照必须与数据在同一文件系统内，且不能在删除范围内")
+            entry["spill"]=snapshot_tree(capability.target,path,self.spill_token,self._spill_slot())
+        self.operations.append(entry)
+        if self.runtime.wal is not None: self.runtime.wal.append(self.txid,dict(entry,mount=capability.name))
+        self.undos.append((capability.target,entry))
+    def _discard_spills(self):
+        for store,entry in self.undos: discard_body(store,entry)
+    def commit(self, parent=None):
+        """Publish the transaction, or hand its undo log to an enclosing one."""
         if self.runtime.wal is not None: self.runtime.wal.commit(self.txid)
+        if parent is not None:
+            parent.undos.extend(self.undos); parent.operations.extend(self.operations)
+        else:
+            self._discard_spills()
     def rollback(self):
         self.rolling_back=True
         errors=[]
-        for undo in reversed(self.undos):
-            try: undo()
+        for store,entry in reversed(self.undos):
+            try: apply_undo(store,entry)
             except Exception as exc: errors.append(exc)
+        self._discard_spills()
         if self.runtime.wal is not None and self.txid is not None:
             self.runtime.wal.abort(self.txid)
         if errors: raise RuntimeError(f"事务回滚失败: {errors[0]}")
@@ -42,6 +77,9 @@ def recover_wal(wal, mounts=None):
     and re-applying an ``append`` would duplicate it. The direction the log is
     actually needed for is the other one: undoing a transaction whose process died.
 
+    Entries are interpreted by the same `undo.apply_undo` the in-process rollback
+    uses, so every operation that records an undo is compensable, not just writes.
+
     ``mounts`` maps a mount name to the capability its operations were recorded
     against. A transaction with an operation whose mount was not supplied is left in
     flight and reported as ``deferred`` instead of being marked aborted, because
@@ -51,23 +89,24 @@ def recover_wal(wal, mounts=None):
     mounts=dict(mounts or {})
     committed,pending=wal.recover()
     report={"committed":[txid for txid,_ in committed],"pending":[],"deferred":[],"rolled_back":0,"unresolved":[]}
-    def undo(operation):
-        target=mounts.get(operation.get("mount"))
-        if target is None: report["unresolved"].append(operation); return False
-        old=operation.get("old")
-        if old is None:
-            if target.exists(operation["path"]): target.remove(operation["path"])
-        else: target.write_file(operation["path"], old.encode("latin1"))
+    def undo(entry):
+        target=mounts.get(entry.get("mount"))
+        if target is None: report["unresolved"].append(entry); return False
+        if not apply_undo(target,normalize(entry)): report["unresolved"].append(entry); return False
         report["rolled_back"]+=1
         return True
     for txid,operations in pending:
         blocked=False
-        for operation in reversed(operations):
-            if not undo(operation): blocked=True
+        for entry in reversed(operations):
+            if not undo(entry): blocked=True
         if blocked: report["deferred"].append(txid)
         else:
             wal.abort(txid); report["pending"].append(txid)
-    if not report["unresolved"]: wal.truncate()
+    if not report["unresolved"]:
+        wal.truncate()
+        # Any spill left now belongs to a transaction that is settled: committed ones
+        # never needed it, and unfinished ones were just undone.
+        for target in mounts.values(): discard_spill_area(target)
     return report
 
 from dataclasses import dataclass
@@ -175,10 +214,9 @@ class Runtime:
     def transactions_open(self):
         """True while a ``tx`` block is still running, so the log cannot be settled."""
         return bool(self._transactions)
-    def record_undo(self, undo):
-        if self._transactions: self._transactions[-1].add(undo)
-    def record_operation(self, operation):
-        if self._transactions: self._transactions[-1].add_operation(operation)
+    def journal(self, capability, undo, **fields):
+        """Record a reversible change before applying it; a no-op outside a ``tx``."""
+        if self._transactions: self._transactions[-1].journal(capability, undo, **fields)
     def exec_block(self,block,env):
         child=Env(env);value=None
         for s in block.statements:value=self.execute(s,child)
@@ -236,10 +274,7 @@ class Runtime:
                 raise
             else:
                 self._transactions.pop()
-                tx.commit()
-                if self._transactions:
-                    self._transactions[-1].undos.extend(tx.undos)
-                    self._transactions[-1].operations.extend(tx.operations)
+                tx.commit(self._transactions[-1] if self._transactions else None)
                 return result
         elif isinstance(n,A.Try):
             try:self.exec_block(n.body,env)
