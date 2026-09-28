@@ -16,6 +16,9 @@ class CompactPreservesStateTests(unittest.TestCase):
         LogDisk.create(str(self.path), 2 * 1024 * 1024)
         self.disk = LogDisk(str(self.path))
         self.disk.mount()
+        # 必须显式关：self.disk 活到 addCleanup 之后，Linux 上"打开中被删"合法
+        # 所以看不出来，Windows 上临时目录会删不掉（WinError 32）。
+        self.addCleanup(self.disk.close)
         self.disk.create_stream("s", segment_events=3, retention_seconds=None, max_events=None)
 
     def test_compact_preserves_consumers(self):

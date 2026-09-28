@@ -17,7 +17,7 @@ def _hnswlib():
     try:
         import hnswlib
     except ImportError as exc:
-        raise ImportError("向量数据盘需要上游依赖 hnswlib；请运行 pip install hnswlib") from exc
+        raise ImportError("向量数据盘需要可选依赖 hnswlib；请运行 pip install \"pyvdisk[vector]\"（Windows 上它需要现场编译 C++）") from exc
     return hnswlib
 
 def _json_bytes(value: Any) -> bytes:

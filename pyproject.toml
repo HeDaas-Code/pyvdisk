@@ -11,11 +11,15 @@ requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "PyVDisk contributors" }]
 keywords = ["virtual-disk", "filesystem", "fuse", "vm", "disk-image", "vector-database", "structured-logging", "time-series"]
-dependencies = ["hnswlib>=0.8.0"]
+# hnswlib 在 Windows 上没有预编译 wheel（PyPI 只有 sdist，要现编 C++），而代码里
+# 向量盘是延迟导入的（vector_disk._hnswlib()），FS/Log/Checkpoint 都不需要它。
+# 因此它属于可选能力而不是核心依赖：不装也能用文件盘，装了才有向量盘。
+dependencies = []
 
 [project.optional-dependencies]
+vector = ["hnswlib>=0.8.0"]
 fuse = ["fusepy"]
-dev = ["pytest", "setuptools>=61.0"]
+dev = ["pytest", "setuptools>=61.0", "hnswlib>=0.8.0"]
 
 [project.scripts]
 pyvdisk = "pyvdisk.cli:main"
