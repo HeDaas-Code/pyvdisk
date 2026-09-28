@@ -16,6 +16,7 @@ class RetentionEventIdsTests(unittest.TestCase):
         LogDisk.create(str(self.path), 2 * 1024 * 1024)
         self.disk = LogDisk(str(self.path))
         self.disk.mount()
+        self.addCleanup(self.disk.close)  # 同上：Windows 不会允许删开着句柄的文件
         self.disk.create_stream("s", segment_events=3, retention_seconds=1, max_events=None)
 
     def test_event_ids_pruned_with_old_segment(self):

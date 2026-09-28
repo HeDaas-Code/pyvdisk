@@ -61,6 +61,9 @@ class SubmitConflictTests(unittest.TestCase):
     def test_scoped_view_rejects_protected_internals(self):
         DataDisk.create(self.root / "disk3.vdisk", 4 * 1024 * 1024)
         disk = DataDisk(self.root / "disk3.vdisk")
+        # handle.error 上的 traceback 会把 worker 栈帧（连同 disk）一直带在手里，
+        # 靠 GC 收不掉；Windows 因此删不了临时目录，这里显式登记关闭。
+        self.addCleanup(disk.close)
         service = ExecutionService(disk)
 
         def probe(ctx_arg, view):

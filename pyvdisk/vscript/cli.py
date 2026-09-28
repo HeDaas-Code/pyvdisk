@@ -1,11 +1,50 @@
 """Command-line frontend for the VScript MVP."""
 from __future__ import annotations
+import os
+import re
 import sys
 from . import Compiler, Runtime, MountRegistry
 from .policy import Policy
 from .runtime import recover_wal
 from .wal import WriteAheadLog
 from .errors import VScriptError, CapabilityError, ResourceLimitError, LexError, ParseError, CompileError
+
+_MOUNT_USAGE = "挂载格式为 PATH:PERM[,PERM] 或 NAME:PATH:PERM[,PERM]"
+# 只在 Windows 上把 "X:" 认作盘符；POSIX 下单字母挂载名（a:PATH:PERM）语义不变。
+_DRIVE_PREFIX = re.compile(r"^[A-Za-z]:[\\/]")
+
+
+def _is_drive_qualified(path: str) -> bool:
+    return os.name == "nt" and bool(_DRIVE_PREFIX.match(path))
+
+
+def _split_mount(item):
+    """拆 --mount 的 NAME:PATH:PERM[,PERM] / PATH:PERM[,PERM]。
+
+    权限段永远不含反斜杠和盘符，所以从**右边**取；不能按冒号个数从左切——
+    Windows 的绝对路径自带一个冒号（D:\\x\\data.vdisk），从左切会把盘符切成
+    路径、把挂载名丢掉，registry 最后拿到 "D" 这样的假路径。
+    """
+    path_part, sep, tail = item.rpartition(":")
+    if not sep or not path_part:
+        raise ValueError(_MOUNT_USAGE)
+    perms = set(tail.split(","))
+    name, colon, rest = path_part.partition(":")
+    if colon and not _is_drive_qualified(path_part):
+        return name, rest, perms
+    return None, path_part, perms
+
+
+def split_disk_location(location):
+    """拆 run-disk 的 DISK.vdisk:/inner/path。
+
+    盘内的脚本路径一定以 "/" 开头，所以分隔符取**最后一次**出现的 ":/"，
+    这样宿主侧的 D:\\...\\tools.vdisk 或 D:/.../tools.vdisk 都不会被误切。
+    """
+    index = location.rfind(":/")
+    if index <= 0:
+        raise ValueError("run-disk 位置应为 DISK.vdisk:/path.vds")
+    return location[:index], location[index + 1:]
 
 def _pairs(values):
     result={}
@@ -26,11 +65,10 @@ def _policy(args):
 def _mounts(values,registry):
     bindings={};allowed={}
     for item in values or []:
-        parts=item.split(":",2)
-        if len(parts)==2:
-            path,raw=parts;allowed[path]=set(raw.split(","));continue
-        if len(parts)!=3: raise ValueError("挂载格式为 PATH:PERM[,PERM] 或 NAME:PATH:PERM[,PERM]")
-        name,path,raw=parts;perms=set(raw.split(","));bindings[name]=registry.open(name,path,permissions=perms);allowed[path]=perms
+        name,path,perms=_split_mount(item)
+        if name is not None:
+            bindings[name]=registry.open(name,path,permissions=perms)
+        allowed[path]=perms
     return bindings,allowed
 
 def _recovery_mounts(bindings):
@@ -46,8 +84,7 @@ def command(args):
         if args.action=="check":Compiler().compile_file(args.script);print(f"OK: {args.script}");return 0
         if args.action=="repl":return repl(_policy(args))
         if args.action=="run-disk":
-            if ":" not in args.location:raise ValueError("run-disk 位置应为 DISK.vdisk:/path.vds")
-            disk_path,vpath=args.location.split(":",1)
+            disk_path,vpath=split_disk_location(args.location)
             from ..vfs import VFS
             with VFS(disk_path) as bootstrap:source=bootstrap.read_file(vpath).decode("utf-8")
             program=Compiler().compile(source,args.location)

@@ -67,7 +67,7 @@ class Lexer:
                     x = self.advance()
                     if x == "\\" and prefix != "r":
                         esc = self.advance(); mapping = {"n":"\n","t":"\t","r":"\r","0":"\0","\\":"\\","\"":"\"","'":"'"}
-                        if esc not in mapping: raise LexError(f"不支持的转义: \\{esc}", self.span(self.line, self.col-1))
+                        if esc not in mapping: raise LexError(f"不支持的转义: \\{esc}；Windows 路径请改用 r'...' 原始字符串，或把反斜杠双写", self.span(self.line, self.col-1))
                         x = mapping[esc]
                     chars.append(x)
                 self.advance(); value = "".join(chars)

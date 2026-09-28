@@ -20,7 +20,14 @@ class HostCapabilityTests(unittest.TestCase):
             self.assertEqual((root/"out").read_bytes(), b"new")
     def test_symlink_escape_and_special_files_rejected(self):
         with tempfile.TemporaryDirectory() as td, tempfile.TemporaryDirectory() as outside:
-            root=Path(td); (root/"link").symlink_to(outside, target_is_directory=True)
+            root=Path(td)
+            try:
+                (root/"link").symlink_to(outside, target_is_directory=True)
+            except OSError as exc:
+                # Windows 建目录符号链接要管理员权限或"开发者模式"（WinError 1314）。
+                # 显式 skipTest 而不是让它冒牌失败：skip 会在结果里点名，
+                # 不会让人以为这条逃逸检查已经跑过了。
+                self.skipTest(f"平台不允许创建符号链接，逃逸分支未覆盖: {exc}")
             (Path(outside)/"secret").write_bytes(b"secret")
             p=HostCapability([root], [root]).proxy()
             with self.assertRaises(CapabilityError): p.read(root/"link"/"secret")
@@ -68,7 +75,7 @@ class HostModuleThroughRuntimeTests(unittest.TestCase):
             target = Path(td) / "f.txt"
             target.write_bytes(b"x")
             with self.assertRaises(CapabilityError) as caught:
-                _run(f'language "1.0"; host.read("{target}");')
+                _run(f'language "1.0"; host.read("{target.as_posix()}");')
             self.assertIn("--host-read-root", str(caught.exception))
 
     def test_policy_roots_make_host_read_write_and_import_work(self):
@@ -78,10 +85,10 @@ class HostModuleThroughRuntimeTests(unittest.TestCase):
             policy = Policy(host_read_roots=[str(root)], host_write_roots=[str(root)])
             _run(
                 f'language "1.0";'
-                f'let d = host.read("{root}/in.txt");'
+                f'let d = host.read("{root.as_posix()}/in.txt");'
                 f'assert d.length == 10;'
-                f'host.write("{root}/out.txt", d);'
-                f'host.write("{root}/second.txt", "second");',
+                f'host.write("{root.as_posix()}/out.txt", d);'
+                f'host.write("{root.as_posix()}/second.txt", "second");',
                 policy=policy,
             )
             self.assertEqual((root / "out.txt").read_bytes(), b"hello-host")
@@ -92,7 +99,7 @@ class HostModuleThroughRuntimeTests(unittest.TestCase):
             (Path(outside) / "secret.txt").write_bytes(b"secret")
             policy = Policy(host_read_roots=[td], host_write_roots=[td])
             with self.assertRaises(CapabilityError):
-                _run(f'language "1.0"; host.read("{outside}/secret.txt");', policy=policy)
+                _run(f'language "1.0"; host.read("{Path(outside).as_posix()}/secret.txt");', policy=policy)
 
 
 class HostCliTests(unittest.TestCase):
@@ -117,8 +124,8 @@ class HostCliTests(unittest.TestCase):
             (root / "in.txt").write_bytes(b"payload")
             script = root / "s.vds"
             script.write_text(
-                f'language "1.0"; let d = host.read("{root}/in.txt");'
-                f'host.write("{root}/out.txt", d);',
+                f'language "1.0"; let d = host.read("{root.as_posix()}/in.txt");'
+                f'host.write("{root.as_posix()}/out.txt", d);',
                 encoding="utf-8",
             )
             args = self._parser().parse_args([
@@ -133,7 +140,7 @@ class HostCliTests(unittest.TestCase):
             root = Path(td)
             (root / "in.txt").write_bytes(b"payload")
             script = root / "s.vds"
-            script.write_text(f'language "1.0"; host.read("{root}/in.txt");', encoding="utf-8")
+            script.write_text(f'language "1.0"; host.read("{root.as_posix()}/in.txt");', encoding="utf-8")
             args = self._parser().parse_args(["vscript", "run", str(script)])
             self.assertEqual(args.func(args), 3)
 
