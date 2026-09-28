@@ -20,7 +20,13 @@ dependencies = []
 # VectorDisk still answers exact queries, in linear time.
 vector = ["hnswlib>=0.8.0"]
 fuse = ["fusepy"]
-dev = ["pytest", "setuptools>=61.0", "hnswlib>=0.8.0"]
+# Test tooling only.  The accelerator deliberately lives in its own extra: this
+# job is what installs the package for every test run, including the
+# no-dependencies job, which installs ".[dev]" and then asserts that no
+# third-party runtime dependency is present.  Keeping pytest and hnswlib apart
+# is what lets that job prove the zero-dependency claim instead of failing on
+# the accelerator it pulled in itself.
+dev = ["pytest", "setuptools>=61.0"]
 
 [project.scripts]
 pyvdisk = "pyvdisk.cli:main"
