@@ -6,7 +6,7 @@
 The "model" here is a scripted list of tool calls, so this runs anywhere. The
 loop is exactly the one you write against a real framework: ask the model, run
 every tool call it asks for, feed the results back, repeat until it stops asking.
-Swap ``scripted_model`` for an [OI]-compatible client and nothing else changes --
+Swap ``scripted_model`` for an OpenAI-compatible client and nothing else changes --
 ``box.tools()`` and ``box.dispatch()`` are the whole integration surface.
 
 Note the last scripted call: the model asks to read ``/etc/passwd`` and gets a
