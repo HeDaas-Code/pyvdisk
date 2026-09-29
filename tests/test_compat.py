@@ -187,6 +187,30 @@ def test_unlock_on_a_closed_handle_is_not_an_error(tmp_path):
     compat.unlock(fd)  # must not raise: close() runs on every teardown path
 
 
+def test_a_real_lock_error_propagates_instead_of_polling(tmp_path, windows_emulation):
+    """Only lock contention is retried; a bad descriptor must raise at once.
+
+    Under the old catch-all _retry this call polled LK_NBLCK for the whole
+    timeout and then reported False -- indistinguishable from "contended" --
+    and with blocking=True it would have spun forever.
+    """
+    fd = _lock_file(tmp_path)
+    os.close(fd)
+    started = time.monotonic()
+    with pytest.raises(OSError):
+        compat.lock(fd, timeout=0.2)
+    assert time.monotonic() - started < 0.2, "a real error must not be retried"
+
+
+def test_native_flock_real_error_is_not_reported_as_contention(tmp_path):
+    if os.name != "posix":
+        pytest.skip("the native path is exercised directly only on POSIX")
+    fd = _lock_file(tmp_path)
+    os.close(fd)
+    with pytest.raises(OSError):
+        compat.lock(fd, blocking=False)  # was False before: looked like contention
+
+
 def test_fsync_dir_flushes_a_real_directory(tmp_path):
     if os.name != "posix":
         pytest.skip("directory fsync is a POSIX facility")

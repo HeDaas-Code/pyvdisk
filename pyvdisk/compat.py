@@ -32,6 +32,7 @@ reports which implementation is live, which is what the tests and the
 from __future__ import annotations
 
 import contextlib
+import errno
 import os
 import sys
 import threading
@@ -62,6 +63,25 @@ POLL_SECONDS = 0.01
 _HAS_POSITIONAL = hasattr(os, "pread") and hasattr(os, "pwrite")
 
 _POSITIONAL_LOCK = threading.RLock()
+
+#: Errnos that mean "the lock is held by someone else" (or "retry the syscall"):
+#: ``flock(LOCK_NB)`` raises EAGAIN/EWOULDBLOCK (and EACCES on some systems),
+#: ``msvcrt.locking`` raises EACCES (13) or EDEADLOCK (36), and EINTR means the
+#: syscall was interrupted before it could succeed or fail.  Anything else is a
+#: real error -- a bad descriptor, a dead filesystem -- and must surface
+#: immediately instead of burning CPU at POLL_SECONDS forever.
+_RETRYABLE_ERRNOS = frozenset({
+    errno.EAGAIN,
+    getattr(errno, "EWOULDBLOCK", errno.EAGAIN),
+    errno.EACCES,
+    errno.EINTR,
+    getattr(errno, "EDEADLOCK", 0),
+} - {0})
+
+
+def _lock_conflict(exc: OSError) -> bool:
+    """Is this OSError merely "someone else holds the lock" (or EINTR)?"""
+    return exc.errno in _RETRYABLE_ERRNOS
 
 # Test seams: the emulation is exercised on POSIX by forcing it and injecting a
 # stand-in for ``msvcrt``.  Production code never touches these.
@@ -140,20 +160,28 @@ def _retry(attempt, *, blocking: bool, timeout: float | None) -> bool:
     ``LK_LOCK`` gives up after about ten seconds on Windows, so the emulation
     never uses it: it polls ``LK_NBLCK`` instead and keeps the wait semantics
     ``flock`` has (wait forever by default, or for ``timeout`` seconds).
+
+    Only lock-contention errnos are retried.  Any other OSError (a bad
+    descriptor, an I/O error) propagates immediately: polling it forever at
+    100 Hz would hide the bug and burn a core doing it.
     """
     if blocking and timeout is None:
         while True:
             try:
                 attempt()
                 return True
-            except OSError:
+            except OSError as exc:
+                if not _lock_conflict(exc):
+                    raise
                 time.sleep(POLL_SECONDS)
     deadline = None if timeout is None else time.monotonic() + timeout
     while True:
         try:
             attempt()
             return True
-        except OSError:
+        except OSError as exc:
+            if not _lock_conflict(exc):
+                raise
             if not blocking:
                 return False
             if deadline is not None and time.monotonic() >= deadline:
