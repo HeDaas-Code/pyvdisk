@@ -21,9 +21,9 @@ PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行
 
 ## 架构图谱
 
-**▶ [打开可交互架构图谱](https://htmlpreview.github.io/?https://github.com/HeDaas-Code/pyvdisk/blob/master/normify-pyvdisk/normify.html)** — 点击模块逐层下钻、悬停查看中英双语介绍、`?lang=en` 切换英文、`#module=<id>` 深链直达具体模块。
+**▶ [打开可交互架构图谱](https://htmlpreview.github.io/?https://github.com/HeDaas-Code/pyvdisk/blob/normify/normify-pyvdisk/normify.html)** — 点击模块逐层下钻、悬停查看中英双语介绍、`?lang=en` 切换英文、`#module=<id>` 深链直达具体模块。
 
-> GitHub 会过滤 README 中的 `<script>` / `<iframe>`，自包含的交互页无法内联渲染，因此上传的是**一键运行**链接：由 htmlpreview 直接执行仓库内 `normify-pyvdisk/normify.html`（单文件、无外部依赖、无网络请求）。下面的 Mermaid 图则在 GitHub 上原生渲染。
+> GitHub 会过滤 README 中的 `<script>` / `<iframe>`，自包含的交互页无法内联渲染，因此上传的是**一键运行**链接：由 htmlpreview 直接执行 [`normify` 归档分支](https://github.com/HeDaas-Code/pyvdisk/tree/normify)中的 `normify-pyvdisk/normify.html`（单文件、无外部依赖、无网络请求）。下面的 Mermaid 图则在 GitHub 上原生渲染。
 
 ```mermaid
 graph TD
@@ -69,13 +69,15 @@ graph TD
   G --> G_scoped["scoped（ScopedDataDisk）"]
 ```
 
+图谱产物已归档到独立的 [`normify` 分支](https://github.com/HeDaas-Code/pyvdisk/tree/normify)，不占用代码仓库的文件树；下表链接直达该分支：
+
 | 产物 | 说明 |
 |---|---|
-| [`normify-pyvdisk/normify.html`](normify-pyvdisk/normify.html) | 单文件可交互图谱（272 模块 / 794 API / 124 依赖箭头） |
-| [`normify-pyvdisk/outline.md`](normify-pyvdisk/outline.md) | 缩进式模块大纲，适合逐层通读 |
-| [`normify-pyvdisk/api-index.json`](normify-pyvdisk/api-index.json) | 全量 API 索引 |
-| [`normify-pyvdisk/tree.json`](normify-pyvdisk/tree.json) | 编译产物：模块、每层布局、依赖边、内容指纹 |
-| [`normify-pyvdisk/modules/`](normify-pyvdisk/modules) | 272 个模块 Markdown，frontmatter 为机器可读契约（含源码路径与行号证据） |
+| [`normify-pyvdisk/normify.html`](https://github.com/HeDaas-Code/pyvdisk/blob/normify/normify-pyvdisk/normify.html) | 单文件可交互图谱（272 模块 / 794 API / 124 依赖箭头） |
+| [`normify-pyvdisk/outline.md`](https://github.com/HeDaas-Code/pyvdisk/blob/normify/normify-pyvdisk/outline.md) | 缩进式模块大纲，适合逐层通读 |
+| [`normify-pyvdisk/api-index.json`](https://github.com/HeDaas-Code/pyvdisk/blob/normify/normify-pyvdisk/api-index.json) | 全量 API 索引 |
+| [`normify-pyvdisk/tree.json`](https://github.com/HeDaas-Code/pyvdisk/blob/normify/normify-pyvdisk/tree.json) | 编译产物：模块、每层布局、依赖边、内容指纹 |
+| [`normify-pyvdisk/modules/`](https://github.com/HeDaas-Code/pyvdisk/tree/normify/normify-pyvdisk/modules) | 272 个模块 Markdown，frontmatter 为机器可读契约（含源码路径与行号证据） |
 
 图谱由 Normify 从仓库源码生成，每个叶子模块都带**仓库内真实文件路径 + 行号区间**的 `source` 证据与 SHA-256 指纹，冻结于 commit `6d203c0`；`normify_validate` 结果为 0 error。
 
