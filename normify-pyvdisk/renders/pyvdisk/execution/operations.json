@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.execution.operations",
+  "updated_at": "2026-09-23T07:24:44.073Z",
+  "reading": {
+    "zh": "先是错误词表与存储记录，再是可调用对象注册表与给操作稳定 id 的描述逻辑，最后是注册表门面及其背衬访问。",
+    "en": "Error vocabulary and the stored record first, then the callable registry and operation description that give an operation a stable id, then the registry facade and its backend access."
+  },
+  "order": [
+    "pyvdisk.execution.operations.errors",
+    "pyvdisk.execution.operations.record",
+    "pyvdisk.execution.operations.callables",
+    "pyvdisk.execution.operations.describe",
+    "pyvdisk.execution.operations.registry",
+    "pyvdisk.execution.operations.storage"
+  ]
+}

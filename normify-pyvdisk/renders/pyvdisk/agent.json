@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.agent",
+  "updated_at": "2026-09-24T11:33:31.064Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "从左到右：路径能指向什么，有哪些工具，把两者合起来的门面，最后是调用在哪里执行、留下什么记录。",
+    "en": "Left to right: what a path may name, what tools exist, the facade that ties them together, then where a call runs and what it leaves behind."
+  },
+  "order": [
+    "pyvdisk.agent.paths",
+    "pyvdisk.agent.tools",
+    "pyvdisk.agent.sandbox",
+    "pyvdisk.agent.script",
+    "pyvdisk.agent.audit"
+  ],
+  "groups": [
+    {
+      "id": "surface",
+      "title": {
+        "zh": "模型看到的面",
+        "en": "What the model sees"
+      },
+      "children": [
+        "pyvdisk.agent.paths",
+        "pyvdisk.agent.tools",
+        "pyvdisk.agent.sandbox"
+      ]
+    },
+    {
+      "id": "execution",
+      "title": {
+        "zh": "执行与留痕",
+        "en": "Execution and evidence"
+      },
+      "children": [
+        "pyvdisk.agent.script",
+        "pyvdisk.agent.audit"
+      ]
+    }
+  ]
+}

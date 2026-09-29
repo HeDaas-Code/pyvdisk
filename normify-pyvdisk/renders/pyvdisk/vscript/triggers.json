@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.vscript.triggers",
+  "updated_at": "2026-09-23T07:25:11.546Z",
+  "reading": {
+    "zh": "registry 声明并持久化应当触发什么；daemon 轮询文件与日志事件、经检查点去重并调用处理函数。",
+    "en": "registry declares and persists what should fire; daemon polls file and log events, dedups them through checkpoints and invokes handlers."
+  },
+  "order": [
+    "pyvdisk.vscript.triggers.registry",
+    "pyvdisk.vscript.triggers.daemon"
+  ]
+}

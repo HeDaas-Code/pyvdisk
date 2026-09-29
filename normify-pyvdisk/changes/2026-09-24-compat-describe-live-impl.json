@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "2026-09-24-compat-describe-live-impl",
+  "title": {
+    "en": "describe() reports the live implementation",
+    "zh": "describe() 报告生效的实现"
+  },
+  "status": "verified",
+  "intent": {
+    "en": "describe() reported the host platform's primitives even while the Windows emulation was forced, confirming exactly the opposite of the change's core promise. Fix it and pin it with a test.",
+    "zh": "describe() 在 Windows 模拟生效时仍报告宿主平台的原语，给出的结论恰好与本次改动的核心承诺相反。修正并用测试固定。"
+  },
+  "modules": {
+    "create": [],
+    "modify": [
+      "pyvdisk.platform.dispatch",
+      "pyvdisk.platform",
+      "pyvdisk.tests.compat",
+      "pyvdisk.docs.readme",
+      "pyvdisk.docs",
+      "pyvdisk.tests"
+    ]
+  },
+  "acceptance": [
+    "describe() 在 windows 模拟生效时报告模拟原语（locking/positional_io/directory_fsync/uid_gid）",
+    "tests/test_compat.py 有一条在模拟下断言全部字段的用例",
+    "受影响模块（platform.dispatch / platform / tests.compat / docs.readme / docs / tests）指纹与介绍与代码一致",
+    "normify_validate 0 error"
+  ],
+  "note": "describe() 改为描述生效实现；platform 四个模块、tests.compat、docs/tests 容器已同步指纹。",
+  "revision": {
+    "before": null,
+    "after": "3cb47877135592bd8565726610c54ebd1ecd9fba"
+  },
+  "created_at": "2026-09-24T11:50:54.562Z",
+  "updated_at": "2026-09-24T11:51:43.517Z",
+  "closed_at": "2026-09-24T11:51:43.517Z"
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.governance",
+  "updated_at": "2026-09-23T07:24:45.377Z",
+  "reading": {
+    "zh": "先是能力门禁（路径归一、范围包含与受保护委托），再是它保护的文件系统与向量/日志适配器，最后是交给不可信代码的 ScopedDataDisk 对象。",
+    "en": "The capability gate comes first (path scoping, containment and guarded delegation), then the filesystem and vector/log adapters it protects, and finally the ScopedDataDisk object handed to untrusted code."
+  },
+  "order": [
+    "pyvdisk.governance.namespace",
+    "pyvdisk.governance.files",
+    "pyvdisk.governance.data",
+    "pyvdisk.governance.scoped"
+  ]
+}

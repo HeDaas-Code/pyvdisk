@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.execution.queue",
+  "updated_at": "2026-09-23T07:24:44.383Z",
+  "reading": {
+    "zh": "先是错误体系与任务值对象，再是状态持久化与重试退避，随后是完整任务生命周期，最后是过期租约回收与列举。",
+    "en": "Error taxonomy and the task value object, then state persistence with retry backoff, then the full task lifecycle, and finally stale-lease recovery and listing."
+  },
+  "order": [
+    "pyvdisk.execution.queue.errors",
+    "pyvdisk.execution.queue.task",
+    "pyvdisk.execution.queue.store",
+    "pyvdisk.execution.queue.lifecycle",
+    "pyvdisk.execution.queue.recovery"
+  ]
+}

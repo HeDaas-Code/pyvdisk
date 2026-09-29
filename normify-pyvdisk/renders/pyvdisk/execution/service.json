@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.execution.service",
+  "updated_at": "2026-09-23T07:24:45.085Z",
+  "reading": {
+    "zh": "先是构造与 worker 控制，再是单个操作如何被分发（受限视图加 Python 或 VScript 执行），随后是队列驱动的运行，最后是 submit/run/cancel 接口。",
+    "en": "Construction and worker control, then how one operation is dispatched (scoped view plus Python or VScript execution), then queue-driven runs, and finally the submit/run/cancel surface."
+  },
+  "order": [
+    "pyvdisk.execution.service.setup",
+    "pyvdisk.execution.service.invoke",
+    "pyvdisk.execution.service.queue",
+    "pyvdisk.execution.service.submit"
+  ]
+}

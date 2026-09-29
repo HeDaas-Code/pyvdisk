@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.checkpoint",
+  "updated_at": "2026-09-23T07:23:38.263Z",
+  "reading": {
+    "zh": "open 决定背衬（VFS 或宿主目录）与锁；io 是读写保存；triggers 是给调度器的事件去重层。",
+    "en": "open chooses the backend (VFS or host directory) and the lock; io reads, writes and saves; triggers is the event-dedup layer used by the scheduler."
+  },
+  "order": [
+    "pyvdisk.storage.checkpoint.open",
+    "pyvdisk.storage.checkpoint.io",
+    "pyvdisk.storage.checkpoint.triggers"
+  ]
+}

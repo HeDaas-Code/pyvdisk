@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.fuse",
+  "updated_at": "2026-09-23T07:23:39.976Z",
+  "reading": {
+    "zh": "meta 与 data 分别实现元数据与数据回调，handlers 覆盖其余 FUSE 操作，mount 负责挂载与参数。",
+    "en": "meta and data implement the metadata and data callbacks, handlers covers the remaining FUSE operations, and mount performs the mount and argument handling."
+  },
+  "order": [
+    "pyvdisk.storage.fuse.meta",
+    "pyvdisk.storage.fuse.data",
+    "pyvdisk.storage.fuse.handlers",
+    "pyvdisk.storage.fuse.mount"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.vscript.stdlib",
+  "updated_at": "2026-09-23T07:25:10.640Z",
+  "reading": {
+    "zh": "先是原生模块与 Handle 基础设施，再是每个原生函数都会调用的两个守卫，最后是组装 fs、vector、log 与 json 模块的工厂。",
+    "en": "Native module and Handle plumbing first, then the two guard helpers every native calls, and finally the factory that assembles the fs, vector, log and json modules."
+  },
+  "order": [
+    "pyvdisk.vscript.stdlib.native",
+    "pyvdisk.vscript.stdlib.guards",
+    "pyvdisk.vscript.stdlib.factory"
+  ]
+}

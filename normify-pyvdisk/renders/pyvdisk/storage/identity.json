@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.identity",
+  "updated_at": "2026-09-23T07:23:40.359Z",
+  "reading": {
+    "zh": "format 定义尾标的磁盘格式，model 是其内存模型，trailer 负责编码解码，probe 从任意宿主文件识别出 pyvdisk 镜像。",
+    "en": "format defines the on-disk trailer format, model is its in-memory shape, trailer encodes and decodes it, and probe recognises a pyvdisk image from an arbitrary host file."
+  },
+  "order": [
+    "pyvdisk.storage.identity.format",
+    "pyvdisk.storage.identity.model",
+    "pyvdisk.storage.identity.trailer",
+    "pyvdisk.storage.identity.probe"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.execution.runstate",
+  "updated_at": "2026-09-23T07:24:44.749Z",
+  "reading": {
+    "zh": "model 是运行记录及其冲突类型，store 在其上提供带版本的迁移、幂等创建与过期运行回收。",
+    "en": "model is the run record and its conflict type, store adds versioned transitions, idempotent creation and stale-run recovery."
+  },
+  "order": [
+    "pyvdisk.execution.runstate.model",
+    "pyvdisk.execution.runstate.store"
+  ]
+}

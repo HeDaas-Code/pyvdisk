@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.docs",
+  "updated_at": "2026-09-24T09:56:14.155Z",
+  "reading": {
+    "zh": "先读 README 建立整体印象，再看架构总览、契约参考、能力治理设计说明与 VScript 语言规范；变更日志记录每个版本改了什么。",
+    "en": "Start with the README for orientation, then the architecture overview, the contract reference, the capability-governance design note and the VScript language specification; the changelog records what changed release by release."
+  },
+  "order": [
+    "pyvdisk.docs.readme",
+    "pyvdisk.docs.architecture",
+    "pyvdisk.docs.contracts",
+    "pyvdisk.docs.api-governance",
+    "pyvdisk.docs.vscript-spec",
+    "pyvdisk.docs.changelog"
+  ]
+}

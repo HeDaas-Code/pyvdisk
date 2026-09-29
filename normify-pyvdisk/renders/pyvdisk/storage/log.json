@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.storage.log",
+  "updated_at": "2026-09-23T07:24:01.803Z",
+  "reading": {
+    "zh": "先打开日志盘并管理流，再追加事件，随后经 query 与其过滤辅助读回，最后执行保留策略。",
+    "en": "Opens the log disk, manages streams, appends events, then reads them back through query and its filter helper, and finally applies retention."
+  },
+  "order": [
+    "pyvdisk.storage.log.open",
+    "pyvdisk.storage.log.streams",
+    "pyvdisk.storage.log.append",
+    "pyvdisk.storage.log.query",
+    "pyvdisk.storage.log.filter",
+    "pyvdisk.storage.log.retention"
+  ]
+}

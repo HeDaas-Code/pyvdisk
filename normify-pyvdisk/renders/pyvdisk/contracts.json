@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "pyvdisk.contracts",
+  "updated_at": "2026-09-23T07:24:03.694Z",
+  "mode": "groups",
+  "reading": {
+    "zh": "先是能力、存储与持久性原语，再是事件、执行与运行句柄协议，以及把它们串起来的 ExecutionPlane。",
+    "en": "The capability, storage and durability primitives, then the event, execution and run-handle protocols and the ExecutionPlane that ties them together."
+  },
+  "order": [
+    "pyvdisk.contracts.capability",
+    "pyvdisk.contracts.storage",
+    "pyvdisk.contracts.durability",
+    "pyvdisk.contracts.events",
+    "pyvdisk.contracts.execution",
+    "pyvdisk.contracts.runhandle",
+    "pyvdisk.contracts.plane"
+  ],
+  "groups": [
+    {
+      "id": "primitives",
+      "title": {
+        "zh": "基础契约",
+        "en": "Primitive Contracts"
+      },
+      "children": [
+        "pyvdisk.contracts.capability",
+        "pyvdisk.contracts.storage",
+        "pyvdisk.contracts.durability"
+      ]
+    },
+    {
+      "id": "plane",
+      "title": {
+        "zh": "事件与执行契约",
+        "en": "Event and Execution Contracts"
+      },
+      "children": [
+        "pyvdisk.contracts.events",
+        "pyvdisk.contracts.execution",
+        "pyvdisk.contracts.runhandle",
+        "pyvdisk.contracts.plane"
+      ]
+    }
+  ]
+}
