@@ -235,8 +235,11 @@ def test_host_roots_are_opt_in(tmp_path):
     allowed.mkdir()
     (allowed / "input.txt").write_text("from the host", encoding="utf-8")
     with AgentSandbox.create(str(tmp_path / "host.vdisk"), host_read_roots=[str(allowed)]) as box:
+        # as_posix(): backslashes cannot appear in a plain VScript string
+        # (the lexer refuses \U etc.), the same rule PR #5 taught the host
+        # tests; the policy layer accepts the mixed separators on Windows.
         result = box.call("run_script", {
-            "source": f'import std.host as host; print(host.read("{allowed}/input.txt"));',
+            "source": f'import std.host as host; print(host.read("{allowed.as_posix()}/input.txt"));',
         })
         assert result.ok and "from the host" in result.content
 
