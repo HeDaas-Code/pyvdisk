@@ -73,8 +73,11 @@ from .contracts import (
     NamespaceStore, CollectionStore, Event, EventStore, ExecutionContext,
     RunHandle, ExecutionPlane,
 )
+from . import compat
+from .vector_index import FlatIndex, FlatIndexError
+from .sandbox import AgentSandbox, SandboxError, ToolResult
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
     "VirtualDisk",
@@ -148,6 +151,12 @@ __all__ = [
     "ExecutionPlane",
     "ExecutionService",
     "ExecutionPlaneAdapter",
+    "compat",
+    "FlatIndex",
+    "FlatIndexError",
+    "AgentSandbox",
+    "SandboxError",
+    "ToolResult",
     "VFS",
     "VFile",
     "__version__",

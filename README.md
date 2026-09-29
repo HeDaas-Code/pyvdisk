@@ -6,7 +6,8 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-PyVDisk-181717?logo=github)](https://github.com/HeDaas-Code/pyvdisk)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-391%20passed-2ea44f)](#验证)
+[![Tests](https://img.shields.io/badge/Tests-447%20passed-2ea44f)](#验证)
+[![No%20dependencies](https://img.shields.io/badge/dependencies-none-2ea44f)](#验证)
 
 PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行基础设施项目：DataDisk 负责统一数据与执行基础设施，VScript 负责安全工作流语言、CLI、REPL 与运行时。
 
@@ -16,13 +17,13 @@ PyVDisk 是一个包含 VScript 脚本运行时的单机 Agentic 数据与执行
 
 ## 架构总览
 
-<div align="center"><table><tr><th colspan="3">Agent / 应用</th></tr><tr><td colspan="3">VScript · Python API · CLI · REPL · HostProxy</td></tr><tr><th>Execution</th><th>Capability</th><th>Storage</th></tr><tr><td>ExecutionService<br>DurableQueue<br>worker · lease · retry · DLQ<br>RunState · Audit</td><td>ScopedDataDisk<br>FS / Vector / Log / Checkpoint<br>逐操作权限</td><td>DataDisk<br>单一 .vdisk<br>WAL · transaction · recovery</td></tr><tr><th>FS</th><th>Vector</th><th>Log</th></tr><tr><td>workspace</td><td>HNSW memory<br>generation · checksum</td><td>trace<br>sequence · replay · ack</td></tr><tr><th colspan="3">VirtualDisk · Volume · lock · fsync · mirror degraded fallback</th></tr></table></div>
+<div align="center"><table><tr><th colspan="3">Agent / 应用</th></tr><tr><td colspan="3">VScript · Python API · CLI · REPL · HostProxy</td></tr><tr><th>Execution</th><th>Capability</th><th>Storage</th></tr><tr><td>ExecutionService<br>DurableQueue<br>worker · lease · retry · DLQ<br>RunState · Audit</td><td>ScopedDataDisk<br>FS / Vector / Log / Checkpoint<br>逐操作权限</td><td>DataDisk<br>单一 .vdisk<br>WAL · transaction · recovery</td></tr><tr><th>FS</th><th>Vector</th><th>Log</th></tr><tr><td>workspace</td><td>HNSW / flat memory<br>generation · checksum</td><td>trace<br>sequence · replay · ack</td></tr><tr><th colspan="3">VirtualDisk · Volume · lock · fsync · mirror degraded fallback</th></tr></table></div>
 
 ## 架构图谱
 
-**▶ [打开可交互架构图谱](https://htmlpreview.github.io/?https://github.com/HeDaas-Code/pyvdisk/blob/master/normify-pyvdisk/normify.html)** — 点击模块逐层下钻、悬停查看中英双语介绍、`?lang=en` 切换英文、`#module=<id>` 深链直达具体模块。
+**▶ [打开可交互架构图谱](https://htmlpreview.github.io/?https://github.com/HeDaas-Code/pyvdisk/blob/normify/normify-pyvdisk/normify.html)** — 点击模块逐层下钻、悬停查看中英双语介绍、`?lang=en` 切换英文、`#module=<id>` 深链直达具体模块。
 
-> GitHub 会过滤 README 中的 `<script>` / `<iframe>`，自包含的交互页无法内联渲染，因此上传的是**一键运行**链接：由 htmlpreview 直接执行仓库内 `normify-pyvdisk/normify.html`（单文件、无外部依赖、无网络请求）。下面的 Mermaid 图则在 GitHub 上原生渲染。
+> GitHub 会过滤 README 中的 `<script>` / `<iframe>`，自包含的交互页无法内联渲染，因此上传的是**一键运行**链接：由 htmlpreview 直接执行 [`normify` 归档分支](https://github.com/HeDaas-Code/pyvdisk/tree/normify)中的 `normify-pyvdisk/normify.html`（单文件、无外部依赖、无网络请求）。下面的 Mermaid 图则在 GitHub 上原生渲染。
 
 ```mermaid
 graph TD
@@ -68,13 +69,15 @@ graph TD
   G --> G_scoped["scoped（ScopedDataDisk）"]
 ```
 
+图谱产物已归档到独立的 [`normify` 分支](https://github.com/HeDaas-Code/pyvdisk/tree/normify)，不占用代码仓库的文件树；下表链接直达该分支：
+
 | 产物 | 说明 |
 |---|---|
-| [`normify-pyvdisk/normify.html`](normify-pyvdisk/normify.html) | 单文件可交互图谱（272 模块 / 794 API / 124 依赖箭头） |
-| [`normify-pyvdisk/outline.md`](normify-pyvdisk/outline.md) | 缩进式模块大纲，适合逐层通读 |
-| [`normify-pyvdisk/api-index.json`](normify-pyvdisk/api-index.json) | 全量 API 索引 |
-| [`normify-pyvdisk/tree.json`](normify-pyvdisk/tree.json) | 编译产物：模块、每层布局、依赖边、内容指纹 |
-| [`normify-pyvdisk/modules/`](normify-pyvdisk/modules) | 272 个模块 Markdown，frontmatter 为机器可读契约（含源码路径与行号证据） |
+| [`normify-pyvdisk/normify.html`](https://github.com/HeDaas-Code/pyvdisk/blob/normify/normify-pyvdisk/normify.html) | 单文件可交互图谱（272 模块 / 794 API / 124 依赖箭头） |
+| [`normify-pyvdisk/outline.md`](https://github.com/HeDaas-Code/pyvdisk/blob/normify/normify-pyvdisk/outline.md) | 缩进式模块大纲，适合逐层通读 |
+| [`normify-pyvdisk/api-index.json`](https://github.com/HeDaas-Code/pyvdisk/blob/normify/normify-pyvdisk/api-index.json) | 全量 API 索引 |
+| [`normify-pyvdisk/tree.json`](https://github.com/HeDaas-Code/pyvdisk/blob/normify/normify-pyvdisk/tree.json) | 编译产物：模块、每层布局、依赖边、内容指纹 |
+| [`normify-pyvdisk/modules/`](https://github.com/HeDaas-Code/pyvdisk/tree/normify/normify-pyvdisk/modules) | 272 个模块 Markdown，frontmatter 为机器可读契约（含源码路径与行号证据） |
 
 图谱由 Normify 从仓库源码生成，每个叶子模块都带**仓库内真实文件路径 + 行号区间**的 `source` 证据与 SHA-256 指纹，冻结于 commit `6d203c0`；`normify_validate` 结果为 0 error。
 
@@ -84,9 +87,17 @@ graph TD
 
 ## 快速开始
 
+**零依赖**：核心只用标准库，`pip install pyvdisk` 不需要编译任何东西（hnswlib / fusepy 都是可选加速项）。一条命令跑通全栈：
+
+```bash
+python examples/quickstart.py          # 单文件、无外部依赖，Windows / Linux 通用
+```
+
 ```bash
 python -m pip install -e .
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev]"      # 开发依赖
+python -m pip install -e ".[vector]"   # 可选：hnswlib 近似最近邻（不装则用内置 flat 索引）
+python -m pip install -e ".[fuse]"     # 可选：FUSE 挂载
 ```
 
 ```python
@@ -98,6 +109,35 @@ with DataDisk.create("agent.vdisk", 32 * 1024 * 1024) as disk:
     disk.log.create_stream("events")
     disk.log.append("events", level="INFO", logger="demo", message="started")
 ```
+
+### 对接 Agent 框架（10 行）
+
+`AgentSandbox` 把 DataDisk 包成一个"给模型用的工作区"：路径被限制在镜像内，工具调用全部落进哈希链审计流。
+
+```python
+import json
+from pyvdisk import AgentSandbox
+
+box = AgentSandbox.create("agent.vdisk")           # 或 AgentSandbox.open(...) 续用已有镜像
+client = OpenAI().chat.completions                 # 换成任意框架的客户端
+messages = [{"role": "user", "content": "把发现写进 /report.md"}]
+
+while True:
+    reply = client.create(model="gpt-4o", messages=messages, tools=box.tools())
+    message = reply.choices[0].message
+    messages.append(message)                       # 不追加则模型看不到自己请求过什么
+    if not message.tool_calls:
+        break                                      # 模型不再调用工具，结束
+    for call in message.tool_calls:                # 一次可能请求多个工具
+        result = box.dispatch(call.function.name, json.loads(call.function.arguments))
+        messages.append({"role": "tool", "tool_call_id": call.id, "content": result})
+```
+
+`box.tools()` 支持 `openai` / `anthropic` / `mcp` 三种 schema；`box.dispatch()` 永远返回字符串（失败也是字符串），可以直接塞回消息列表，**被拒绝的调用也一样**——模型看到的是"越权被拒"这条结果，而不是整个 agent loop 崩掉。
+
+三个容易踩的点：`json.loads` 的是 `call.function.arguments`（不是 `call.arguments`）；`tool_calls` 是列表，要逐个 `dispatch` 并用各自的 `call.id` 一一对应地回填 `tool_call_id`；每轮都要把 assistant 消息本身也追加进 `messages`。
+
+可运行版本见 [examples/agent_tools.py](examples/agent_tools.py)（内置脚本化"模型"，无需 API key 与网络，因此也能进 CI）。
 
 ## VScript
 
@@ -112,6 +152,7 @@ pyvdisk vscript run-disk tools.vdisk:/.vscript/scripts/job.vds
 
 ## 核心能力
 
+- 零外部依赖：核心仅用标准库，`dependencies = []`；Windows / Linux 同一套代码（`pyvdisk/compat.py` 收敛定位读写、文件锁、目录 fsync、uid/gid 等平台差异）。hnswlib（近似最近邻）与 fusepy（FUSE 挂载）是可选加速项，不装也能跑全栈：`VectorDisk` 自动回退到内置 flat 索引，索引文件带写入方标识，两种后端互相可读。
 - Storage Plane：FS、Vector、Log、Checkpoint、Metadata、WAL、VirtualDisk、Volume。
 - Execution Plane：ExecutionService、DurableQueue、worker、lease、heartbeat、retry、idempotency、dead-letter、RunState、Audit。
 - WAL 检查点：日志结算后整段截断（`wal.ckpt.json` 记录明细），重挂载只重放检查点之后的尾巴；DataDisk 与 VScript 共用同一份 WAL 实现，`vscript run --wal` 是它的真实恢复入口。
@@ -149,5 +190,13 @@ pyvdisk info image.vdisk
 .venv/bin/python -m pytest -q
 ```
 
-当前回归：391 passed（本地 3.12；CI 覆盖 3.9 / 3.10 / 3.11 / 3.12 四个版本的同一套用例）
-其中 3.11 本地缺 hnswlib 时有 5 例跳过（该版本无法编译 hnswlib），CI 环境正常。
+CI 在 `3.9 / 3.10 / 3.11 / 3.12` 四个版本上跑同一套用例，并额外跑一个不装任何第三方包的
+`no-dependencies` job。两个口径的实测结果（均为 CI 输出，非本地推算）：
+
+| 环境 | 结果 |
+|---|---|
+| `.[dev,vector]`（装了 hnswlib） | **447 passed** |
+| `.[dev]`（不装 hnswlib） | **443 passed, 4 skipped** |
+
+跳过的是"两种索引后端结果一致"这类对照用例 —— 它们需要 hnswlib 与内置 flat 索引同时在场，
+没装加速器时无法对照。核心路径在两种环境下都完整执行。

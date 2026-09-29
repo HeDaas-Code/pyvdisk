@@ -4,22 +4,29 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyvdisk"
-version = "0.3.0"
+version = "0.4.0"
 description = "纯 Python 虚拟磁盘、文件系统、向量数据盘与时序日志盘"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [{ name = "PyVDisk contributors" }]
 keywords = ["virtual-disk", "filesystem", "fuse", "vm", "disk-image", "vector-database", "structured-logging", "time-series"]
-# hnswlib 在 Windows 上没有预编译 wheel（PyPI 只有 sdist，要现编 C++），而代码里
-# 向量盘是延迟导入的（vector_disk._hnswlib()），FS/Log/Checkpoint 都不需要它。
-# 因此它属于可选能力而不是核心依赖：不装也能用文件盘，装了才有向量盘。
+# No runtime dependencies: the core is stdlib-only, and the vector disk falls back
+# to a built-in flat index when hnswlib is absent. Extras below add the accelerators.
 dependencies = []
 
 [project.optional-dependencies]
+# Approximate nearest-neighbour search for large vector collections. Without it
+# VectorDisk still answers exact queries, in linear time.
 vector = ["hnswlib>=0.8.0"]
 fuse = ["fusepy"]
-dev = ["pytest", "setuptools>=61.0", "hnswlib>=0.8.0"]
+# Test tooling only.  The accelerator deliberately lives in its own extra: this
+# job is what installs the package for every test run, including the
+# no-dependencies job, which installs ".[dev]" and then asserts that no
+# third-party runtime dependency is present.  Keeping pytest and hnswlib apart
+# is what lets that job prove the zero-dependency claim instead of failing on
+# the accelerator it pulled in itself.
+dev = ["pytest", "setuptools>=61.0"]
 
 [project.scripts]
 pyvdisk = "pyvdisk.cli:main"
