@@ -29,9 +29,18 @@ jobs:
 
   no-dependencies:
     # The zero-dependency claim is a promise to users, so it gets its own job: install
-    # the package alone and prove the core still imports and passes.
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # the package alone and prove the core still imports and passes.  The matrix is
+    # where Windows gets covered (#7): every platform primitive the package touches
+    # lives in pyvdisk/compat.py, and the emulation tests force those paths on Linux,
+    # but only a real Windows runner exercises msvcrt.locking, the directory-fsync
+    # no-op and drive-letter paths against the actual OS.  PR #5 proved the port
+    # works; this job keeps proving it on every push.
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -47,3 +56,5 @@ jobs:
           python -c "import pyvdisk; print('pyvdisk', pyvdisk.__version__, 'imported with the standard library only')"
       - name: Tests (accelerator-dependent cases skip)
         run: python -m pytest -q --no-header -p no:cacheprovider
+      - name: Quickstart smoke (stdlib only, end to end)
+        run: python examples/quickstart.py

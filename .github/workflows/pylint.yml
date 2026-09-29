@@ -26,3 +26,24 @@ jobs:
       # declared 3.9 floor still parses is proven by the CI test matrix, not here.
       - name: Lint (errors only)
         run: python -m pylint -E --score=n pyvdisk tests
+
+  errors-windows:
+    # Same errors-only gate on Windows (#7).  pylint -E resolves imports against
+    # the running interpreter, so an unguarded `import fcntl` -- the exact bug
+    # that made PR #5 necessary -- becomes an import-error here instead of a
+    # runtime surprise on a user's machine.  The msvcrt half of compat.py is
+    # likewise only *real* on Windows, so attribute checks see it bound.
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[dev]
+          python -m pip install "pylint==4.0.9"
+      - name: Lint (errors only)
+        run: python -m pylint -E --score=n pyvdisk tests
