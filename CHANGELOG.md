@@ -3,7 +3,7 @@
 记录用户可见的变更。版本号与 `pyproject.toml` 的 `version` 一致；更早的历史见 git 提交。
 本文件从 issue #1（核心缺口复盘）的修复开始维护，条目按该清单的编号标注。
 
-## [Unreleased]
+## [0.4.0] - 2026-09-30
 
 ### 新增 — 零依赖与跨平台（issue #2）
 - **Windows 兼容层**：新增 `pyvdisk/compat.py`，把全部平台原语收敛到一处 —— 定位读写（`os.pread/pwrite` ↔ `lseek`+`read/write` + 互斥）、文件锁（`fcntl.flock` ↔ `msvcrt.locking`）、目录 `fsync`、`uid/gid`、符号链接探测。此前 `pyvdisk/infrastructure/checkpoint.py` 顶层 `import fcntl`，在 Windows 上连导入都会失败。现在除 `compat.py` 外，包内不再直接触碰这些原语，`tests/test_compat.py` 用一条守卫测试固定该约束。

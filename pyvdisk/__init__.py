@@ -77,7 +77,7 @@ from . import compat
 from .vector_index import FlatIndex, FlatIndexError
 from .sandbox import AgentSandbox, SandboxError, ToolResult
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
     "VirtualDisk",
