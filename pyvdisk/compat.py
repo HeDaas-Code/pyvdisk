@@ -154,7 +154,9 @@ def pread(fd: int, length: int, offset: int) -> bytes:
     Returns fewer bytes only at end of file, like ``os.pread``.
     """
     if _HAS_POSITIONAL and implementation() == "posix":
-        return os.pread(fd, length, offset)
+        # The guard above is invisible to pylint on Windows, where os has no
+        # pread/pwrite to infer from -- hence the scoped disable.
+        return os.pread(fd, length, offset)  # pylint: disable=no-member
     with _pio_lock(fd):
         os.lseek(fd, offset, os.SEEK_SET)
         return os.read(fd, length)
@@ -166,7 +168,7 @@ def pwrite(fd: int, data: bytes, offset: int) -> int:
     Returns the number of bytes written, like ``os.pwrite``.
     """
     if _HAS_POSITIONAL and implementation() == "posix":
-        return os.pwrite(fd, data, offset)
+        return os.pwrite(fd, data, offset)  # pylint: disable=no-member
     with _pio_lock(fd):
         os.lseek(fd, offset, os.SEEK_SET)
         return os.write(fd, data)

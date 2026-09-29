@@ -99,8 +99,9 @@ def test_uid_and_gid_are_integers():
     assert isinstance(compat.uid(), int)
     assert isinstance(compat.gid(), int)
     if os.name == "posix":
-        assert compat.uid() == os.getuid()
-        assert compat.gid() == os.getgid()
+        # pylint on Windows cannot see this guard -- os has no getuid there.
+        assert compat.uid() == os.getuid()  # pylint: disable=no-member
+        assert compat.gid() == os.getgid()  # pylint: disable=no-member
     else:
         assert (compat.uid(), compat.gid()) == (0, 0)
 
