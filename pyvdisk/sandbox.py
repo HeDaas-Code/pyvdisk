@@ -77,15 +77,40 @@ class _SandboxFS:
     rules, and ``fs.listdir(sandbox, "/")`` would hand the model the very paths
     ``list_files`` refuses to show it.  Paths are translated here and the calls
     are forwarded, so the capability-scoped namespace underneath still applies.
+
+    The door carries exactly the verbs defined below (plus the path-less
+    diagnostics the scoped view itself provides, such as ``df`` and ``fsck``).
+    The VScript stdlib advertises the full disk's fs API -- ``fs.symlink``,
+    ``fs.chmod`` and friends -- so an agent script that reaches for one of the
+    verbs the sandbox does not carry must be told so *in words*, not with a
+    bare AttributeError from the missing scoped method (#9).
     """
+
+    #: The verbs this door actually carries, for the refusal message.
+    VERBS = (
+        "append_file", "df", "du", "exists", "fsck", "isdir", "isfile",
+        "listdir", "listdir_with_stat", "mkdir", "makedirs", "open",
+        "read_file", "remove", "rename", "rmtree", "stat", "statfs",
+        "walk", "write_file",
+    )
 
     def __init__(self, target: Any, translate: Any):
         self._target = target
         self._translate = translate
 
     def __getattr__(self, name: str):
-        """Everything without a path (``df``, ``fsck``, ...) is passed straight on."""
-        return getattr(object.__getattribute__(self, "_target"), name)
+        """Path-less diagnostics (``df``, ``fsck``, ``statfs``) pass straight on.
+
+        Anything else the scoped view does not implement is refused with the
+        carried-verb list, so a script (and the model reading the result)
+        learns what the sandbox *does* offer instead of guessing.
+        """
+        try:
+            return getattr(object.__getattribute__(self, "_target"), name)
+        except AttributeError:
+            raise SandboxError(
+                f"fs.{name} 不在沙箱内可用；可用动词: {', '.join(self.VERBS)}"
+            ) from None
 
     @staticmethod
     def _keep(top: str, name: str) -> bool:
@@ -134,8 +159,9 @@ class _SandboxFS:
         target = self._translate(path)
         return False if _hidden(target) else self._target.isdir(target)
 
-    def stat(self, path: str) -> Any:
-        return self._forward("stat", path)
+    def stat(self, path: str, *args: Any, **kwargs: Any) -> Any:
+        # follow= passes through: stdlib fs_chmod/fs_chown stat with follow.
+        return self._forward("stat", path, *args, **kwargs)
 
     def read_file(self, path: str) -> bytes:
         return self._forward("read_file", path)
@@ -161,38 +187,17 @@ class _SandboxFS:
     def rename(self, source: str, destination: str, *args: Any, **kwargs: Any) -> Any:
         return self._target.rename(self._translate(source), self._translate(destination), *args, **kwargs)
 
-    def move(self, source: str, destination: str, *args: Any, **kwargs: Any) -> Any:
-        return self._target.move(self._translate(source), self._translate(destination), *args, **kwargs)
-
-    def copy(self, source: str, destination: str, *args: Any, **kwargs: Any) -> Any:
-        return self._target.copy(self._translate(source), self._translate(destination), *args, **kwargs)
-
-    def link(self, source: str, destination: str, *args: Any, **kwargs: Any) -> Any:
-        return self._target.link(self._translate(source), self._translate(destination), *args, **kwargs)
-
-    def symlink(self, source: str, destination: str, *args: Any, **kwargs: Any) -> Any:
-        return self._target.symlink(self._translate(source), self._translate(destination), *args, **kwargs)
+    # move/copy/link/symlink/readlink/truncate/chmod/chown/utime are deliberately
+    # NOT carried: the scoped view implements none of them, and the Python tool
+    # door does not offer them either.  A script that calls one now gets the
+    # refusal from __getattr__ above, with the carried-verb list, instead of a
+    # bare AttributeError that reads like a bug in the sandbox (#9).
 
     def open(self, path: str, *args: Any, **kwargs: Any) -> Any:
         return self._forward("open", path, *args, **kwargs)
 
     def du(self, path: str = "/") -> Any:
         return self._forward("du", path)
-
-    def readlink(self, path: str) -> Any:
-        return self._forward("readlink", path)
-
-    def truncate(self, path: str, *args: Any, **kwargs: Any) -> Any:
-        return self._forward("truncate", path, *args, **kwargs)
-
-    def chmod(self, path: str, *args: Any, **kwargs: Any) -> Any:
-        return self._forward("chmod", path, *args, **kwargs)
-
-    def chown(self, path: str, *args: Any, **kwargs: Any) -> Any:
-        return self._forward("chown", path, *args, **kwargs)
-
-    def utime(self, path: str, *args: Any, **kwargs: Any) -> Any:
-        return self._forward("utime", path, *args, **kwargs)
 
 
 class SandboxError(Exception):

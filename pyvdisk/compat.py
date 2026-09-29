@@ -16,8 +16,12 @@ uid / gid               ``os.getuid/getgid``        ``0``
 Why a lock on the emulated positional IO: ``os.pread``/``os.pwrite`` are
 atomic, ``lseek`` + ``read`` is not.  Two threads sharing one handle could
 interleave and read the wrong block, so the emulation serialises through a
-module-level lock.  That costs throughput on Windows only, and only while a
-block IO is in flight; it is not a global lock over the whole disk.
+**per-descriptor** lock: one handle queues behind itself, different handles
+-- and therefore different disks -- never wait on each other.  Stale entries
+after a descriptor is closed are harmless: an fd number reused by a new file
+at worst shares a lock with its predecessor and picks up spurious
+contention, never incorrectness.  That costs throughput on Windows only, and
+only while a block IO on the *same* handle is in flight.
 
 The Windows byte-range lock covers ``[0, LOCK_BYTES)`` -- the same "whole file"
 scope ``flock`` gives us, because every handle in this package locks from
@@ -62,7 +66,23 @@ POLL_SECONDS = 0.01
 #: ``pread``/``pwrite``.
 _HAS_POSITIONAL = hasattr(os, "pread") and hasattr(os, "pwrite")
 
-_POSITIONAL_LOCK = threading.RLock()
+#: One lock per descriptor, created on demand (issue #8: the original
+#: module-level lock serialised every open disk behind one RLock).  Entries
+#: are intentionally not pruned: an fd number reused after close shares its
+#: predecessor's lock, which can only add contention, never break correctness,
+#: and pruning would need a close hook this layer does not own.
+_PIO_LOCKS: dict = {}
+_PIO_GUARD = threading.Lock()
+
+
+def _pio_lock(fd: int) -> threading.RLock:
+    """The emulation lock for this descriptor -- same fd, same lock, always."""
+    with _PIO_GUARD:
+        lock = _PIO_LOCKS.get(fd)
+        if lock is None:
+            lock = threading.RLock()
+            _PIO_LOCKS[fd] = lock
+        return lock
 
 #: Errnos that mean "the lock is held by someone else" (or "retry the syscall"):
 #: ``flock(LOCK_NB)`` raises EAGAIN/EWOULDBLOCK (and EACCES on some systems),
@@ -134,8 +154,10 @@ def pread(fd: int, length: int, offset: int) -> bytes:
     Returns fewer bytes only at end of file, like ``os.pread``.
     """
     if _HAS_POSITIONAL and implementation() == "posix":
-        return os.pread(fd, length, offset)
-    with _POSITIONAL_LOCK:
+        # The guard above is invisible to pylint on Windows, where os has no
+        # pread/pwrite to infer from -- hence the scoped disable.
+        return os.pread(fd, length, offset)  # pylint: disable=no-member
+    with _pio_lock(fd):
         os.lseek(fd, offset, os.SEEK_SET)
         return os.read(fd, length)
 
@@ -146,8 +168,8 @@ def pwrite(fd: int, data: bytes, offset: int) -> int:
     Returns the number of bytes written, like ``os.pwrite``.
     """
     if _HAS_POSITIONAL and implementation() == "posix":
-        return os.pwrite(fd, data, offset)
-    with _POSITIONAL_LOCK:
+        return os.pwrite(fd, data, offset)  # pylint: disable=no-member
+    with _pio_lock(fd):
         os.lseek(fd, offset, os.SEEK_SET)
         return os.write(fd, data)
 

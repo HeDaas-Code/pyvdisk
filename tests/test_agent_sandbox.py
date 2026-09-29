@@ -196,6 +196,24 @@ def test_scripts_cannot_touch_container_bookkeeping(box):
         assert not result.ok and "bookkeeping" in result.content, source
 
 
+def test_fs_verbs_outside_the_sandbox_door_refuse_with_guidance(box):
+    """The stdlib advertises the full disk's fs API; the sandbox carries a subset.
+
+    A script reaching for a verb the door does not carry (fs.symlink, fs.chmod,
+    ...) used to die with a bare AttributeError from the missing scoped method.
+    Now it is refused in words, and the words list what IS available (#9).
+    """
+    # symlink refuses immediately; chmod/truncate first stat/read the target,
+    # so each source creates its file before reaching the refusal.
+    for source in ('import std.fs as fs; fs.symlink(sandbox, "/a", "/b");',
+                   'import std.fs as fs; fs.write(sandbox, "/a.txt", "x"); fs.chmod(sandbox, "/a.txt", 420);',
+                   'import std.fs as fs; fs.write(sandbox, "/b.txt", "x"); fs.truncate(sandbox, "/b.txt", 0);'):
+        result = box.call("run_script", {"source": source})
+        assert not result.ok, source
+        assert "不在沙箱内可用" in result.content, source
+        assert "write_file" in result.content and "read_file" in result.content, source
+
+
 def test_the_script_and_python_doors_share_one_workspace(box):
     """A file written by a script is an ordinary file for every other verb."""
     box.dispatch("run_script", {"source": 'import std.fs as fs; fs.write(sandbox, "/shared.txt", "from script");'})
@@ -217,8 +235,11 @@ def test_host_roots_are_opt_in(tmp_path):
     allowed.mkdir()
     (allowed / "input.txt").write_text("from the host", encoding="utf-8")
     with AgentSandbox.create(str(tmp_path / "host.vdisk"), host_read_roots=[str(allowed)]) as box:
+        # as_posix(): backslashes cannot appear in a plain VScript string
+        # (the lexer refuses \U etc.), the same rule PR #5 taught the host
+        # tests; the policy layer accepts the mixed separators on Windows.
         result = box.call("run_script", {
-            "source": f'import std.host as host; print(host.read("{allowed}/input.txt"));',
+            "source": f'import std.host as host; print(host.read("{allowed.as_posix()}/input.txt"));',
         })
         assert result.ok and "from the host" in result.content
 

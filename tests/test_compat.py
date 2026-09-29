@@ -19,6 +19,7 @@ from __future__ import annotations
 import os
 import re
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -98,8 +99,9 @@ def test_uid_and_gid_are_integers():
     assert isinstance(compat.uid(), int)
     assert isinstance(compat.gid(), int)
     if os.name == "posix":
-        assert compat.uid() == os.getuid()
-        assert compat.gid() == os.getgid()
+        # pylint on Windows cannot see this guard -- os has no getuid there.
+        assert compat.uid() == os.getuid()  # pylint: disable=no-member
+        assert compat.gid() == os.getgid()  # pylint: disable=no-member
     else:
         assert (compat.uid(), compat.gid()) == (0, 0)
 
@@ -230,6 +232,48 @@ def test_emulated_positional_io_matches_the_native_one(tmp_path, windows_emulati
         assert compat.pread(fd, 4, 61) == bytes([61, 62, 63])
     finally:
         os.close(fd)
+
+
+def test_positional_io_lock_is_per_descriptor(windows_emulation):
+    """Same fd shares one lock; different fds get different locks (#8).
+
+    The pre-#8 module-level lock returned the same RLock for every handle,
+    which serialised separate disks against each other on Windows.  The
+    assertion only needs descriptors, not files -- a pipe pair provides them.
+    """
+    r, w = os.pipe()
+    try:
+        assert compat._pio_lock(w) is compat._pio_lock(w), "same fd, same lock"
+        assert compat._pio_lock(w) is not compat._pio_lock(r), "different fds must not share a lock"
+    finally:
+        os.close(r)
+        os.close(w)
+
+
+def test_pio_on_one_descriptor_does_not_block_another(tmp_path, windows_emulation):
+    """While handle A is mid-pwrite, handle B must still make progress (#8).
+
+    Regression for the module-level lock: under it, the worker thread would
+    wait for A's lock and never finish.  This holds a lock on one descriptor
+    and proves IO on another descriptor completes regardless.  The descriptors
+    must be seekable files: the emulated pwrite is lseek + write, and pipes
+    would fail with ESPIPE regardless of locking.
+    """
+    a = os.open(str(tmp_path / "a.bin"), os.O_CREAT | os.O_RDWR)
+    b = os.open(str(tmp_path / "b.bin"), os.O_CREAT | os.O_RDWR)
+    done = []
+    worker = threading.Thread(
+        target=lambda: (compat.pwrite(b, b"ok", 0), done.append(True))
+    )
+    with compat._pio_lock(a):  # simulate disk A with a block IO in flight
+        worker.start()
+        worker.join(timeout=5)
+    try:
+        assert done == [1], "IO on descriptor b must not wait for descriptor a's lock"
+        assert compat.pread(b, 2, 0) == b"ok"
+    finally:
+        os.close(a)
+        os.close(b)
 
 
 def test_emulated_locking_contends_and_times_out(tmp_path, windows_emulation):
